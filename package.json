@@ -1,0 +1,31 @@
+{
+  "name": "@unicoderns/orm",
+  "version": "0.0.5",
+  "description": "Unicoderns Object/Relational Mapping",
+  "author": {
+    "name": "Unicoderns SA",
+    "email": "info@unicoderns.com",
+    "url": "https://unicoderns.com/"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepublish": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/unicoderns/ORM/issues",
+    "email": "info@unicoderns.com"
+  },
+  "keywords": [
+    "orm",
+    "sql",
+    "database",
+    "mapping"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^3.0.3"
+  }
+}
