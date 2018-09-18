@@ -28,21 +28,28 @@ let db = new connection_1.DB({
     }
 });
 let testTable = new test.Users(db);
+let testUnsafeTable = new test.Users(db, "unsafe");
 tests();
 /**
  * Tests
  */
 function tests() {
     describe('General', () => {
-        it('Test Model should be a safe model', () => {
-            expect(testTable.unsafe).to.be.false;
+        it('Model has correct table name', () => {
+            expect(testTable.getTableName()).be.eql("users");
+        });
+        it('Safe Model should be a safe model', () => {
+            expect(testTable.isSafe()).to.be.true;
+        });
+        it('Unsafe Model should be a unsafe model', () => {
+            expect(testUnsafeTable.isSafe()).to.be.false;
         });
     });
     describe('Fields', () => {
-        it('Test Model to have fields', () => {
+        it('Model to have fields', () => {
             expect(testTable.getFields()).to.exist;
         });
-        it('Test Model returns correct map', () => {
+        it('Model returns correct map', () => {
             let map = new Map([
                 ['id', 'id'],
                 ['created', 'created'],
@@ -55,6 +62,23 @@ function tests() {
                 ['active', 'active']
             ]);
             expect(testTable.getFields()).to.eql(map);
+        });
+        it('Unsafe Model returns correct map', () => {
+            let map = new Map([
+                ['id', 'id'],
+                ['created', 'created'],
+                ['username', 'username'],
+                ['email', 'email'],
+                ['firstName', 'first_name'],
+                ['lastName', 'last_name'],
+                ['admin', 'admin'],
+                ['verified', 'verified'],
+                ['active', 'active'],
+                ['salt', 'added_salt'],
+                ['password', 'password']
+            ]);
+            console.log(testUnsafeTable.getFields());
+            expect(testUnsafeTable.getFields()).to.eql(map);
         });
     });
 }

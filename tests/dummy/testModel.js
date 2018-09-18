@@ -96,7 +96,7 @@ __decorate([
     __metadata("design:type", Object)
 ], Users.prototype, "password", void 0);
 __decorate([
-    decorators_1.secret(),
+    decorators_1.secret("added_salt"),
     __metadata("design:type", Object)
 ], Users.prototype, "salt", void 0);
 __decorate([

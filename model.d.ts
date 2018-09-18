@@ -5,11 +5,11 @@ import { DB } from "./connection";
  * Model Abstract
  */
 export declare class Model {
-    protected tableName: string;
-    protected DB: DB;
-    unsafe: boolean;
-    fields: Map<string, string> | undefined;
-    joins: Models.Join[];
+    private tableName;
+    private DB;
+    private unsafe;
+    private fields;
+    private joins;
     /**
      * Create a table object.
      *
@@ -17,6 +17,18 @@ export declare class Model {
      * @param privacy To get all fields (secrets included), you need to set privacy as "unsafe" explicitly, in that way we ensure that this will not be a security breach in any wrong future upgrade.
      */
     constructor(DB: DB, privacy?: string);
+    /**
+     * Current table name.
+     *
+     * @return string
+     */
+    getTableName(): string;
+    /**
+     * Current table is safe.
+     *
+     * @return boolean
+     */
+    isSafe(): boolean;
     /**
      * Create cache and return the model field list.
      *

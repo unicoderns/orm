@@ -75,7 +75,7 @@ export class Users extends Model {
         size: 60
     });
 
-    @secret()
+    @secret("added_salt")
     public salt: Fields.DataType = new Datatypes().VARCHAR({
         notNull: true,
         size: 20

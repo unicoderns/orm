@@ -36,11 +36,12 @@ import { DB } from "./connection";
  * Model Abstract
  */
 export class Model {
-    protected tableName: string = ((<any>this).constructor.name).charAt(0).toLowerCase() + ((<any>this).constructor.name).slice(1); // Get the table name from the model name in camelcase.
-    protected DB: DB;
-    public unsafe: boolean = false;
-    public fields: Map<string, string> | undefined = undefined;
-    public joins: Models.Join[] = [];
+    private tableName: string = ((<any>this).constructor.name).charAt(0).toLowerCase() + ((<any>this).constructor.name).slice(1); // Get the table name from the model name in camelcase.
+    private DB: DB;
+    private unsafe: boolean = false;
+    private fields: Map<string, string> | undefined = undefined;
+    private joins: Models.Join[] = [];
+    private plainQuery: boolean = false;
 
     /**
      * Create a table object.
@@ -53,6 +54,31 @@ export class Model {
         if (privacy == "unsafe") {
             this.unsafe = true;
         }
+    }
+
+    /**
+     * Current table name.
+     * 
+     * @return string
+     */
+    public getTableName(): string {
+        return this.tableName;
+    }
+
+    /**
+     * Current table is safe.
+     * 
+     * @return boolean
+     */
+    public isSafe(): boolean {
+        return !this.unsafe;
+    }
+
+    /**
+     * Avoid query execution and return models query instead.
+     */
+    public returnQuery(): void {
+        this.plainQuery = true;
     }
 
     /**
@@ -130,23 +156,6 @@ export class Model {
             console.error(clc.red("No fields in the model"));
         }
     }
-
-    /*
-        /////////////////////////////////////////////////////////////////////
-        // Generate a report and filter fields
-        /////////////////////////////////////////////////////////////////////
-        private selectFieldsReport(select: string[]): Fields {
-            let report: Fields;
-            let fields = this.getFields();
-    
-            report.all = this.filterArrayInArray(select, fields.all);
-            report.public = this.filterArrayInArray(select, fields.public);
-            report.protected = this.filterArrayInArray(select, fields.protected);
-            report.private = this.filterArrayInArray(select, fields.private);
-    
-            return this.getFields();
-        }
-    */
 
     /**
      * Clean and validate a select if is need it
@@ -355,7 +364,7 @@ export class Model {
      * Join at least 2 tables is important
      * Group this using functions like select("").orderBy() is just easier to understand
      */
-    private select(select: Models.SelectLimit): Promise<any> {
+    private select(select: Models.SelectLimit): Models.Query {
         let fieldsSQL = this.getSelectFieldsSQL(select.fields);
         let joinFieldsSQL = this.getJoinSelectFieldsSQL();
         let joinCode = this.generateJoinCode();
@@ -375,7 +384,7 @@ export class Model {
         }
         let sql = "SELECT " + fieldsSQL + joinFieldsSQL + " FROM `" + this.tableName + "`" + joinCode + whereCode.sql + extra + ";";
         this.joins = [];
-        return this.query({ sql: sql, values: whereCode.values });
+        return { sql: sql, values: whereCode.values };
     }
 
     /**
@@ -392,13 +401,14 @@ export class Model {
         // Create promise
         const p: Promise<any> = new Promise(
             (resolve: (data: any) => void, reject: (err: mysql.MysqlError) => void) => {
-                let sqlPromise = this.select({
+                let selectQuery = this.select({
                     fields: select.fields,
                     where: select.where,
                     groupBy: select.groupBy,
                     orderBy: select.orderBy,
                     limit: 1
                 });
+                let sqlPromise = this.query(selectQuery);
                 sqlPromise.then((data) => {
                     resolve(data[0]);
                 }).catch(err => {
@@ -421,7 +431,7 @@ export class Model {
      * @return Promise with query result
      */
     public getSome(select: Models.SelectLimit): Promise<any> {
-        return this.select(select);
+        return this.query(this.select(select));
     }
 
     /**
@@ -435,7 +445,7 @@ export class Model {
      * @return Promise with query result
      */
     public getAll(select: Models.Select): Promise<any> {
-        return this.select(select);
+        return this.query(this.select(select));
     }
 
     /**

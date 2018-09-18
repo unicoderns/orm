@@ -54,6 +54,22 @@ class Model {
         }
     }
     /**
+     * Current table name.
+     *
+     * @return string
+     */
+    getTableName() {
+        return this.tableName;
+    }
+    /**
+     * Current table is safe.
+     *
+     * @return boolean
+     */
+    isSafe() {
+        return !this.unsafe;
+    }
+    /**
      * Create cache and return the model field list.
      *
      * If this.unsafe is set then merge public with secret fields.
