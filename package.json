@@ -12,7 +12,7 @@
   "scripts": {
     "build": "tsc",
     "prepare": "tsc",
-    "test": "mocha --reporter spec --report lcovonly --require espower-typescript/guess source/tests/**/*.test.ts"
+    "test": "mocha --reporter spec --report lcovonly --require espower-typescript/guess sources/tests/**/*.test.ts"
   },
   "bugs": {
     "url": "https://github.com/unicoderns/ORM/issues",
