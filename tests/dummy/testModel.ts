@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////
 // The MIT License (MIT)                                                                  //
 //                                                                                        //
-// Copyright (C) 2018  Unicoderns SA - info@unicoderns.com - unicoderns.com               //
+// Copyright (C) 2016  Chriss Mejía - me@chrissmejia.com - chrissmejia.com                //
 //                                                                                        //
 // Permission is hereby granted, free of charge, to any person obtaining a copy           //
 // of this software and associated documentation files (the "Software"), to deal          //
@@ -22,24 +22,82 @@
 // SOFTWARE.                                                                              //
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-import { Fields } from "./fields";
-import { Defaults } from "./defaults";
+import { field, secret } from "../../decorators"
+import { Fields } from "../../interfaces/db/fields"
+import { Defaults } from "../../interfaces/db/defaults"
+import { Datatypes } from "../../datatypes"
+import { Model } from "../../model"
+
+export interface Row {
+    id?: number;
+    created?: number;
+    username: string;
+    email: string;
+    password: string;
+    salt: string;
+    firstName?: string;
+    lastName?: string;
+    admin?: boolean;
+    verified?: boolean;
+    active?: boolean;
+}
 
 /**
- * Internal abstract types
+ * User Model
  */
-export namespace Types {
+export class Users extends Model {
 
-    export interface General extends Fields.CommonTypes {
-        size?: number;
-    }
+    @field()
+    public id: Fields.DataType = new Datatypes().ID();
 
-    export interface Bool extends Fields.CommonTypes {
-        default?: Defaults.Binary;
-    }
+    @field()
+    public created: Fields.DataTimestampType = new Datatypes().TIMESTAMP({
+        notNull: true,
+        default: Defaults.Timestamp.CURRENT_TIMESTAMP
+    });
 
-    export interface Timestamp extends Fields.CommonTypes {
-        default?: Defaults.Timestamp;
-    }
+    @field()
+    public username: Fields.DataType = new Datatypes().VARCHAR({
+        size: 45,
+        unique: true
+    });
+
+    @field()
+    public email: Fields.DataType = new Datatypes().VARCHAR({
+        notNull: true,
+        size: 45,
+        unique: true
+    });
+
+    @secret()
+    public password: Fields.DataType = new Datatypes().CHAR({
+        notNull: true,
+        size: 60
+    });
+
+    @secret()
+    public salt: Fields.DataType = new Datatypes().VARCHAR({
+        notNull: true,
+        size: 20
+    });
+
+    @field("first_name")
+    public firstName: Fields.DataType = new Datatypes().VARCHAR({
+        size: 45
+    });
+
+    @field("last_name")
+    public lastName: Fields.DataType = new Datatypes().VARCHAR({
+        size: 45
+    });
+
+    @field()
+    public admin: Fields.BoolType = new Datatypes().BOOL();
+
+    @field()
+    public verified: Fields.BoolType = new Datatypes().BOOL();
+
+    @field()
+    public active: Fields.BoolType = new Datatypes().BOOL();
 
 }

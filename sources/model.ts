@@ -42,8 +42,6 @@ export class Model {
     public fields: Map<string, string> | undefined = undefined;
     public joins: Models.Join[] = [];
 
-
-
     /**
      * Create a table object.
      * 

@@ -9,4 +9,3 @@ export * from "./interfaces/config";
 export * from "./interfaces/db/fields";
 export * from "./interfaces/db/defaults";
 export * from "./interfaces/db/models";
-export * from "./interfaces/db/types";
