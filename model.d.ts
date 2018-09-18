@@ -10,6 +10,7 @@ export declare class Model {
     private unsafe;
     private fields;
     private joins;
+    private plainQuery;
     /**
      * Create a table object.
      *
@@ -29,6 +30,10 @@ export declare class Model {
      * @return boolean
      */
     isSafe(): boolean;
+    /**
+     * Avoid query execution and return models query instead.
+     */
+    returnQuery(): void;
     /**
      * Create cache and return the model field list.
      *

@@ -113,9 +113,9 @@ exports.field = field;
  * @param target Db table name.
  * @param key Field name.
  */
-function secret(alias) {
+function secret(privateAlias) {
     return function (target, key) {
-        register((target.constructor.name).charAt(0).toLowerCase() + (target.constructor.name).slice(1), "secret", key, alias || key);
+        register((target.constructor.name).charAt(0).toLowerCase() + (target.constructor.name).slice(1), "secret", key, privateAlias || key);
     };
 }
 exports.secret = secret;

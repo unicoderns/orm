@@ -1,9 +1,7 @@
-import * as chai from 'chai';
 import * as test from './dummy/testModel';
 
 import { DB } from "../connection"
 
-const expect = chai.expect;
 
 /**
  * Starting mock system
@@ -26,7 +24,7 @@ let db = new DB({
 let testTable: test.Users;
 let testUnsafeTable: test.Users;
 
-before(done => {
+beforeAll(done => {
     testTable = new test.Users(db);
     testUnsafeTable = new test.Users(db, "unsafe");
     done();
@@ -34,21 +32,21 @@ before(done => {
 
 describe('General', () => {
     it('Model has correct table name', () => {
-        expect(testTable.getTableName()).be.eql("users");
+        expect(testTable.getTableName()).toEqual("users");
     });
 
     it('Safe Model should be a safe model', () => {
-        expect(testTable.isSafe()).to.be.true;
+        expect(testTable.isSafe()).toBeTruthy;
     });
 
     it('Unsafe Model should be a unsafe model', () => {
-        expect(testUnsafeTable.isSafe()).to.be.false;
+        expect(testUnsafeTable.isSafe()).toBeFalsy;
     });
 });
 
 describe('Fields', () => {
     it('Model to have fields', () => {
-        expect(testTable.getFields()).to.exist;
+        expect(testTable.getFields()).not.toBeNull();
     });
 
     it('Model returns correct map', () => {
@@ -63,7 +61,7 @@ describe('Fields', () => {
             ['verified', 'verified'],
             ['active', 'active']
         ]);
-        expect(testTable.getFields()).to.eql(map);
+        expect(testTable.getFields()).toEqual(map);
     });
 
     it('Unsafe Model returns correct map', () => {
@@ -80,7 +78,7 @@ describe('Fields', () => {
             ['salt', 'added_salt'],
             ['password', 'password']
         ]);
-        expect(testUnsafeTable.getFields()).to.eql(map);
+        expect(testUnsafeTable.getFields()).toEqual(map);
     });
 
 });

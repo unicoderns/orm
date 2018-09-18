@@ -48,6 +48,7 @@ class Model {
         this.unsafe = false;
         this.fields = undefined;
         this.joins = [];
+        this.plainQuery = false;
         this.DB = DB;
         if (privacy == "unsafe") {
             this.unsafe = true;
@@ -68,6 +69,12 @@ class Model {
      */
     isSafe() {
         return !this.unsafe;
+    }
+    /**
+     * Avoid query execution and return models query instead.
+     */
+    returnQuery() {
+        this.plainQuery = true;
     }
     /**
      * Create cache and return the model field list.
@@ -142,22 +149,6 @@ class Model {
             console.error(clc.red("No fields in the model"));
         }
     }
-    /*
-        /////////////////////////////////////////////////////////////////////
-        // Generate a report and filter fields
-        /////////////////////////////////////////////////////////////////////
-        private selectFieldsReport(select: string[]): Fields {
-            let report: Fields;
-            let fields = this.getFields();
-    
-            report.all = this.filterArrayInArray(select, fields.all);
-            report.public = this.filterArrayInArray(select, fields.public);
-            report.protected = this.filterArrayInArray(select, fields.protected);
-            report.private = this.filterArrayInArray(select, fields.private);
-    
-            return this.getFields();
-        }
-    */
     /**
      * Clean and validate a select if is need it
      *
@@ -375,7 +366,7 @@ class Model {
         }
         let sql = "SELECT " + fieldsSQL + joinFieldsSQL + " FROM `" + this.tableName + "`" + joinCode + whereCode.sql + extra + ";";
         this.joins = [];
-        return this.query({ sql: sql, values: whereCode.values });
+        return { sql: sql, values: whereCode.values };
     }
     /**
      * Get item - Select query
@@ -390,13 +381,14 @@ class Model {
     get(select) {
         // Create promise
         const p = new es6_promise_1.Promise((resolve, reject) => {
-            let sqlPromise = this.select({
+            let selectQuery = this.select({
                 fields: select.fields,
                 where: select.where,
                 groupBy: select.groupBy,
                 orderBy: select.orderBy,
                 limit: 1
             });
+            let sqlPromise = this.query(selectQuery);
             sqlPromise.then((data) => {
                 resolve(data[0]);
             }).catch(err => {
@@ -417,7 +409,7 @@ class Model {
      * @return Promise with query result
      */
     getSome(select) {
-        return this.select(select);
+        return this.query(this.select(select));
     }
     /**
      * Get all items - Select query
@@ -430,7 +422,7 @@ class Model {
      * @return Promise with query result
      */
     getAll(select) {
-        return this.select(select);
+        return this.query(this.select(select));
     }
     /**
      * Join a table

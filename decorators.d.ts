@@ -20,4 +20,4 @@ export declare function field(alias?: string): (target: any, key: string) => voi
  * @param target Db table name.
  * @param key Field name.
  */
-export declare function secret(alias?: string): (target: any, key: string) => void;
+export declare function secret(privateAlias?: string): (target: any, key: string) => void;
