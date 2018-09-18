@@ -68,11 +68,10 @@
     "emitDecoratorMetadata": true,
     /* Enables experimental support for emitting type metadata for decorators. */
   },
-  "include" : [
+  "include": [
     "sources"
   ],
   "exclude": [
-    "node_modules",
-    "tests"
+    "node_modules"
   ]
 }

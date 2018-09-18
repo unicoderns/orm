@@ -12,8 +12,7 @@
   "scripts": {
     "build": "tsc",
     "prepare": "tsc",
-    "test": "mocha --reporter spec --report lcovonly --require espower-typescript/guess tests/**/*.test.ts",
-    "cover": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly tests/**/*.test.ts -- -R spec --require espower-typescript/guess && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage"
+    "test": "mocha --reporter spec --report lcovonly --require espower-typescript/guess source/tests/**/*.test.ts"
   },
   "bugs": {
     "url": "https://github.com/unicoderns/ORM/issues",
