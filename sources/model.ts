@@ -47,13 +47,10 @@ export class Model {
     /**
      * Create a table object.
      * 
-     * TODO: it shouldn't take DB | any, following this thread: 
-     * https://stackoverflow.com/questions/52376742/npm-package-with-classes-not-compatible-between-typescript-and-transpiled-versio
-     * 
      * @param jsloth Core library
      * @param privacy To get all fields (secrets included), you need to set privacy as "unsafe" explicitly, in that way we ensure that this will not be a security breach in any wrong future upgrade.
      */
-    constructor(DB: DB | any, privacy?: string) {
+    constructor(DB: DB, privacy?: string) {
         this.DB = DB;
         if (privacy == "unsafe") {
             this.unsafe = true;
