@@ -22,15 +22,24 @@
 // SOFTWARE.                                                                              //
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-/**
-* Unicoderns ORM central module
-*/
-export * from "./connection";
-export * from "./model";
-export * from "./decorators";
-export * from "./datatypes";
-export * from "./interfaces/config";
-export * from "./interfaces/db/fields";
-export * from "./interfaces/db/defaults";
-export * from "./interfaces/db/models";
-export * from "./interfaces/db/types";
+/*** Main configuration interface */
+export interface Config {
+  dev: boolean;
+  connection: Connection;
+}
+
+/*** Connection configuration interface. */
+export interface Connection {
+  user: string;
+  password: string;
+  database: string;
+  port: number;
+  host: string;
+  connectionLimit: number;
+  validations: ValidationSettings;
+}
+
+/*** Validation settings interface. */
+export interface ValidationSettings {
+  fields: boolean;
+}
