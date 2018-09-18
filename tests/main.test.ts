@@ -30,6 +30,12 @@ tests();
  * Tests
  */
 function tests() {
+    describe('General', () => {
+        it('Test Model should be a safe model', () => {
+            expect(testTable.unsafe).to.be.false;
+        });
+    });
+
     describe('Fields', () => {
         it('Test Model to have fields', () => {
             expect(testTable.getFields()).to.exist;
