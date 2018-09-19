@@ -29,8 +29,6 @@
     "@types/cli-color": "^0.3.29",
     "@types/jasmine": "^2.8.8",
     "@types/mysql": "^2.15.5",
-    "chai": "^4.1.2",
-    "chai-immutable": "^1.6.0",
     "jasmine": "^3.2.0",
     "ts-node": "^7.0.1",
     "typescript": "^3.0.3"
