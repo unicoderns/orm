@@ -3,4 +3,3 @@ node_js:
  - "8.11.3"
 script: 
  - "npm test"
-after_script: NODE_ENV=test istanbul cover ts-node node_modules/jasmine/bin/jasmine sources/tests/**/*.test.ts --captureExceptions spec/ && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage
