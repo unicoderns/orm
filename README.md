@@ -71,7 +71,7 @@ Query result:
 Get all matching rows
 
 ```typescript
-usersTable..getAll({
+usersTable.getAll({
     where: {
         id: 3
     }
@@ -85,4 +85,58 @@ usersTable..getAll({
 Query result: 
 ```sql
 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`first_name`, `users`.`last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE `users`.`id` = 3;'
+```
+
+## Insert
+
+```typescript
+usersTable.insert({
+    firstName: "Chriss"
+}).then((data: any) => {
+    console.log(data);
+}).catch((err: any) => {
+    console.error(err)
+});
+```
+
+Query result: 
+```sql
+'INSERT INTO `users` (`firstName`) VALUES (?);'
+```
+
+## Update
+
+```typescript
+usersTable.update({
+    data: {
+        firstName: "Chriss"
+    },
+    where: { id: 3 }
+}).then((data: any) => {
+    console.log(data);
+}).catch((err: any) => {
+    console.error(err)
+});
+```
+
+Query result: 
+```sql
+'UPDATE `users` SET `firstName` = "Chriss" WHERE `users`.`id` = 3;'
+```
+
+## Delete
+
+```typescript
+usersTable.delete({ 
+    id: 1 
+}).then((data: any) => {
+    console.log(data);
+}).catch((err: any) => {
+    console.error(err)
+});
+```
+
+Query result: 
+```sql
+'DELETE FROM `users` WHERE `users`.`id` = 1;'
 ```
