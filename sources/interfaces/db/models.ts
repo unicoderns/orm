@@ -47,7 +47,7 @@ export namespace Models {
      */
     export interface Query {
         sql: string;
-        values: string[];
+        values: (string | number)[];
     }
 
     /**

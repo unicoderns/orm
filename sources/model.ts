@@ -22,7 +22,7 @@
 // SOFTWARE.                                                                              //
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-import * as clc from "cli-color";
+import chalk from "chalk";
 import * as mysql from "mysql";
 
 import { Promise } from "es6-promise";
@@ -37,7 +37,7 @@ import { DB } from "./connection";
  */
 export class Model {
     private tableName: string = ((<any>this).constructor.name).charAt(0).toLowerCase() + ((<any>this).constructor.name).slice(1); // Get the table name from the model name in camelcase.
-    private DB: DB;
+    protected DB: DB;
     private unsafe: boolean = false;
     private fields: Map<string, string> | undefined = undefined;
     private joins: Models.Join[] = [];
@@ -77,8 +77,9 @@ export class Model {
     /**
      * Avoid query execution and return models query instead.
      */
-    public returnQuery(): void {
+    public returnQuery(): Model {
         this.plainQuery = true;
+        return this;
     }
 
     /**
@@ -119,7 +120,7 @@ export class Model {
                 keys.push(item);
             });
         } else {
-            console.error(clc.red("No fields in the model"));
+            console.error(chalk.red("No fields in the model"));
         }
         return keys;
     }
@@ -137,7 +138,7 @@ export class Model {
                 }
             });
         } else {
-            console.error(clc.red("No fields in the model"));
+            console.error(chalk.red("No fields in the model"));
         }
         return keys;
     }
@@ -149,11 +150,11 @@ export class Model {
         if (typeof scope !== "undefined") {
             target.forEach(item => {
                 if (!scope.has(item)) {
-                    console.error(item + " field doesn't exists!");
+                    console.error(chalk.yellow(item + " field doesn't exists!"));
                 }
             });
         } else {
-            console.error(clc.red("No fields in the model"));
+            console.error(chalk.red("No fields in the model"));
         }
     }
 
@@ -344,7 +345,17 @@ export class Model {
      * @return Promise with query result
      */
     public query(query: Models.Query): Promise<any> {
-        return this.DB.query(query);
+        if (this.plainQuery) {
+            // Create promise
+            const p: Promise<any> = new Promise(
+                (resolve: (data: Models.Query) => void) => {
+                    resolve(query);
+                }
+            );
+            return p;
+        } else {
+            return this.DB.query(query);
+        }
     }
 
     /**
@@ -409,11 +420,15 @@ export class Model {
                     limit: 1
                 });
                 let sqlPromise = this.query(selectQuery);
-                sqlPromise.then((data) => {
-                    resolve(data[0]);
-                }).catch(err => {
-                    reject(err);
-                });
+                if (this.plainQuery) {
+                    resolve(sqlPromise);
+                } else {
+                    sqlPromise.then((data) => {
+                        resolve(data[0]);
+                    }).catch(err => {
+                        reject(err);
+                    });
+                }
             }
         );
         return p;

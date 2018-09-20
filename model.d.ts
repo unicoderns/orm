@@ -6,7 +6,7 @@ import { DB } from "./connection";
  */
 export declare class Model {
     private tableName;
-    private DB;
+    protected DB: DB;
     private unsafe;
     private fields;
     private joins;
@@ -33,7 +33,7 @@ export declare class Model {
     /**
      * Avoid query execution and return models query instead.
      */
-    returnQuery(): void;
+    returnQuery(): Model;
     /**
      * Create cache and return the model field list.
      *

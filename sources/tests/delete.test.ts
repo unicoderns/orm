@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////
 // The MIT License (MIT)                                                                  //
 //                                                                                        //
-// Copyright (C) 2016  Chriss Mejía - me@chrissmejia.com - chrissmejia.com                //
+// Copyright (C) 2018  Unicoderns SA - info@unicoderns.com - unicoderns.com               //
 //                                                                                        //
 // Permission is hereby granted, free of charge, to any person obtaining a copy           //
 // of this software and associated documentation files (the "Software"), to deal          //
@@ -22,82 +22,72 @@
 // SOFTWARE.                                                                              //
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-import { field, secret } from "../../decorators"
-import { Fields } from "../../interfaces/db/fields"
-import { Defaults } from "../../interfaces/db/defaults"
-import { Datatypes } from "../../datatypes"
-import { Model } from "../../model"
+import * as users from './dummy/usersModel';
 
-export interface Row {
-    id?: number;
-    created?: number;
-    username: string;
-    email: string;
-    password: string;
-    salt: string;
-    firstName?: string;
-    lastName?: string;
-    admin?: boolean;
-    verified?: boolean;
-    active?: boolean;
-}
+import { DB } from "../connection"
+import { Models } from "../interfaces/db/models"
+
 
 /**
- * User Model
+ * Starting mock system
  */
-export class Users extends Model {
+let db = new DB({
+    dev: true, connection:
+    {
+        "user": "apiUser",
+        "password": "password",
+        "database": "apiDB",
+        "port": 3306,
+        "host": "localhost",
+        "connectionLimit": 10,
+        "validations": {
+            "fields": true
+        }
+    }
+});
 
-    @field()
-    public id: Fields.DataType = new Datatypes().ID();
+let usersTable: users.Users;
 
-    @field()
-    public created: Fields.DataTimestampType = new Datatypes().TIMESTAMP({
-        notNull: true,
-        default: Defaults.Timestamp.CURRENT_TIMESTAMP
+beforeAll(done => {
+    usersTable = new users.Users(db);
+    done();
+});
+
+describe('Delete', () => {
+    it('Delete all', () => {
+        var expected = {
+            sql: 'DELETE FROM `users`;',
+            values: []
+        };
+        usersTable.returnQuery().delete("*").then((query: Models.Query) => {
+            expect(query).toEqual(expected);
+        }).catch((err: any) => {
+            console.error(err)
+        });
     });
 
-    @field()
-    public username: Fields.DataType = new Datatypes().VARCHAR({
-        size: 45,
-        unique: true
+    it('Delete with 1 condition', () => {
+        var expected = {
+            sql: 'DELETE FROM `users` WHERE `users`.`id` = ?;',
+            values: [1]
+        };
+        usersTable.returnQuery().delete({ id: 1 }).then((query: Models.Query) => {
+            expect(query).toEqual(expected);
+        }).catch((err: any) => {
+            console.error(err)
+        });
     });
 
-    @field()
-    public email: Fields.DataType = new Datatypes().VARCHAR({
-        notNull: true,
-        size: 45,
-        unique: true
+    it('DELETE FROM `users` WHERE `users`.`user` = ? AND `users`.`id` = ?;', () => {
+        var expected = {
+            sql: 'DELETE FROM `users` WHERE `users`.`username` = ? AND `users`.`id` = ?;',
+            values: ["chriss", 3]
+        };
+        usersTable.returnQuery().delete({ username: "chriss", id: 3 }).then((query: Models.Query) => {
+            expect(query).toEqual(expected);
+        }).catch((err: any) => {
+            console.error(err)
+        });
     });
 
-    @secret()
-    public password: Fields.DataType = new Datatypes().CHAR({
-        notNull: true,
-        size: 60
-    });
-
-    @secret("added_salt")
-    public salt: Fields.DataType = new Datatypes().VARCHAR({
-        notNull: true,
-        size: 20
-    });
-
-    @field("first_name")
-    public firstName: Fields.DataType = new Datatypes().VARCHAR({
-        size: 45
-    });
-
-    @field("last_name")
-    public lastName: Fields.DataType = new Datatypes().VARCHAR({
-        size: 45
-    });
-
-    @field()
-    public admin: Fields.BoolType = new Datatypes().BOOL();
-
-    @field()
-    public verified: Fields.BoolType = new Datatypes().BOOL();
-
-    @field()
-    public active: Fields.BoolType = new Datatypes().BOOL();
-
-}
+});

@@ -22,65 +22,87 @@
 // SOFTWARE.                                                                              //
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-import { Config } from "./interfaces/config";
-import { Promise } from "es6-promise";
+import * as users from './dummy/usersModel';
 
-import { Models } from "./interfaces/db/models";
-import * as mysql from "mysql";
+import { DB } from "../connection"
+import { Models } from "../interfaces/db/models"
+
 
 /**
-* Unicoderns DB Connection
-*/
-export class DB {
-    protected connections: mysql.Pool;
-    public config: Config;
-
-    /**
-     * Configuration methods 
-     * 
-     * Create a connection pool
-     * 
-     * @var config system configuration file
-     */
-    constructor(config: Config) {
-        this.config = config;
-        this.connections = mysql.createPool(config.connection);
+ * Starting mock system
+ */
+let db = new DB({
+    dev: true, connection:
+    {
+        "user": "apiUser",
+        "password": "password",
+        "database": "apiDB",
+        "port": 3306,
+        "host": "localhost",
+        "connectionLimit": 10,
+        "validations": {
+            "fields": true
+        }
     }
+});
 
-    /**
-     * Plain query
-     * 
-     * @var sql MySQL query
-     * @var params Object (key/value) with parameters to replace in the query
-     * @return Promise with query result
-     */
-    public query(query: Models.Query): Promise<any> {
-        // Create promise
-        const p: Promise<any> = new Promise(
-            (resolve: (data: any) => void, reject: (err: mysql.MysqlError) => void) => {
-                // Get connection
-                this.connections.getConnection((err: mysql.MysqlError, connection) => {
-                    if (err) { // Improve error log
-                        reject(err);
-                        throw err;
-                    }
-                    // Query Mysql
-                    let mysqlQuery = connection.query(query.sql, query.values, (err: mysql.MysqlError | null, rows: any) => {
-                        connection.release();
-                        if (this.config.dev) {
-                            console.log("SQL Query: " + mysqlQuery.sql);
-                        }
+let usersTable: users.Users;
 
-                        if (err) { // Improve error log
-                            reject(err);
-                            throw err;
-                        }
-                        // Resolve promise
-                        resolve(rows);
-                    });
-                });
-            }
-        );
-        return p;
-    }
-}
+beforeAll(done => {
+    usersTable = new users.Users(db);
+    done();
+});
+
+describe('Update', () => {
+    it('Fails if where is an object', () => {
+        var expected = {
+            sql: 'UPDATE `users` SET `user` = ? WHERE `users`.`` = ?;',
+            values: ["Chriss Mejía"]
+        };
+        usersTable.returnQuery().update({
+            data: {
+                user: "Chriss Mejía"
+            },
+            where: {}
+        }).then((query: Models.Query) => {
+            expect(query).toEqual(expected);
+        }).catch((err: any) => {
+            console.error(err)
+        });
+    });
+
+    it('Fails if where is an array', () => {
+        var expected = {
+            sql: 'UPDATE `users` SET `user` = ? WHERE ();',
+            values: ["Chriss Mejía"]
+        };
+        usersTable.returnQuery().update({
+            data: {
+                user: "Chriss Mejía"
+            },
+            where: []
+        }).then((query: Models.Query) => {
+            expect(query).toEqual(expected);
+        }).catch((err: any) => {
+            console.error(err)
+        });
+    });
+
+    it('1 field 1 where', () => {
+        var expected = {
+            sql: 'UPDATE `users` SET `user` = ? WHERE `users`.`id` = ?;',
+            values: ["Chriss Mejía", 3]
+        };
+        usersTable.returnQuery().update({
+            data: {
+                user: "Chriss Mejía"
+            },
+            where: { id: 3 }
+        }).then((query: Models.Query) => {
+            expect(query).toEqual(expected);
+        }).catch((err: any) => {
+            console.error(err)
+        });
+    });
+
+});

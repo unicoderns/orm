@@ -26,21 +26,37 @@ let db = new connection_1.DB({
     }
 });
 let usersTable;
-let usersUnsafeTable;
 beforeAll(done => {
     usersTable = new users.Users(db);
-    usersUnsafeTable = new users.Users(db, "unsafe");
     done();
 });
-describe('General', () => {
-    it('Model has correct table name', () => {
-        expect(usersTable.getTableName()).toEqual("users");
+describe('Insert', () => {
+    it('1 value', () => {
+        var expected = {
+            sql: 'INSERT INTO `users` (`user`) VALUES (?);',
+            values: ["Chriss Mejía"]
+        };
+        usersTable.returnQuery().insert({
+            user: "Chriss Mejía"
+        }).then((query) => {
+            expect(query).toEqual(expected);
+        }).catch((err) => {
+            console.error(err);
+        });
     });
-    it('Safe Model should be a safe model', () => {
-        expect(usersTable.isSafe()).toBeTruthy;
-    });
-    it('Unsafe Model should be a unsafe model', () => {
-        expect(usersUnsafeTable.isSafe()).toBeFalsy;
+    it('2 values', () => {
+        var expected = {
+            sql: 'INSERT INTO `users` (`user`, `username`) VALUES (?, ?);',
+            values: ["Chriss Mejía", "chriss"]
+        };
+        usersTable.returnQuery().insert({
+            user: "Chriss Mejía",
+            username: "chriss"
+        }).then((query) => {
+            expect(query).toEqual(expected);
+        }).catch((err) => {
+            console.error(err);
+        });
     });
 });
-//# sourceMappingURL=main.test.js.map
+//# sourceMappingURL=insert.test.js.map

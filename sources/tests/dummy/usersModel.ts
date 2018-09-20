@@ -22,65 +22,82 @@
 // SOFTWARE.                                                                              //
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-import { Config } from "./interfaces/config";
-import { Promise } from "es6-promise";
+import { field, secret } from "../../decorators"
+import { Fields } from "../../interfaces/db/fields"
+import { Defaults } from "../../interfaces/db/defaults"
+import { Datatypes } from "../../datatypes"
+import { Model } from "../../model"
 
-import { Models } from "./interfaces/db/models";
-import * as mysql from "mysql";
+export interface Row {
+    id?: number;
+    created?: number;
+    username: string;
+    email: string;
+    password: string;
+    salt: string;
+    firstName?: string;
+    lastName?: string;
+    admin?: boolean;
+    verified?: boolean;
+    active?: boolean;
+}
 
 /**
-* Unicoderns DB Connection
-*/
-export class DB {
-    protected connections: mysql.Pool;
-    public config: Config;
+ * User Model
+ */
+export class Users extends Model {
 
-    /**
-     * Configuration methods 
-     * 
-     * Create a connection pool
-     * 
-     * @var config system configuration file
-     */
-    constructor(config: Config) {
-        this.config = config;
-        this.connections = mysql.createPool(config.connection);
-    }
+    @field()
+    public id: Fields.DataType = new Datatypes().ID();
 
-    /**
-     * Plain query
-     * 
-     * @var sql MySQL query
-     * @var params Object (key/value) with parameters to replace in the query
-     * @return Promise with query result
-     */
-    public query(query: Models.Query): Promise<any> {
-        // Create promise
-        const p: Promise<any> = new Promise(
-            (resolve: (data: any) => void, reject: (err: mysql.MysqlError) => void) => {
-                // Get connection
-                this.connections.getConnection((err: mysql.MysqlError, connection) => {
-                    if (err) { // Improve error log
-                        reject(err);
-                        throw err;
-                    }
-                    // Query Mysql
-                    let mysqlQuery = connection.query(query.sql, query.values, (err: mysql.MysqlError | null, rows: any) => {
-                        connection.release();
-                        if (this.config.dev) {
-                            console.log("SQL Query: " + mysqlQuery.sql);
-                        }
+    @field()
+    public created: Fields.DataTimestampType = new Datatypes().TIMESTAMP({
+        notNull: true,
+        default: Defaults.Timestamp.CURRENT_TIMESTAMP
+    });
 
-                        if (err) { // Improve error log
-                            reject(err);
-                            throw err;
-                        }
-                        // Resolve promise
-                        resolve(rows);
-                    });
-                });
-            }
-        );
-        return p;
-    }
+    @field()
+    public username: Fields.DataType = new Datatypes().VARCHAR({
+        size: 45,
+        unique: true
+    });
+
+    @field()
+    public email: Fields.DataType = new Datatypes().VARCHAR({
+        notNull: true,
+        size: 45,
+        unique: true
+    });
+
+    @secret()
+    public password: Fields.DataType = new Datatypes().CHAR({
+        notNull: true,
+        size: 60
+    });
+
+    @secret("added_salt")
+    public salt: Fields.DataType = new Datatypes().VARCHAR({
+        notNull: true,
+        size: 20
+    });
+
+    @field("first_name")
+    public firstName: Fields.DataType = new Datatypes().VARCHAR({
+        size: 45
+    });
+
+    @field("last_name")
+    public lastName: Fields.DataType = new Datatypes().VARCHAR({
+        size: 45
+    });
+
+    @field()
+    public admin: Fields.BoolType = new Datatypes().BOOL();
+
+    @field()
+    public verified: Fields.BoolType = new Datatypes().BOOL();
+
+    @field()
+    public active: Fields.BoolType = new Datatypes().BOOL();
+
 }

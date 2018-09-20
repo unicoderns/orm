@@ -22,65 +22,66 @@
 // SOFTWARE.                                                                              //
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-import { Config } from "./interfaces/config";
-import { Promise } from "es6-promise";
+import * as sessions from './dummy/sessionsModel';
 
-import { Models } from "./interfaces/db/models";
-import * as mysql from "mysql";
+import { DB } from "../connection"
+import { Models } from "../interfaces/db/models"
 
 /**
-* Unicoderns DB Connection
-*/
-export class DB {
-    protected connections: mysql.Pool;
-    public config: Config;
-
-    /**
-     * Configuration methods 
-     * 
-     * Create a connection pool
-     * 
-     * @var config system configuration file
-     */
-    constructor(config: Config) {
-        this.config = config;
-        this.connections = mysql.createPool(config.connection);
+ * Starting mock system
+ */
+let db = new DB({
+    dev: true, connection:
+    {
+        "user": "apiUser",
+        "password": "password",
+        "database": "apiDB",
+        "port": 3306,
+        "host": "localhost",
+        "connectionLimit": 10,
+        "validations": {
+            "fields": true
+        }
     }
+});
 
-    /**
-     * Plain query
-     * 
-     * @var sql MySQL query
-     * @var params Object (key/value) with parameters to replace in the query
-     * @return Promise with query result
-     */
-    public query(query: Models.Query): Promise<any> {
-        // Create promise
-        const p: Promise<any> = new Promise(
-            (resolve: (data: any) => void, reject: (err: mysql.MysqlError) => void) => {
-                // Get connection
-                this.connections.getConnection((err: mysql.MysqlError, connection) => {
-                    if (err) { // Improve error log
-                        reject(err);
-                        throw err;
-                    }
-                    // Query Mysql
-                    let mysqlQuery = connection.query(query.sql, query.values, (err: mysql.MysqlError | null, rows: any) => {
-                        connection.release();
-                        if (this.config.dev) {
-                            console.log("SQL Query: " + mysqlQuery.sql);
-                        }
+let sessionsTable: sessions.Sessions
 
-                        if (err) { // Improve error log
-                            reject(err);
-                            throw err;
-                        }
-                        // Resolve promise
-                        resolve(rows);
-                    });
-                });
-            }
-        );
-        return p;
-    }
-}
+beforeAll(done => {
+    sessionsTable = new sessions.Sessions(db);
+    done();
+});
+
+describe('Joins', () => {
+    it('Left join sessions with users', () => {
+        var expected = {
+            sql: 'SELECT `sessions`.`id`, `sessions`.`created`, `sessions`.`ip`, `sessions`.`user`, `users`.`username` AS `users__username`, `users`.`email` AS `users__email`, `users`.`firstName` AS `users__firstName`, `users`.`lastName` AS `users__lastName` FROM `sessions` LEFT JOIN `users` ON `sessions`.`user` = `users`.`id`;',
+            values: []
+        };
+        sessionsTable.returnQuery().join({
+            keyField: sessionsTable.user,
+            fields: ["username", "email", "firstName", "lastName"],
+            kind: "LEFT"
+        }).getAll({}).then((query: Models.Query) => {
+            expect(query).toEqual(expected);
+        }).catch((err: any) => {
+            console.error(err)
+        });
+    });
+
+    it('Right join sessions with users', () => {
+        var expected = {
+            sql: 'SELECT `sessions`.`id`, `sessions`.`created`, `sessions`.`ip`, `sessions`.`user`, `users`.`username` AS `users__username`, `users`.`email` AS `users__email` FROM `sessions` RIGHT JOIN `users` ON `sessions`.`user` = `users`.`id`;',
+            values: []
+        };
+        sessionsTable.returnQuery().join({
+            keyField: sessionsTable.user,
+            fields: ["username", "email"],
+            kind: "RIGHT"
+        }).getAll({}).then((query: Models.Query) => {
+            expect(query).toEqual(expected);
+        }).catch((err: any) => {
+            console.error(err)
+        });
+    });
+});

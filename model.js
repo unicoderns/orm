@@ -22,15 +22,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE          //
 // SOFTWARE.                                                                              //
 ////////////////////////////////////////////////////////////////////////////////////////////
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const clc = __importStar(require("cli-color"));
+const chalk_1 = __importDefault(require("chalk"));
 const es6_promise_1 = require("es6-promise");
 const decorators_1 = require("./decorators");
 /**
@@ -75,6 +71,7 @@ class Model {
      */
     returnQuery() {
         this.plainQuery = true;
+        return this;
     }
     /**
      * Create cache and return the model field list.
@@ -113,7 +110,7 @@ class Model {
             });
         }
         else {
-            console.error(clc.red("No fields in the model"));
+            console.error(chalk_1.default.red("No fields in the model"));
         }
         return keys;
     }
@@ -130,7 +127,7 @@ class Model {
             });
         }
         else {
-            console.error(clc.red("No fields in the model"));
+            console.error(chalk_1.default.red("No fields in the model"));
         }
         return keys;
     }
@@ -141,12 +138,12 @@ class Model {
         if (typeof scope !== "undefined") {
             target.forEach(item => {
                 if (!scope.has(item)) {
-                    console.error(item + " field doesn't exists!");
+                    console.error(chalk_1.default.yellow(item + " field doesn't exists!"));
                 }
             });
         }
         else {
-            console.error(clc.red("No fields in the model"));
+            console.error(chalk_1.default.red("No fields in the model"));
         }
     }
     /**
@@ -327,7 +324,16 @@ class Model {
      * @return Promise with query result
      */
     query(query) {
-        return this.DB.query(query);
+        if (this.plainQuery) {
+            // Create promise
+            const p = new es6_promise_1.Promise((resolve) => {
+                resolve(query);
+            });
+            return p;
+        }
+        else {
+            return this.DB.query(query);
+        }
     }
     /**
      * Select private query
@@ -389,11 +395,16 @@ class Model {
                 limit: 1
             });
             let sqlPromise = this.query(selectQuery);
-            sqlPromise.then((data) => {
-                resolve(data[0]);
-            }).catch(err => {
-                reject(err);
-            });
+            if (this.plainQuery) {
+                resolve(sqlPromise);
+            }
+            else {
+                sqlPromise.then((data) => {
+                    resolve(data[0]);
+                }).catch(err => {
+                    reject(err);
+                });
+            }
         });
         return p;
     }

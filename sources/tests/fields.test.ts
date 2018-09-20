@@ -22,65 +22,73 @@
 // SOFTWARE.                                                                              //
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-import { Config } from "./interfaces/config";
-import { Promise } from "es6-promise";
+import * as users from './dummy/usersModel';
 
-import { Models } from "./interfaces/db/models";
-import * as mysql from "mysql";
+import { DB } from "../connection"
+
 
 /**
-* Unicoderns DB Connection
-*/
-export class DB {
-    protected connections: mysql.Pool;
-    public config: Config;
-
-    /**
-     * Configuration methods 
-     * 
-     * Create a connection pool
-     * 
-     * @var config system configuration file
-     */
-    constructor(config: Config) {
-        this.config = config;
-        this.connections = mysql.createPool(config.connection);
+ * Starting mock system
+ */
+let db = new DB({
+    dev: true, connection:
+    {
+        "user": "apiUser",
+        "password": "password",
+        "database": "apiDB",
+        "port": 3306,
+        "host": "localhost",
+        "connectionLimit": 10,
+        "validations": {
+            "fields": true
+        }
     }
+});
 
-    /**
-     * Plain query
-     * 
-     * @var sql MySQL query
-     * @var params Object (key/value) with parameters to replace in the query
-     * @return Promise with query result
-     */
-    public query(query: Models.Query): Promise<any> {
-        // Create promise
-        const p: Promise<any> = new Promise(
-            (resolve: (data: any) => void, reject: (err: mysql.MysqlError) => void) => {
-                // Get connection
-                this.connections.getConnection((err: mysql.MysqlError, connection) => {
-                    if (err) { // Improve error log
-                        reject(err);
-                        throw err;
-                    }
-                    // Query Mysql
-                    let mysqlQuery = connection.query(query.sql, query.values, (err: mysql.MysqlError | null, rows: any) => {
-                        connection.release();
-                        if (this.config.dev) {
-                            console.log("SQL Query: " + mysqlQuery.sql);
-                        }
+let usersTable: users.Users;
+let usersUnsafeTable: users.Users;
 
-                        if (err) { // Improve error log
-                            reject(err);
-                            throw err;
-                        }
-                        // Resolve promise
-                        resolve(rows);
-                    });
-                });
-            }
-        );
-        return p;
-    }
-}
+beforeAll(done => {
+    usersTable = new users.Users(db);
+    usersUnsafeTable = new users.Users(db, "unsafe");
+    done();
+});
+
+describe('Fields', () => {
+    it('Model to have fields', () => {
+        expect(usersTable.getFields()).not.toBeNull();
+    });
+
+    it('Model returns correct map', () => {
+        let map: Map<string, string> = new Map([
+            ['id', 'id'],
+            ['created', 'created'],
+            ['username', 'username'],
+            ['email', 'email'],
+            ['firstName', 'first_name'],
+            ['lastName', 'last_name'],
+            ['admin', 'admin'],
+            ['verified', 'verified'],
+            ['active', 'active']
+        ]);
+        expect(usersTable.getFields()).toEqual(map);
+    });
+
+    it('Unsafe Model returns correct map', () => {
+        let map: Map<string, string> = new Map([
+            ['id', 'id'],
+            ['created', 'created'],
+            ['username', 'username'],
+            ['email', 'email'],
+            ['firstName', 'first_name'],
+            ['lastName', 'last_name'],
+            ['admin', 'admin'],
+            ['verified', 'verified'],
+            ['active', 'active'],
+            ['salt', 'added_salt'],
+            ['password', 'password']
+        ]);
+        expect(usersUnsafeTable.getFields()).toEqual(map);
+    });
+
+});

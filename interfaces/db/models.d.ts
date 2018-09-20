@@ -19,7 +19,7 @@ export declare namespace Models {
      */
     interface Query {
         sql: string;
-        values: string[];
+        values: (string | number)[];
     }
     /**
      * Join declaration
