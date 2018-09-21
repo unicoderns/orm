@@ -32,8 +32,8 @@ import { Models } from "../interfaces/db/models"
  * Starting mock system
  */
 let db = new DB({
-    dev: true, connection:
-    {
+    dev: true,
+    connection: {
         "user": "apiUser",
         "password": "password",
         "database": "apiDB",
@@ -56,12 +56,12 @@ beforeAll(done => {
 describe('Update', () => {
     it('Fails if where is an object', () => {
         var expected = {
-            sql: 'UPDATE `users` SET `user` = ? WHERE `users`.`` = ?;',
-            values: ["Chriss Mejía"]
+            sql: 'UPDATE `users` SET `firstName` = ? WHERE `users`.`` = ?;',
+            values: ["Chriss"]
         };
         usersTable.returnQuery().update({
             data: {
-                user: "Chriss Mejía"
+                firstName: "Chriss"
             },
             where: {}
         }).then((query: Models.Query) => {
@@ -73,12 +73,12 @@ describe('Update', () => {
 
     it('Fails if where is an array', () => {
         var expected = {
-            sql: 'UPDATE `users` SET `user` = ? WHERE ();',
-            values: ["Chriss Mejía"]
+            sql: 'UPDATE `users` SET `firstName` = ? WHERE ();',
+            values: ["Chriss"]
         };
         usersTable.returnQuery().update({
             data: {
-                user: "Chriss Mejía"
+                firstName: "Chriss"
             },
             where: []
         }).then((query: Models.Query) => {
@@ -90,12 +90,12 @@ describe('Update', () => {
 
     it('1 field 1 where', () => {
         var expected = {
-            sql: 'UPDATE `users` SET `user` = ? WHERE `users`.`id` = ?;',
-            values: ["Chriss Mejía", 3]
+            sql: 'UPDATE `users` SET `firstName` = ? WHERE `users`.`id` = ?;',
+            values: ["Chriss", 3]
         };
         usersTable.returnQuery().update({
             data: {
-                user: "Chriss Mejía"
+                firstName: "Chriss"
             },
             where: { id: 3 }
         }).then((query: Models.Query) => {

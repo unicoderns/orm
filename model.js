@@ -105,8 +105,13 @@ class Model {
     mapInArray(target) {
         let keys = [];
         if (typeof target !== "undefined") {
-            target.forEach(item => {
-                keys.push(item);
+            target.forEach((value, key) => {
+                if (value != key) {
+                    keys.push(key + "` AS `" + value);
+                }
+                else {
+                    keys.push(key);
+                }
             });
         }
         else {
@@ -157,35 +162,40 @@ class Model {
         let selectableFields = [];
         let modelFields = this.getFields();
         let config = this.DB.config;
-        // Check if is an array or just SQL code
-        if ((Array.isArray(fields)) && (fields.length)) {
-            // Log missing fields in dev mode
-            if (config.dev) {
-                this.logArrayInArray(fields, modelFields);
-            }
-            // Check if the validations of fields is on and then filter (Always disallowed in dev mode)
-            if (config.connection.validations.fields) {
-                selectableFields = this.filterArrayInArray(fields, modelFields);
+        if (typeof fields === "string") {
+            return fields;
+        }
+        else {
+            // Check if is an array or just SQL code
+            if ((Array.isArray(fields)) && (fields.length)) {
+                // Log missing fields in dev mode
+                if (config.dev) {
+                    this.logArrayInArray(fields, modelFields);
+                }
+                // Check if the validations of fields is on and then filter (Always disallowed in dev mode)
+                if (config.connection.validations.fields) {
+                    selectableFields = this.filterArrayInArray(fields, modelFields);
+                }
+                else {
+                    selectableFields = this.mapInArray(modelFields);
+                }
             }
             else {
                 selectableFields = this.mapInArray(modelFields);
             }
+            if (typeof prefix == "undefined") {
+                fieldsSQL = "`" + this.tableName + "`.`";
+                fieldsSQL = fieldsSQL + selectableFields.join("`, `" + this.tableName + "`.`") + "`";
+            }
+            else {
+                let formatedFields = [];
+                selectableFields.forEach((field) => {
+                    formatedFields.push("`" + this.tableName + "`.`" + field + "` AS `" + this.tableName + "__" + field + "`");
+                });
+                fieldsSQL = formatedFields.join(", ");
+            }
+            return fieldsSQL;
         }
-        else {
-            selectableFields = this.mapInArray(modelFields);
-        }
-        if (typeof prefix == "undefined") {
-            fieldsSQL = "`" + this.tableName + "`.`";
-            fieldsSQL = fieldsSQL + selectableFields.join("`, `" + this.tableName + "`.`") + "`";
-        }
-        else {
-            let formatedFields = [];
-            selectableFields.forEach((field) => {
-                formatedFields.push("`" + this.tableName + "`.`" + field + "` AS `" + this.tableName + "__" + field + "`");
-            });
-            fieldsSQL = formatedFields.join(", ");
-        }
-        return fieldsSQL;
     }
     /**
      * Generates a select string from the Join configuration
@@ -283,6 +293,12 @@ class Model {
                 values: []
             };
         }
+        else if (typeof where === "string") {
+            return {
+                sql: "ERROR",
+                values: []
+            };
+        }
         else {
             let generated = {
                 sql: "",
@@ -341,8 +357,8 @@ class Model {
      * @var fields If is NOT set "*" will be used, if there's a string then it will be used as is, a plain query will be
      * executed, if in the other hand an array is provided (Recommended), then it will filter the keys and run the query.
      * @var where Key/Value object used to filter the query, an array of Key/Value objects will generate a multiple filter separated by an "OR".
-     * @var orderBy String with column_name and direction E.g.: "id, name ASC"
-     * @var groupBy String with column_name E.g.: "id, name"
+     * @var orderBy String with column names and direction E.g.: "id, name ASC"
+     * @var groupBy String with column names E.g.: "id, name"
      * @var limit Number of rows to retrieve
      * @return Promise with query result
      *
@@ -380,8 +396,8 @@ class Model {
      * @var fields If is NOT set "*" will be used, if there's a string then it will be used as is, a plain query will be
      * executed, if in the other hand an array is provided (Recommended), then it will filter the keys and run the query.
      * @var where Key/Value object used to filter the query, an array of Key/Value objects will generate a multiple filter separated by an "OR".
-     * @var orderBy String with column_name and direction E.g.: "id, name ASC"
-     * @var groupBy String with column_name E.g.: "id, name"
+     * @var orderBy String with column names and direction E.g.: "id, name ASC"
+     * @var groupBy String with column names E.g.: "id, name"
      * @return Promise with query result
      */
     get(select) {
@@ -414,8 +430,8 @@ class Model {
      * @var fields If is NOT set "*" will be used, if there's a string then it will be used as is, a plain query will be
      * executed, if in the other hand an array is provided (Recommended), then it will filter the keys and run the query.
      * @var where Key/Value object used to filter the query, an array of Key/Value objects will generate a multiple filter separated by an "OR".
-     * @var orderBy String with column_name and direction E.g.: "id, name ASC"
-     * @var groupBy String with column_name E.g.: "id, name"
+     * @var orderBy String with column names and direction E.g.: "id, name ASC"
+     * @var groupBy String with column names E.g.: "id, name"
      * @var limit Number of rows to retrieve
      * @return Promise with query result
      */
@@ -428,8 +444,8 @@ class Model {
      * @var fields If is NOT set "*" will be used, if there's a string then it will be used as is, a plain query will be
      * executed, if in the other hand an array is provided (Recommended), then it will filter the keys and run the query.
      * @var where Key/Value object used to filter the query, an array of Key/Value objects will generate a multiple filter separated by an "OR".
-     * @var orderBy String with column_name and direction E.g.: "id, name ASC"
-     * @var groupBy String with column_name E.g.: "id, name"
+     * @var orderBy String with column names and direction E.g.: "id, name ASC"
+     * @var groupBy String with column names E.g.: "id, name"
      * @return Promise with query result
      */
     getAll(select) {

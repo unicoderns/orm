@@ -32,7 +32,8 @@ import { Models } from "../interfaces/db/models"
  * Starting mock system
  */
 let db = new DB({
-    dev: true, connection:
+    dev: true, 
+    connection:
     {
         "user": "apiUser",
         "password": "password",
@@ -56,11 +57,11 @@ beforeAll(done => {
 describe('Insert', () => {
     it('1 value', () => {
         var expected = {
-            sql: 'INSERT INTO `users` (`user`) VALUES (?);',
-            values: ["Chriss Mejía"]
+            sql: 'INSERT INTO `users` (`firstName`) VALUES (?);',
+            values: ["Chriss"]
         };
         usersTable.returnQuery().insert({
-            user: "Chriss Mejía"
+            firstName: "Chriss"
         }).then((query: Models.Query) => {
             expect(query).toEqual(expected);
         }).catch((err: any) => {
@@ -70,11 +71,11 @@ describe('Insert', () => {
 
     it('2 values', () => {
         var expected = {
-            sql: 'INSERT INTO `users` (`user`, `username`) VALUES (?, ?);',
-            values: ["Chriss Mejía", "chriss"]
+            sql: 'INSERT INTO `users` (`firstName`, `username`) VALUES (?, ?);',
+            values: ["Chriss", "chriss"]
         };
         usersTable.returnQuery().insert({
-            user: "Chriss Mejía",
+            firstName: "Chriss",
             username: "chriss"
         }).then((query: Models.Query) => {
             expect(query).toEqual(expected);

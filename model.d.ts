@@ -101,8 +101,8 @@ export declare class Model {
      * @var fields If is NOT set "*" will be used, if there's a string then it will be used as is, a plain query will be
      * executed, if in the other hand an array is provided (Recommended), then it will filter the keys and run the query.
      * @var where Key/Value object used to filter the query, an array of Key/Value objects will generate a multiple filter separated by an "OR".
-     * @var orderBy String with column_name and direction E.g.: "id, name ASC"
-     * @var groupBy String with column_name E.g.: "id, name"
+     * @var orderBy String with column names and direction E.g.: "id, name ASC"
+     * @var groupBy String with column names E.g.: "id, name"
      * @var limit Number of rows to retrieve
      * @return Promise with query result
      *
@@ -119,8 +119,8 @@ export declare class Model {
      * @var fields If is NOT set "*" will be used, if there's a string then it will be used as is, a plain query will be
      * executed, if in the other hand an array is provided (Recommended), then it will filter the keys and run the query.
      * @var where Key/Value object used to filter the query, an array of Key/Value objects will generate a multiple filter separated by an "OR".
-     * @var orderBy String with column_name and direction E.g.: "id, name ASC"
-     * @var groupBy String with column_name E.g.: "id, name"
+     * @var orderBy String with column names and direction E.g.: "id, name ASC"
+     * @var groupBy String with column names E.g.: "id, name"
      * @return Promise with query result
      */
     get(select: Models.Select): Promise<any>;
@@ -130,8 +130,8 @@ export declare class Model {
      * @var fields If is NOT set "*" will be used, if there's a string then it will be used as is, a plain query will be
      * executed, if in the other hand an array is provided (Recommended), then it will filter the keys and run the query.
      * @var where Key/Value object used to filter the query, an array of Key/Value objects will generate a multiple filter separated by an "OR".
-     * @var orderBy String with column_name and direction E.g.: "id, name ASC"
-     * @var groupBy String with column_name E.g.: "id, name"
+     * @var orderBy String with column names and direction E.g.: "id, name ASC"
+     * @var groupBy String with column names E.g.: "id, name"
      * @var limit Number of rows to retrieve
      * @return Promise with query result
      */
@@ -142,8 +142,8 @@ export declare class Model {
      * @var fields If is NOT set "*" will be used, if there's a string then it will be used as is, a plain query will be
      * executed, if in the other hand an array is provided (Recommended), then it will filter the keys and run the query.
      * @var where Key/Value object used to filter the query, an array of Key/Value objects will generate a multiple filter separated by an "OR".
-     * @var orderBy String with column_name and direction E.g.: "id, name ASC"
-     * @var groupBy String with column_name E.g.: "id, name"
+     * @var orderBy String with column names and direction E.g.: "id, name ASC"
+     * @var groupBy String with column names E.g.: "id, name"
      * @return Promise with query result
      */
     getAll(select: Models.Select): Promise<any>;

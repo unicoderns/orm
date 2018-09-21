@@ -114,10 +114,13 @@ export class Model {
      */
     private mapInArray(target: Map<string, string> | undefined): string[] {
         let keys: string[] = [];
-
         if (typeof target !== "undefined") {
-            target.forEach(item => {
-                keys.push(item);
+            target.forEach((value: string, key: string) => {
+                if (value != key) {
+                    keys.push(key + "` AS `" + value);
+                } else {
+                    keys.push(key);
+                }
             });
         } else {
             console.error(chalk.red("No fields in the model"));
@@ -164,43 +167,48 @@ export class Model {
      * @var fields String array with field names.
      * @return Object cointaining the SQL and a field report
      */
-    private getSelectFieldsSQL(fields: string[] | undefined, prefix?: boolean): string {
+    private getSelectFieldsSQL(fields: string | string[] | undefined, prefix?: boolean): string {
         let fieldsSQL = "";
         let selectableFields: string[] = [];
         let modelFields = this.getFields();
         let config: Config = this.DB.config;
 
-        // Check if is an array or just SQL code
-        if ((Array.isArray(fields)) && (fields.length)) {
+        if (typeof fields === "string") {
+            return fields;
+        } else {
+            // Check if is an array or just SQL code
+            if ((Array.isArray(fields)) && (fields.length)) {
 
-            // Log missing fields in dev mode
-            if (config.dev) {
-                this.logArrayInArray(fields, modelFields);
-            }
+                // Log missing fields in dev mode
+                if (config.dev) {
+                    this.logArrayInArray(fields, modelFields);
+                }
 
-            // Check if the validations of fields is on and then filter (Always disallowed in dev mode)
-            if (config.connection.validations.fields) {
-                selectableFields = this.filterArrayInArray(fields, modelFields);
+                // Check if the validations of fields is on and then filter (Always disallowed in dev mode)
+                if (config.connection.validations.fields) {
+                    selectableFields = this.filterArrayInArray(fields, modelFields);
+                } else {
+                    selectableFields = this.mapInArray(modelFields);
+                }
+
             } else {
                 selectableFields = this.mapInArray(modelFields);
             }
 
-        } else {
-            selectableFields = this.mapInArray(modelFields);
+            if (typeof prefix == "undefined") {
+                fieldsSQL = "`" + this.tableName + "`.`";
+                fieldsSQL = fieldsSQL + selectableFields.join("`, `" + this.tableName + "`.`") + "`";
+            } else {
+                let formatedFields: string[] = [];
+                selectableFields.forEach((field: string) => {
+                    formatedFields.push("`" + this.tableName + "`.`" + field + "` AS `" + this.tableName + "__" + field + "`");
+                });
+                fieldsSQL = formatedFields.join(", ")
+            }
+
+            return fieldsSQL;
         }
 
-        if (typeof prefix == "undefined") {
-            fieldsSQL = "`" + this.tableName + "`.`";
-            fieldsSQL = fieldsSQL + selectableFields.join("`, `" + this.tableName + "`.`") + "`";
-        } else {
-            let formatedFields: string[] = [];
-            selectableFields.forEach((field: string) => {
-                formatedFields.push("`" + this.tableName + "`.`" + field + "` AS `" + this.tableName + "__" + field + "`");
-            });
-            fieldsSQL = formatedFields.join(", ")
-        }
-
-        return fieldsSQL;
     }
 
     /**
@@ -304,6 +312,11 @@ export class Model {
                 sql: "",
                 values: []
             };
+        } else if (typeof where === "string") {
+            return {
+                sql: "ERROR",
+                values: []
+            };
         } else {
             let generated: { sql: string, values: string[] } = {
                 sql: "",
@@ -364,8 +377,8 @@ export class Model {
      * @var fields If is NOT set "*" will be used, if there's a string then it will be used as is, a plain query will be 
      * executed, if in the other hand an array is provided (Recommended), then it will filter the keys and run the query.
      * @var where Key/Value object used to filter the query, an array of Key/Value objects will generate a multiple filter separated by an "OR".
-     * @var orderBy String with column_name and direction E.g.: "id, name ASC"
-     * @var groupBy String with column_name E.g.: "id, name"
+     * @var orderBy String with column names and direction E.g.: "id, name ASC"
+     * @var groupBy String with column names E.g.: "id, name"
      * @var limit Number of rows to retrieve
      * @return Promise with query result
      * 
@@ -404,8 +417,8 @@ export class Model {
      * @var fields If is NOT set "*" will be used, if there's a string then it will be used as is, a plain query will be 
      * executed, if in the other hand an array is provided (Recommended), then it will filter the keys and run the query.
      * @var where Key/Value object used to filter the query, an array of Key/Value objects will generate a multiple filter separated by an "OR".
-     * @var orderBy String with column_name and direction E.g.: "id, name ASC"
-     * @var groupBy String with column_name E.g.: "id, name"
+     * @var orderBy String with column names and direction E.g.: "id, name ASC"
+     * @var groupBy String with column names E.g.: "id, name"
      * @return Promise with query result
      */
     public get(select: Models.Select): Promise<any> {
@@ -440,8 +453,8 @@ export class Model {
      * @var fields If is NOT set "*" will be used, if there's a string then it will be used as is, a plain query will be 
      * executed, if in the other hand an array is provided (Recommended), then it will filter the keys and run the query.
      * @var where Key/Value object used to filter the query, an array of Key/Value objects will generate a multiple filter separated by an "OR".
-     * @var orderBy String with column_name and direction E.g.: "id, name ASC"
-     * @var groupBy String with column_name E.g.: "id, name"
+     * @var orderBy String with column names and direction E.g.: "id, name ASC"
+     * @var groupBy String with column names E.g.: "id, name"
      * @var limit Number of rows to retrieve
      * @return Promise with query result
      */
@@ -455,8 +468,8 @@ export class Model {
      * @var fields If is NOT set "*" will be used, if there's a string then it will be used as is, a plain query will be 
      * executed, if in the other hand an array is provided (Recommended), then it will filter the keys and run the query.
      * @var where Key/Value object used to filter the query, an array of Key/Value objects will generate a multiple filter separated by an "OR".
-     * @var orderBy String with column_name and direction E.g.: "id, name ASC"
-     * @var groupBy String with column_name E.g.: "id, name"
+     * @var orderBy String with column names and direction E.g.: "id, name ASC"
+     * @var groupBy String with column names E.g.: "id, name"
      * @return Promise with query result
      */
     public getAll(select: Models.Select): Promise<any> {

@@ -43,8 +43,8 @@ export declare namespace Models {
      * @var groupBy String with column_name E.g.: "id, name"
      */
     interface Select {
-        fields?: string[];
-        where?: KeyValue | KeyValue[];
+        fields?: string | string[];
+        where?: string | KeyValue | KeyValue[];
         groupBy?: string;
         orderBy?: string;
     }

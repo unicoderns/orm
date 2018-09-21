@@ -49,7 +49,7 @@ Query result:
 
 #### Params ####
 `fields` 
-* If is NOT set "*" will be used
+* If is NOT set `*` will be used
 * If there's a string then it will be used as is
 * If in the other hand an array is provided (Recommended), then it will filter the keys and add the table name.
 
@@ -83,7 +83,7 @@ Query result:
 
 #### Params ####
 `fields` 
-* If is NOT set "*" will be used
+* If is NOT set `*` will be used
 * If there's a string then it will be used as is
 * If in the other hand an array is provided (Recommended), then it will filter the keys and add the table name.
 
@@ -120,7 +120,7 @@ Query result:
 
 #### Params ####
 `fields` 
-* If is NOT set "*" will be used
+* If is NOT set `*` will be used
 * If there's a string then it will be used as is
 * If in the other hand an array is provided (Recommended), then it will filter the keys and add the table name.
 
@@ -176,7 +176,7 @@ Query result:
 `data` object data to be update in the table.
 
 `where`
-* "*" string wildcard is required for security reasons if you want to match all rows
+* `*` string wildcard is required for security reasons if you want to match all rows
 * Key/Value object used to filter the query
 * Array of Key/Value objects will generate a multiple filters separated by an "OR".
 
@@ -201,6 +201,6 @@ Query result:
 
 Expecting:
 
-* "*" string wildcard is required for security reasons if you want to match all rows
+* `*` string wildcard is required for security reasons if you want to match all rows
 * Key/Value object used to filter the query
 * Array of Key/Value objects will generate a multiple filters separated by an "OR".

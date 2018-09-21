@@ -1,4 +1,27 @@
 "use strict";
+////////////////////////////////////////////////////////////////////////////////////////////
+// The MIT License (MIT)                                                                  //
+//                                                                                        //
+// Copyright (C) 2018  Unicoderns SA - info@unicoderns.com - unicoderns.com               //
+//                                                                                        //
+// Permission is hereby granted, free of charge, to any person obtaining a copy           //
+// of this software and associated documentation files (the "Software"), to deal          //
+// in the Software without restriction, including without limitation the rights           //
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell              //
+// copies of the Software, and to permit persons to whom the Software is                  //
+// furnished to do so, subject to the following conditions:                               //
+//                                                                                        //
+// The above copyright notice and this permission notice shall be included in all         //
+// copies or substantial portions of the Software.                                        //
+//                                                                                        //
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR             //
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,               //
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE            //
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER                 //
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,          //
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE          //
+// SOFTWARE.                                                                              //
+////////////////////////////////////////////////////////////////////////////////////////////
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
@@ -13,7 +36,8 @@ const connection_1 = require("../connection");
  * Starting mock system
  */
 let db = new connection_1.DB({
-    dev: true, connection: {
+    dev: true,
+    connection: {
         "user": "apiUser",
         "password": "password",
         "database": "apiDB",
@@ -33,7 +57,7 @@ beforeAll(done => {
 describe('Get general', () => {
     it('Simple with empty where array should fail', () => {
         var expected = {
-            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`first_name`, `users`.`last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE ();',
+            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE ();',
             values: []
         };
         usersTable.returnQuery().getAll({
@@ -46,7 +70,7 @@ describe('Get general', () => {
     });
     it('Simple with empty where object should fail', () => {
         var expected = {
-            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`first_name`, `users`.`last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE `users`.`` = ?;',
+            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE `users`.`` = ?;',
             values: []
         };
         usersTable.returnQuery().getAll({
@@ -57,9 +81,22 @@ describe('Get general', () => {
             console.error(err);
         });
     });
+    it('Simple with where string different than "*" should fail', () => {
+        var expected = {
+            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users`ERROR;',
+            values: []
+        };
+        usersTable.returnQuery().getAll({
+            where: "hello"
+        }).then((query) => {
+            expect(query).toEqual(expected);
+        }).catch((err) => {
+            console.error(err);
+        });
+    });
     it('Simple with OR', () => {
         var expected = {
-            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`first_name`, `users`.`last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE (`users`.`id` = ?) OR (`users`.`username` = ?);',
+            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE (`users`.`id` = ?) OR (`users`.`username` = ?);',
             values: [3, "chriss"]
         };
         usersTable.returnQuery().getAll({
@@ -75,7 +112,7 @@ describe('Get general', () => {
     });
     it('Multiple fields with OR', () => {
         var expected = {
-            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`first_name`, `users`.`last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE (`users`.`id` = ? AND `users`.`email` = ?) OR (`users`.`username` = ?);',
+            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE (`users`.`id` = ? AND `users`.`email` = ?) OR (`users`.`username` = ?);',
             values: [3, "chriss@unicoderns.com", "chriss"]
         };
         usersTable.returnQuery().getAll({
@@ -91,11 +128,51 @@ describe('Get general', () => {
     });
     it('Simple with multiple OR', () => {
         var expected = {
-            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`first_name`, `users`.`last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE (`users`.`id` = ?) OR (`users`.`username` = ?) OR (`users`.`email` = ?);',
+            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE (`users`.`id` = ?) OR (`users`.`username` = ?) OR (`users`.`email` = ?);',
             values: [3, "chriss", "chriss@unicoderns.com"]
         };
         usersTable.returnQuery().getAll({
             where: [{ id: 3 }, { username: "chriss" }, { email: "chriss@unicoderns.com" }]
+        }).then((query) => {
+            expect(query).toEqual(expected);
+        }).catch((err) => {
+            console.error(err);
+        });
+    });
+    it('Simple with groupBy', () => {
+        var expected = {
+            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` GROUP BY username, active;',
+            values: []
+        };
+        usersTable.returnQuery().getAll({
+            groupBy: "username, active"
+        }).then((query) => {
+            expect(query).toEqual(expected);
+        }).catch((err) => {
+            console.error(err);
+        });
+    });
+    it('Simple with orderBy', () => {
+        var expected = {
+            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` ORDER BY id ASC;',
+            values: []
+        };
+        usersTable.returnQuery().getAll({
+            orderBy: "id ASC"
+        }).then((query) => {
+            expect(query).toEqual(expected);
+        }).catch((err) => {
+            console.error(err);
+        });
+    });
+    it('Simple with orderBy and groupBy', () => {
+        var expected = {
+            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` GROUP BY username, active ORDER BY id ASC;',
+            values: []
+        };
+        usersTable.returnQuery().getAll({
+            orderBy: "id ASC",
+            groupBy: "username, active"
         }).then((query) => {
             expect(query).toEqual(expected);
         }).catch((err) => {

@@ -31,8 +31,8 @@ import { Models } from "../interfaces/db/models"
  * Starting mock system
  */
 let db = new DB({
-    dev: true, connection:
-    {
+    dev: true,
+    connection: {
         "user": "apiUser",
         "password": "password",
         "database": "apiDB",
@@ -55,9 +55,23 @@ beforeAll(done => {
 });
 
 describe('Get general', () => {
+    it('Simple with plain text', () => {
+        var expected = {
+            sql: 'SELECT username AS user FROM `users`;',
+            values: []
+        };
+        usersTable.returnQuery().getAll({
+            fields: "username AS user"
+        }).then((query: Models.Query) => {
+            expect(query).toEqual(expected);
+        }).catch((err: any) => {
+            console.error(err)
+        });
+    });
+
     it('Simple with empty fields array', () => {
         var expected = {
-            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`first_name`, `users`.`last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users`;',
+            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users`;',
             values: []
         };
         usersTable.returnQuery().getAll({
@@ -71,7 +85,7 @@ describe('Get general', () => {
 
     it('Simple unsafe', () => {
         var expected = {
-            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`first_name`, `users`.`last_name`, `users`.`admin`, `users`.`verified`, `users`.`active`, `users`.`password`, `users`.`added_salt` FROM `users`;',
+            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active`, `users`.`password`, `users`.`salt` AS `added_salt` FROM `users`;',
             values: []
         };
         usersUnsafeTable.returnQuery().getAll({
@@ -81,14 +95,14 @@ describe('Get general', () => {
         }).catch((err: any) => {
             console.error(err)
         });
-    });    
+    });
 });
 
 
 describe('Get all', () => {
     it('Simple', () => {
         var expected = {
-            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`first_name`, `users`.`last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users`;',
+            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users`;',
             values: []
         };
         usersTable.returnQuery().getAll({}).then((query: Models.Query) => {
@@ -100,7 +114,7 @@ describe('Get all', () => {
 
     it('With where', () => {
         var expected = {
-            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`first_name`, `users`.`last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE `users`.`id` = ?;',
+            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE `users`.`id` = ?;',
             values: [3]
         };
         usersTable.returnQuery().getAll({
@@ -151,7 +165,7 @@ describe('Get all', () => {
 describe('Get Some', () => {
     it('Simple', () => {
         var expected = {
-            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`first_name`, `users`.`last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` LIMIT 3;',
+            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` LIMIT 3;',
             values: []
         };
         usersTable.returnQuery().getSome({
@@ -165,7 +179,7 @@ describe('Get Some', () => {
 
     it('Simple without limit', () => {
         var expected = {
-            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`first_name`, `users`.`last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users`;',
+            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users`;',
             values: []
         };
         usersTable.returnQuery().getSome({}).then((query: Models.Query) => {
@@ -177,7 +191,7 @@ describe('Get Some', () => {
 
     it('With where', () => {
         var expected = {
-            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`first_name`, `users`.`last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE `users`.`id` = ? LIMIT 3;',
+            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE `users`.`id` = ? LIMIT 3;',
             values: [3]
         };
         usersTable.returnQuery().getSome({
@@ -231,7 +245,7 @@ describe('Get Some', () => {
 describe('Get one', () => {
     it('Simple', () => {
         var expected = {
-            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`first_name`, `users`.`last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` LIMIT 1;',
+            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` LIMIT 1;',
             values: []
         };
         usersTable.returnQuery().get({}).then((query: Models.Query) => {
@@ -243,7 +257,7 @@ describe('Get one', () => {
 
     it('With where', () => {
         var expected = {
-            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`first_name`, `users`.`last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE `users`.`id` = ? LIMIT 1;',
+            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE `users`.`id` = ? LIMIT 1;',
             values: [3]
         };
         usersTable.returnQuery().get({

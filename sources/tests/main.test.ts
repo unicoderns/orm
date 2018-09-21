@@ -31,7 +31,8 @@ import { DB } from "../connection"
  * Starting mock system
  */
 let db = new DB({
-    dev: true, connection:
+    dev: true, 
+    connection:
     {
         "user": "apiUser",
         "password": "password",
