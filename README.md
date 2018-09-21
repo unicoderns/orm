@@ -9,6 +9,7 @@ Premise based typescript light layer package that allow you to query the DB in a
 
 ```typescript
 import * as users from './dummy/usersModel';
+import * as sessions from './dummy/sessionsModel';
 import { DB } from "@unicoderns/orm/connection"
 
 let db = new DB({
@@ -27,6 +28,8 @@ let db = new DB({
 });
 
 let usersTable: users.Users = new users.Users(db);
+let sessionsTable: sessions.Sessions = new sessions.Sessions(db);
+
 ```
 
 ## Select
@@ -204,3 +207,30 @@ Expecting:
 * `*` string wildcard is required for security reasons if you want to match all rows
 * Key/Value object used to filter the query
 * Array of Key/Value objects will generate a multiple filters separated by an "OR".
+
+## Join
+Working only with select queries
+
+```typescript
+sessionsTable.join({
+    keyField: sessionsTable.user,
+    fields: ["username", "email", "firstName", "lastName"],
+    kind: "LEFT"
+}).getAll({}).then((data: any) => {
+    console.log(data);
+}).catch((err: any) => {
+    console.error(err)
+});
+```
+
+Query result: 
+```sql
+'SELECT `sessions`.`id`, `sessions`.`created`, `sessions`.`ip`, `sessions`.`user`, `users`.`username` AS `users__username`, `users`.`email` AS `users__email`, `users`.`firstName` AS `users__firstName`, `users`.`lastName` AS `users__lastName` FROM `sessions` LEFT JOIN `users` ON `sessions`.`user` = `users`.`id`;'
+```
+
+#### Params ####
+`keyField` Model foreign key.
+
+`fields` String array with names of fields to join.
+
+`kind` Type of Join to apply E.g.: INNER, LEFT.
