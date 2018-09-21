@@ -47,6 +47,21 @@ Query result:
 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`first_name`, `users`.`last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` LIMIT 1;'
 ```
 
+#### Params ####
+`fields` 
+* If is NOT set "*" will be used
+* If there's a string then it will be used as is
+* If in the other hand an array is provided (Recommended), then it will filter the keys and add the table name.
+
+`where` 
+* Key/Value object used to filter the query
+* Array of Key/Value objects will generate a multiple filters separated by an "OR".
+
+`orderBy` String with column names and direction E.g.: "id, name ASC"
+
+`groupBy` String with column names E.g.: "id, name"
+
+
 ### Get Some
 
 Get a limited number of matching rows
@@ -65,6 +80,22 @@ Query result:
 ```sql
 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`first_name`, `users`.`last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` LIMIT 3;'
 ```
+
+#### Params ####
+`fields` 
+* If is NOT set "*" will be used
+* If there's a string then it will be used as is
+* If in the other hand an array is provided (Recommended), then it will filter the keys and add the table name.
+
+`where` 
+* Key/Value object used to filter the query
+* Array of Key/Value objects will generate a multiple filters separated by an "OR".
+
+`orderBy` String with column names and direction E.g.: "id, name ASC"
+
+`groupBy` String with column names E.g.: "id, name"
+
+`limit` Number of rows to retrieve
 
 ### Get All
 
@@ -87,6 +118,20 @@ Query result:
 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`first_name`, `users`.`last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE `users`.`id` = 3;'
 ```
 
+#### Params ####
+`fields` 
+* If is NOT set "*" will be used
+* If there's a string then it will be used as is
+* If in the other hand an array is provided (Recommended), then it will filter the keys and add the table name.
+
+`where` 
+* Key/Value object used to filter the query
+* Array of Key/Value objects will generate a multiple filters separated by an "OR".
+
+`orderBy` String with column names and direction E.g.: "id, name ASC"
+
+`groupBy` String with column names E.g.: "id, name"
+
 ## Insert
 
 ```typescript
@@ -103,6 +148,9 @@ Query result:
 ```sql
 'INSERT INTO `users` (`firstName`) VALUES (?);'
 ```
+
+#### Params ####
+Expecting object to be inserted in the table
 
 ## Update
 
@@ -124,6 +172,14 @@ Query result:
 'UPDATE `users` SET `firstName` = "Chriss" WHERE `users`.`id` = 3;'
 ```
 
+#### Params ####
+`data` object data to be update in the table.
+
+`where`
+* "*" string wildcard is required for security reasons if you want to match all rows
+* Key/Value object used to filter the query
+* Array of Key/Value objects will generate a multiple filters separated by an "OR".
+
 ## Delete
 
 ```typescript
@@ -140,3 +196,11 @@ Query result:
 ```sql
 'DELETE FROM `users` WHERE `users`.`id` = 1;'
 ```
+
+#### Params ####
+
+Expecting:
+
+* "*" string wildcard is required for security reasons if you want to match all rows
+* Key/Value object used to filter the query
+* Array of Key/Value objects will generate a multiple filters separated by an "OR".
