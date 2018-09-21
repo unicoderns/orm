@@ -481,7 +481,7 @@ export class Model {
      *
      * Specify a field that needs to be joined
      * 
-     * Warning: It works only with select requests
+     * Warning: It works only with select queries
      * 
      * @var keyField Model foreign key
      * @var fields String array with names of fields to join
