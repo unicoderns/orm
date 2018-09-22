@@ -125,14 +125,14 @@ describe('Joins', () => {
         });
     });
 
-    it('Left join update with where at users', () => {
+    it('Inner join update with where at users', () => {
         var expected = {
-            sql: 'UPDATE `sessions` LEFT JOIN `users` ON `sessions`.`user` = `users`.`id` SET `ip` = ? WHERE `users`.`id` = ?;',
+            sql: 'UPDATE `sessions` INNER JOIN `users` ON `sessions`.`user` = `users`.`id` SET `ip` = ? WHERE `users`.`id` = ?;',
             values: ["121.0.0.1", 3]
         };
         sessionsTable.returnQuery().join([{
             keyField: sessionsTable.user,
-            kind: "LEFT"
+            kind: "INNER"
         }]).update({
             data: {
                 ip: "121.0.0.1"
@@ -146,26 +146,44 @@ describe('Joins', () => {
             console.error(err)
         });
     });
-/*
-    it('INNER join update usersTwo with literal from users', () => {
+
+    it('Inner join delete with where at users', () => {
         var expected = {
-            sql: 'SELECT `sessions`.`id`, `sessions`.`created`, `sessions`.`ip`, `sessions`.`user`, `users`.`username` AS `users__username`, `users`.`email` AS `users__email`, `users`.`firstName` AS `users__firstName`, `users`.`lastName` AS `users__lastName` FROM `sessions` LEFT JOIN `users` ON `sessions`.`user` = `users`.`id` WHERE `users`.`id` = ?;',
+            sql: 'DELETE FROM `sessions` INNER JOIN `users` ON `sessions`.`user` = `users`.`id` WHERE `users`.`id` = ?;',
             values: [3]
         };
-        usersTwoTable.returnQuery().join([{
-            keyField: usersTwoTable.user,
-            fields: ["username"],
+        sessionsTable.returnQuery().join([{
+            keyField: sessionsTable.user,
             kind: "INNER"
-        }]).update({
-            data: {
-                username: "users__username"
-            },
-            where: "*"
+        }]).delete({
+            "users__id": 3
         }).then((query: Models.Query) => {
             expect(query).toEqual(expected);
         }).catch((err: any) => {
             console.error(err)
         });
     });
-*/
+    
+    /*
+        it('INNER join update usersTwo with literal from users', () => {
+            var expected = {
+                sql: 'SELECT `sessions`.`id`, `sessions`.`created`, `sessions`.`ip`, `sessions`.`user`, `users`.`username` AS `users__username`, `users`.`email` AS `users__email`, `users`.`firstName` AS `users__firstName`, `users`.`lastName` AS `users__lastName` FROM `sessions` LEFT JOIN `users` ON `sessions`.`user` = `users`.`id` WHERE `users`.`id` = ?;',
+                values: [3]
+            };
+            usersTwoTable.returnQuery().join([{
+                keyField: usersTwoTable.user,
+                fields: ["username"],
+                kind: "INNER"
+            }]).update({
+                data: {
+                    username: "users__username"
+                },
+                where: "*"
+            }).then((query: Models.Query) => {
+                expect(query).toEqual(expected);
+            }).catch((err: any) => {
+                console.error(err)
+            });
+        });
+    */
 });

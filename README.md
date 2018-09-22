@@ -213,6 +213,8 @@ Please notice:
 * Fields from the joined table will not be validated (coming soon).
 * You can't assign 1 column value to a joined column value yet (coming soon).
 
+### GetAll
+
 ```typescript
 sessionsTable.join([{
     keyField: sessionsTable.user,
@@ -238,5 +240,60 @@ SELECT `sessions`.`id`, `sessions`.`created`, `sessions`.`ip`, `sessions`.`user`
 `keyField` Model foreign key.
 
 `fields` String array with names of fields to join.
+
+`kind` Type of Join to apply E.g.: INNER, LEFT.
+
+### Update
+
+```typescript
+sessionsTable.join([{
+    keyField: sessionsTable.user,
+    kind: "INNER"
+}]).update({
+    data: {
+        ip: "121.0.0.1"
+    },
+    where: {
+        "users__id": 3
+    }
+}).then((data: any) => {
+    console.log(data);
+}).catch((err: any) => {
+    console.error(err)
+});
+```
+
+Query result: 
+```sql
+UPDATE `sessions` INNER JOIN `users` ON `sessions`.`user` = `users`.`id` SET `ip` = "121.0.0.1" WHERE `users`.`id` = 3;
+```
+
+#### Params ####
+`keyField` Model foreign key.
+
+`kind` Type of Join to apply E.g.: INNER, LEFT.
+
+### Delete
+
+```typescript
+sessionsTable.join([{
+    keyField: sessionsTable.user,
+    kind: "INNER"
+}]).delete({
+    "users__id": 3
+})then((data: any) => {
+    console.log(data);
+}).catch((err: any) => {
+    console.error(err)
+});
+```
+
+Query result: 
+```sql
+DELETE FROM `sessions` INNER JOIN `users` ON `sessions`.`user` = `users`.`id` WHERE `users`.`id` = 3;
+```
+
+#### Params ####
+`keyField` Model foreign key.
 
 `kind` Type of Join to apply E.g.: INNER, LEFT.

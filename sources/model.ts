@@ -578,6 +578,7 @@ export class Model {
      */
     public delete(where: string | Models.KeyValue | Models.KeyValue[]): Promise<any> {
         let whereCode;
+        let joinCode = this.generateJoinCode();
         if ((typeof where === "undefined") ||
             ((!isArray(where)) && (!Object.keys(where).length))) {
             whereCode = {
@@ -587,7 +588,7 @@ export class Model {
         } else {
             whereCode = this.generateWhereCode(where)
         }
-        let query = "DELETE FROM `" + this.tableName + "`" + whereCode.sql + ";";
+        let query = "DELETE FROM `" + this.tableName + "`" + joinCode + whereCode.sql + ";";
         return this.query({ sql: query, values: whereCode.values });
     }
 
