@@ -57,7 +57,7 @@ beforeAll(done => {
 describe('Get general', () => {
     it('Simple with empty where array should fail', () => {
         var expected = {
-            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE ();',
+            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users`ERROR;',
             values: []
         };
         usersTable.returnQuery().getAll({
@@ -68,14 +68,28 @@ describe('Get general', () => {
             console.error(err);
         });
     });
-    it('Simple with empty where object should fail', () => {
+    it('Simple update with empty where object should fail', () => {
         var expected = {
-            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE `users`.`` = ?;',
-            values: []
+            sql: 'UPDATE `users` SET `username` = ?ERROR;',
+            values: ["chriss"]
         };
-        usersTable.returnQuery().getAll({
+        usersTable.returnQuery().update({
+            data: {
+                username: "chriss"
+            },
             where: {}
         }).then((query) => {
+            expect(query).toEqual(expected);
+        }).catch((err) => {
+            console.error(err);
+        });
+    });
+    it('Simple delete with empty where object should fail', () => {
+        var expected = {
+            sql: 'DELETE FROM `users`ERROR;',
+            values: []
+        };
+        usersTable.returnQuery().delete({}).then((query) => {
             expect(query).toEqual(expected);
         }).catch((err) => {
             console.error(err);

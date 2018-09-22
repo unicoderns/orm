@@ -31,6 +31,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const sessions = __importStar(require("./dummy/sessionsModel"));
+const userstwo = __importStar(require("./dummy/usersTwoModel"));
 const connection_1 = require("../connection");
 /**
  * Starting mock system
@@ -50,21 +51,37 @@ let db = new connection_1.DB({
     }
 });
 let sessionsTable;
+let usersTwoTable;
 beforeAll(done => {
     sessionsTable = new sessions.Sessions(db);
+    usersTwoTable = new userstwo.UsersTwo(db);
     done();
 });
 describe('Joins', () => {
+    it('Left join sessions with users without fields', () => {
+        var expected = {
+            sql: 'SELECT `sessions`.`id`, `sessions`.`created`, `sessions`.`ip`, `sessions`.`user`,  FROM `sessions` LEFT JOIN `users` ON `sessions`.`user` = `users`.`id`;',
+            values: []
+        };
+        sessionsTable.returnQuery().join([{
+                keyField: sessionsTable.user,
+                kind: "LEFT"
+            }]).getAll({}).then((query) => {
+            expect(query).toEqual(expected);
+        }).catch((err) => {
+            console.error(err);
+        });
+    });
     it('Left join sessions with users', () => {
         var expected = {
             sql: 'SELECT `sessions`.`id`, `sessions`.`created`, `sessions`.`ip`, `sessions`.`user`, `users`.`username` AS `users__username`, `users`.`email` AS `users__email`, `users`.`firstName` AS `users__firstName`, `users`.`lastName` AS `users__lastName` FROM `sessions` LEFT JOIN `users` ON `sessions`.`user` = `users`.`id`;',
             values: []
         };
-        sessionsTable.returnQuery().join({
-            keyField: sessionsTable.user,
-            fields: ["username", "email", "firstName", "lastName"],
-            kind: "LEFT"
-        }).getAll({}).then((query) => {
+        sessionsTable.returnQuery().join([{
+                keyField: sessionsTable.user,
+                fields: ["username", "email", "firstName", "lastName"],
+                kind: "LEFT"
+            }]).getAll({}).then((query) => {
             expect(query).toEqual(expected);
         }).catch((err) => {
             console.error(err);
@@ -75,15 +92,77 @@ describe('Joins', () => {
             sql: 'SELECT `sessions`.`id`, `sessions`.`created`, `sessions`.`ip`, `sessions`.`user`, `users`.`username` AS `users__username`, `users`.`email` AS `users__email` FROM `sessions` RIGHT JOIN `users` ON `sessions`.`user` = `users`.`id`;',
             values: []
         };
-        sessionsTable.returnQuery().join({
-            keyField: sessionsTable.user,
-            fields: ["username", "email"],
-            kind: "RIGHT"
-        }).getAll({}).then((query) => {
+        sessionsTable.returnQuery().join([{
+                keyField: sessionsTable.user,
+                fields: ["username", "email"],
+                kind: "RIGHT"
+            }]).getAll({}).then((query) => {
             expect(query).toEqual(expected);
         }).catch((err) => {
             console.error(err);
         });
     });
+    it('Left join sessions with where at users', () => {
+        var expected = {
+            sql: 'SELECT `sessions`.`id`, `sessions`.`created`, `sessions`.`ip`, `sessions`.`user`, `users`.`username` AS `users__username`, `users`.`email` AS `users__email`, `users`.`firstName` AS `users__firstName`, `users`.`lastName` AS `users__lastName` FROM `sessions` LEFT JOIN `users` ON `sessions`.`user` = `users`.`id` WHERE `users`.`id` = ?;',
+            values: [3]
+        };
+        sessionsTable.returnQuery().join([{
+                keyField: sessionsTable.user,
+                fields: ["username", "email", "firstName", "lastName"],
+                kind: "LEFT"
+            }]).getAll({
+            where: {
+                "users__id": 3
+            }
+        }).then((query) => {
+            expect(query).toEqual(expected);
+        }).catch((err) => {
+            console.error(err);
+        });
+    });
+    it('Left join update with where at users', () => {
+        var expected = {
+            sql: 'UPDATE `sessions` LEFT JOIN `users` ON `sessions`.`user` = `users`.`id` SET `ip` = ? WHERE `users`.`id` = ?;',
+            values: ["121.0.0.1", 3]
+        };
+        sessionsTable.returnQuery().join([{
+                keyField: sessionsTable.user,
+                kind: "LEFT"
+            }]).update({
+            data: {
+                ip: "121.0.0.1"
+            },
+            where: {
+                "users__id": 3
+            }
+        }).then((query) => {
+            expect(query).toEqual(expected);
+        }).catch((err) => {
+            console.error(err);
+        });
+    });
+    /*
+        it('INNER join update usersTwo with literal from users', () => {
+            var expected = {
+                sql: 'SELECT `sessions`.`id`, `sessions`.`created`, `sessions`.`ip`, `sessions`.`user`, `users`.`username` AS `users__username`, `users`.`email` AS `users__email`, `users`.`firstName` AS `users__firstName`, `users`.`lastName` AS `users__lastName` FROM `sessions` LEFT JOIN `users` ON `sessions`.`user` = `users`.`id` WHERE `users`.`id` = ?;',
+                values: [3]
+            };
+            usersTwoTable.returnQuery().join([{
+                keyField: usersTwoTable.user,
+                fields: ["username"],
+                kind: "INNER"
+            }]).update({
+                data: {
+                    username: "users__username"
+                },
+                where: "*"
+            }).then((query: Models.Query) => {
+                expect(query).toEqual(expected);
+            }).catch((err: any) => {
+                console.error(err)
+            });
+        });
+    */
 });
 //# sourceMappingURL=join.test.js.map

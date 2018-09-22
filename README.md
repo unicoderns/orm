@@ -209,14 +209,20 @@ Expecting:
 * Array of Key/Value objects will generate a multiple filters separated by an "OR".
 
 ## Join
-Working only with select queries
+Please notice:
+* Fields from the joined table will not be validated (coming soon).
+* You can't assign 1 column value to a joined column value yet (coming soon).
 
 ```typescript
-sessionsTable.join({
+sessionsTable.join([{
     keyField: sessionsTable.user,
     fields: ["username", "email", "firstName", "lastName"],
     kind: "LEFT"
-}).getAll({}).then((data: any) => {
+}]).getAll({
+    where: {
+        "users__id": 3
+    }
+}).then((data: any) => {
     console.log(data);
 }).catch((err: any) => {
     console.error(err)
@@ -225,7 +231,7 @@ sessionsTable.join({
 
 Query result: 
 ```sql
-'SELECT `sessions`.`id`, `sessions`.`created`, `sessions`.`ip`, `sessions`.`user`, `users`.`username` AS `users__username`, `users`.`email` AS `users__email`, `users`.`firstName` AS `users__firstName`, `users`.`lastName` AS `users__lastName` FROM `sessions` LEFT JOIN `users` ON `sessions`.`user` = `users`.`id`;'
+SELECT `sessions`.`id`, `sessions`.`created`, `sessions`.`ip`, `sessions`.`user`, `users`.`username` AS `users__username`, `users`.`email` AS `users__email`, `users`.`firstName` AS `users__firstName`, `users`.`lastName` AS `users__lastName` FROM `sessions` LEFT JOIN `users` ON `sessions`.`user` = `users`.`id` WHERE `users`.`id` = 3;
 ```
 
 #### Params ####

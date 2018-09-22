@@ -152,14 +152,14 @@ export declare class Model {
      *
      * Specify a field that needs to be joined
      *
-     * Warning: It works only with select requests
+     * Warning: It works only with select queries
      *
      * @var keyField Model foreign key
      * @var fields String array with names of fields to join
      * @var kind Type of Join to apply E.g.: INNER, LEFT
      * @return Model
      */
-    join(join: Models.Join): Model;
+    join(joins: Models.Join[]): Model;
     /**
      * Insert query
      *

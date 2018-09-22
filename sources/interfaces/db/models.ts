@@ -59,7 +59,7 @@ export namespace Models {
      */
     export interface Join {
         keyField: Fields.ForeignKey;
-        fields: string[];
+        fields?: string[];
         kind: string;
     }
 

@@ -29,6 +29,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const chalk_1 = __importDefault(require("chalk"));
 const es6_promise_1 = require("es6-promise");
 const decorators_1 = require("./decorators");
+const util_1 = require("util");
 /**
  * Model Abstract
  */
@@ -142,8 +143,12 @@ class Model {
     logArrayInArray(target, scope) {
         if (typeof scope !== "undefined") {
             target.forEach(item => {
-                if (!scope.has(item)) {
-                    console.error(chalk_1.default.yellow(item + " field doesn't exists!"));
+                // Validation for joined table not available yet.
+                let joinkeys = item.split("__");
+                if (joinkeys.length == 1) {
+                    if (!scope.has(item)) {
+                        console.error(chalk_1.default.yellow(item + " field doesn't exists!"));
+                    }
                 }
             });
         }
@@ -207,9 +212,11 @@ class Model {
         let joins = this.joins;
         let joinsStringArray = [];
         let joinsSQL = "";
-        if (joins.length) {
+        if ((typeof joins !== "undefined") && (joins.length)) {
             joins.forEach(function (join) {
-                joinsStringArray.push(join.keyField.model.getSelectFieldsSQL(join.fields, true));
+                if (typeof join.fields !== "undefined") {
+                    joinsStringArray.push(join.keyField.model.getSelectFieldsSQL(join.fields, true));
+                }
             });
             joinsSQL = joinsStringArray.join(", ");
             joinsSQL = ", " + joinsSQL;
@@ -261,9 +268,22 @@ class Model {
             filteredKeys = keys;
         }
         if (typeof where !== "undefined") {
-            let sql = "`" + this.tableName + "`.`";
-            sql = sql + filteredKeys.join("` = ? AND `" + this.tableName + "`.`");
-            sql = sql + "` = ?";
+            let sql = "";
+            filteredKeys.forEach((item, id, array) => {
+                let joinkeys = item.split("__");
+                if (joinkeys.length == 2) {
+                    sql = sql + "`" + joinkeys[0] + "`.`" + joinkeys[1] + "` = ?";
+                    if (id < array.length - 1) {
+                        sql = sql + " AND ";
+                    }
+                }
+                else {
+                    sql = sql + "`" + this.tableName + "`.`" + item + "` = ?";
+                    if (id < array.length - 1) {
+                        sql = sql + " AND ";
+                    }
+                }
+            });
             // getting values
             filteredKeys.forEach((item) => {
                 values.push(where[item]);
@@ -293,7 +313,7 @@ class Model {
                 values: []
             };
         }
-        else if (typeof where === "string") {
+        else if ((typeof where === "string") || ((util_1.isArray(where)) && (!where.length))) {
             return {
                 sql: "ERROR",
                 values: []
@@ -456,19 +476,15 @@ class Model {
      *
      * Specify a field that needs to be joined
      *
-     * Warning: It works only with select requests
+     * Warning: It works only with select queries
      *
      * @var keyField Model foreign key
      * @var fields String array with names of fields to join
      * @var kind Type of Join to apply E.g.: INNER, LEFT
      * @return Model
      */
-    join(join) {
-        this.joins.push({
-            keyField: join.keyField,
-            fields: join.fields,
-            kind: join.kind
-        });
+    join(joins) {
+        this.joins = joins;
         return this;
     }
     /**
@@ -500,6 +516,7 @@ class Model {
         let fields = [];
         let values = [];
         let unifiedValues = [];
+        let joinCode = this.generateJoinCode();
         let data = update.data;
         let where = update.where;
         for (let key in data) {
@@ -511,8 +528,18 @@ class Model {
                 values.push(data[key]);
             }
         }
-        let whereCode = this.generateWhereCode(where);
-        let query = "UPDATE `" + this.tableName + "` SET " + fields.join(", ") + whereCode.sql + ";";
+        let whereCode;
+        if ((typeof where === "undefined") ||
+            ((!util_1.isArray(where)) && (!Object.keys(where).length))) {
+            whereCode = {
+                sql: "ERROR",
+                values: []
+            };
+        }
+        else {
+            whereCode = this.generateWhereCode(where);
+        }
+        let query = "UPDATE `" + this.tableName + "`" + joinCode + " SET " + fields.join(", ") + whereCode.sql + ";";
         unifiedValues = values.concat(whereCode.values);
         return this.query({ sql: query, values: unifiedValues });
     }
@@ -523,7 +550,17 @@ class Model {
      * @return Promise with query result
      */
     delete(where) {
-        let whereCode = this.generateWhereCode(where);
+        let whereCode;
+        if ((typeof where === "undefined") ||
+            ((!util_1.isArray(where)) && (!Object.keys(where).length))) {
+            whereCode = {
+                sql: "ERROR",
+                values: []
+            };
+        }
+        else {
+            whereCode = this.generateWhereCode(where);
+        }
         let query = "DELETE FROM `" + this.tableName + "`" + whereCode.sql + ";";
         return this.query({ sql: query, values: whereCode.values });
     }

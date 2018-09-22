@@ -30,7 +30,7 @@ export declare namespace Models {
      */
     interface Join {
         keyField: Fields.ForeignKey;
-        fields: string[];
+        fields?: string[];
         kind: string;
     }
     /**

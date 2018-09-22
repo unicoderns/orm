@@ -56,7 +56,7 @@ beforeAll(done => {
 describe('Update', () => {
     it('Fails if where is an object', () => {
         var expected = {
-            sql: 'UPDATE `users` SET `firstName` = ? WHERE `users`.`` = ?;',
+            sql: 'UPDATE `users` SET `firstName` = ?ERROR;',
             values: ["Chriss"]
         };
         usersTable.returnQuery().update({
@@ -73,7 +73,7 @@ describe('Update', () => {
 
     it('Fails if where is an array', () => {
         var expected = {
-            sql: 'UPDATE `users` SET `firstName` = ? WHERE ();',
+            sql: 'UPDATE `users` SET `firstName` = ?ERROR;',
             values: ["Chriss"]
         };
         usersTable.returnQuery().update({
@@ -81,6 +81,21 @@ describe('Update', () => {
                 firstName: "Chriss"
             },
             where: []
+        }).then((query: Models.Query) => {
+            expect(query).toEqual(expected);
+        }).catch((err: any) => {
+            console.error(err)
+        });
+    });
+
+    it('Fails if data is empty', () => {
+        var expected = {
+            sql: 'UPDATE `users` SET ;',
+            values: []
+        };
+        usersTable.returnQuery().update({
+            data: {},
+            where: "*"
         }).then((query: Models.Query) => {
             expect(query).toEqual(expected);
         }).catch((err: any) => {

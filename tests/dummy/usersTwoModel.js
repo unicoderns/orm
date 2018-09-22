@@ -22,6 +22,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE          //
 // SOFTWARE.                                                                              //
 ////////////////////////////////////////////////////////////////////////////////////////////
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
@@ -30,92 +39,48 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const users = __importStar(require("./dummy/usersModel"));
-const connection_1 = require("../connection");
+const usersModel = __importStar(require("./usersModel"));
+const decorators_1 = require("../../decorators");
+const defaults_1 = require("../../interfaces/db/defaults");
+const datatypes_1 = require("../../datatypes");
+const model_1 = require("../../model");
 /**
- * Starting mock system
+ * User Model
  */
-let db = new connection_1.DB({
-    dev: true,
-    connection: {
-        "user": "apiUser",
-        "password": "password",
-        "database": "apiDB",
-        "port": 3306,
-        "host": "localhost",
-        "connectionLimit": 10,
-        "validations": {
-            "fields": true
-        }
+class UsersTwo extends model_1.Model {
+    constructor() {
+        super(...arguments);
+        this.id = new datatypes_1.Datatypes().ID();
+        this.created = new datatypes_1.Datatypes().TIMESTAMP({
+            notNull: true,
+            default: defaults_1.Defaults.Timestamp.CURRENT_TIMESTAMP
+        });
+        this.username = new datatypes_1.Datatypes().VARCHAR({
+            size: 45,
+            unique: true
+        });
+        // ToDo: Specify the localField looks redundant
+        this.user = new datatypes_1.Datatypes().FOREIGNKEY("user", "id", new usersModel.Users(this.DB), {
+            notNull: true,
+            unique: true
+        });
     }
-});
-let usersTable;
-beforeAll(done => {
-    usersTable = new users.Users(db);
-    done();
-});
-describe('Update', () => {
-    it('Fails if where is an object', () => {
-        var expected = {
-            sql: 'UPDATE `users` SET `firstName` = ?ERROR;',
-            values: ["Chriss"]
-        };
-        usersTable.returnQuery().update({
-            data: {
-                firstName: "Chriss"
-            },
-            where: {}
-        }).then((query) => {
-            expect(query).toEqual(expected);
-        }).catch((err) => {
-            console.error(err);
-        });
-    });
-    it('Fails if where is an array', () => {
-        var expected = {
-            sql: 'UPDATE `users` SET `firstName` = ?ERROR;',
-            values: ["Chriss"]
-        };
-        usersTable.returnQuery().update({
-            data: {
-                firstName: "Chriss"
-            },
-            where: []
-        }).then((query) => {
-            expect(query).toEqual(expected);
-        }).catch((err) => {
-            console.error(err);
-        });
-    });
-    it('Fails if data is empty', () => {
-        var expected = {
-            sql: 'UPDATE `users` SET ;',
-            values: []
-        };
-        usersTable.returnQuery().update({
-            data: {},
-            where: "*"
-        }).then((query) => {
-            expect(query).toEqual(expected);
-        }).catch((err) => {
-            console.error(err);
-        });
-    });
-    it('1 field 1 where', () => {
-        var expected = {
-            sql: 'UPDATE `users` SET `firstName` = ? WHERE `users`.`id` = ?;',
-            values: ["Chriss", 3]
-        };
-        usersTable.returnQuery().update({
-            data: {
-                firstName: "Chriss"
-            },
-            where: { id: 3 }
-        }).then((query) => {
-            expect(query).toEqual(expected);
-        }).catch((err) => {
-            console.error(err);
-        });
-    });
-});
-//# sourceMappingURL=update.test.js.map
+}
+__decorate([
+    decorators_1.field(),
+    __metadata("design:type", Object)
+], UsersTwo.prototype, "id", void 0);
+__decorate([
+    decorators_1.field(),
+    __metadata("design:type", Object)
+], UsersTwo.prototype, "created", void 0);
+__decorate([
+    decorators_1.field(),
+    __metadata("design:type", Object)
+], UsersTwo.prototype, "username", void 0);
+__decorate([
+    decorators_1.field(),
+    __metadata("design:type", Object)
+], UsersTwo.prototype, "user", void 0);
+exports.UsersTwo = UsersTwo;
+//# sourceMappingURL=usersTwoModel.js.map
