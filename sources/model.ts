@@ -296,9 +296,15 @@ export class Model {
                 } else {
                     let joinkeys = item.split("__");
                     if (joinkeys.length == 2) {
-                        sql = sql + "`" + joinkeys[0] + "`.`" + joinkeys[1] + "` = ?";
+                        sql = sql + "`" + joinkeys[0] + "`.`" + joinkeys[1];
                     } else {
-                        sql = sql + "`" + this.tableName + "`.`" + item + "` = ?";
+                        sql = sql + "`" + this.tableName + "`.`" + item;
+                    }
+                    joinkeys = String(where[item]).split("__");
+                    if (joinkeys.length == 2) {
+                        sql = sql + "` = `" + joinkeys[0] + "`.`" + joinkeys[1] + "`";
+                    } else {
+                        sql = sql + "` = ?"
                     }
                 }
                 if (id < array.length - 1) {
@@ -307,7 +313,8 @@ export class Model {
             });
             // getting values
             filteredKeys.forEach((item: string) => {
-                if (String(where[item]).charAt(0) != "\\") {
+                let joinkeys = String(where[item]).split("__");
+                if ((String(where[item]).charAt(0) != "\\") && (joinkeys.length != 2)) {
                     values.push(where[item]);
                 }
             });

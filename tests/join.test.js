@@ -158,28 +158,23 @@ describe('Joins', () => {
             console.error(err);
         });
     });
-    /*
-        it('INNER join update usersTwo with literal from users', () => {
-            var expected = {
-                sql: 'SELECT `sessions`.`id`, `sessions`.`created`, `sessions`.`ip`, `sessions`.`user`, `users`.`username` AS `users__username`, `users`.`email` AS `users__email`, `users`.`firstName` AS `users__firstName`, `users`.`lastName` AS `users__lastName` FROM `sessions` LEFT JOIN `users` ON `sessions`.`user` = `users`.`id` WHERE `users`.`id` = ?;',
-                values: [3]
-            };
-            usersTwoTable.returnQuery().join([{
+    it('INNER join delete usersTwo with literal from users', () => {
+        var expected = {
+            sql: 'DELETE FROM `usersTwo` INNER JOIN `users` ON `usersTwo`.`user` = `users`.`id` WHERE `usersTwo`.`username` = `users`.`username`;',
+            values: []
+        };
+        usersTwoTable.returnQuery().join([{
                 keyField: usersTwoTable.user,
                 fields: ["username"],
                 kind: "INNER"
-            }]).update({
-                data: {
-                    username: "users__username"
-                },
-                where: "*"
-            }).then((query: Models.Query) => {
-                expect(query).toEqual(expected);
-            }).catch((err: any) => {
-                console.error(err)
-            });
+            }]).delete({
+            username: "users__username"
+        }).then((query) => {
+            expect(query).toEqual(expected);
+        }).catch((err) => {
+            console.error(err);
         });
-    */
+    });
     /*
         it('INNER join update usersTwo with literal from users', () => {
             var expected = {

@@ -298,10 +298,37 @@ DELETE FROM `sessions` INNER JOIN `users` ON `sessions`.`user` = `users`.`id` WH
 
 `kind` Type of Join to apply E.g.: INNER, LEFT.
 
-### Advanced
 
-#### Literal strings ####
-You can send an unprepared strings as values in Wheres adding a double `\\` at the start of the condition:
+### Delete on joined condition
+
+```typescript
+sessionsTable.join([{
+    keyField: usersTwoTable.user,
+    fields: ["username"],
+    kind: "INNER"
+}]).delete({
+    username: "users__username"
+}).then((data: any) => {
+    console.log(data);
+}).catch((err: any) => {
+    console.error(err)
+});
+```
+
+Query executed: 
+```sql
+DELETE FROM `usersTwo` INNER JOIN `users` ON `usersTwo`.`user` = `users`.`id` WHERE `usersTwo`.`username` = `users`.`username`;
+```
+
+#### Params ####
+`keyField` Model foreign key.
+
+`kind` Type of Join to apply E.g.: INNER, LEFT.
+
+## Advanced
+
+### Literal strings
+You can send an unprepared strings as values in Wheres adding a double `\\` at the start of the value:
 
 ```typescript
 sessionsTable.getAll({
