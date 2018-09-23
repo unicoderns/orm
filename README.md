@@ -45,7 +45,7 @@ usersTable.get({}).then((data: any) => {
 });
 ```
 
-Query result: 
+Query executed: 
 ```sql
 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`first_name`, `users`.`last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` LIMIT 1;'
 ```
@@ -79,7 +79,7 @@ usersTable.getSome({
 });
 ```
 
-Query result: 
+Query executed: 
 ```sql
 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`first_name`, `users`.`last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` LIMIT 3;'
 ```
@@ -116,7 +116,7 @@ usersTable.getAll({
 });
 ```
 
-Query result: 
+Query executed: 
 ```sql
 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`first_name`, `users`.`last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE `users`.`id` = 3;'
 ```
@@ -147,7 +147,7 @@ usersTable.insert({
 });
 ```
 
-Query result: 
+Query executed: 
 ```sql
 'INSERT INTO `users` (`firstName`) VALUES (?);'
 ```
@@ -170,7 +170,7 @@ usersTable.update({
 });
 ```
 
-Query result: 
+Query executed: 
 ```sql
 'UPDATE `users` SET `firstName` = "Chriss" WHERE `users`.`id` = 3;'
 ```
@@ -195,7 +195,7 @@ usersTable.delete({
 });
 ```
 
-Query result: 
+Query executed: 
 ```sql
 'DELETE FROM `users` WHERE `users`.`id` = 1;'
 ```
@@ -231,7 +231,7 @@ sessionsTable.join([{
 });
 ```
 
-Query result: 
+Query executed: 
 ```sql
 SELECT `sessions`.`id`, `sessions`.`created`, `sessions`.`ip`, `sessions`.`user`, `users`.`username` AS `users__username`, `users`.`email` AS `users__email`, `users`.`firstName` AS `users__firstName`, `users`.`lastName` AS `users__lastName` FROM `sessions` LEFT JOIN `users` ON `sessions`.`user` = `users`.`id` WHERE `users`.`id` = 3;
 ```
@@ -263,7 +263,7 @@ sessionsTable.join([{
 });
 ```
 
-Query result: 
+Query executed: 
 ```sql
 UPDATE `sessions` INNER JOIN `users` ON `sessions`.`user` = `users`.`id` SET `ip` = "121.0.0.1" WHERE `users`.`id` = 3;
 ```
@@ -288,7 +288,7 @@ sessionsTable.join([{
 });
 ```
 
-Query result: 
+Query executed: 
 ```sql
 DELETE FROM `sessions` INNER JOIN `users` ON `sessions`.`user` = `users`.`id` WHERE `users`.`id` = 3;
 ```
@@ -316,9 +316,9 @@ sessionsTable.getAll({
 });
 ```
 
-Query result: 
+Query *prepared*: 
 ```sql
 SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE (`users`.`id` = ?) OR (`users`.`username` = 'chriss');
 ```
 
-This can be helpful in some scenarios but is *not recomended*, only use it if you know what are you doing and *never*, send a parameter unprepared, you will expose your system to sql injection.
+This can be helpful in some scenarios but is **not recomended**, only use it if you know what are you doing and **never**, send a parameter unprepared, you will expose your system to sql injection.
