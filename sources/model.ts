@@ -291,22 +291,25 @@ export class Model {
             let sql: string = "";
 
             filteredKeys.forEach((item: string, id: number, array: string[]) => {
-                let joinkeys = item.split("__");
-                if (joinkeys.length == 2) {
-                    sql = sql + "`" + joinkeys[0] + "`.`" + joinkeys[1] + "` = ?";
-                    if (id < array.length - 1) {
-                        sql = sql + " AND ";
-                    }
+                if (String(where[item]).charAt(0) == "\\") {
+                    sql = sql + "`" + this.tableName + "`.`" + item + "` = " + String(where[item]).substring(1);
                 } else {
-                    sql = sql + "`" + this.tableName + "`.`" + item + "` = ?";
-                    if (id < array.length - 1) {
-                        sql = sql + " AND ";
+                    let joinkeys = item.split("__");
+                    if (joinkeys.length == 2) {
+                        sql = sql + "`" + joinkeys[0] + "`.`" + joinkeys[1] + "` = ?";
+                    } else {
+                        sql = sql + "`" + this.tableName + "`.`" + item + "` = ?";
                     }
+                }
+                if (id < array.length - 1) {
+                    sql = sql + " AND ";
                 }
             });
             // getting values
             filteredKeys.forEach((item: string) => {
-                values.push(where[item]);
+                if (String(where[item]).charAt(0) != "\\") {
+                    values.push(where[item]);
+                }
             });
             return {
                 sql: sql,

@@ -281,7 +281,7 @@ sessionsTable.join([{
     kind: "INNER"
 }]).delete({
     "users__id": 3
-})then((data: any) => {
+}).then((data: any) => {
     console.log(data);
 }).catch((err: any) => {
     console.error(err)
@@ -297,3 +297,28 @@ DELETE FROM `sessions` INNER JOIN `users` ON `sessions`.`user` = `users`.`id` WH
 `keyField` Model foreign key.
 
 `kind` Type of Join to apply E.g.: INNER, LEFT.
+
+### Advanced
+
+#### Literal strings ####
+You can send an unprepared strings as values in Wheres adding a double `\\` at the start of the condition:
+
+```typescript
+sessionsTable.getAll({
+    where: [
+        { id: 3 },
+        { username: "\\'chriss'" }
+    ]
+}).then((data: any) => {
+    console.log(data);
+}).catch((err: any) => {
+    console.error(err)
+});
+```
+
+Query result: 
+```sql
+SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE (`users`.`id` = ?) OR (`users`.`username` = 'chriss');
+```
+
+This can be helpful in some scenarios but is *not recomended*, only use it if you know what are you doing and *never*, send a parameter unprepared, you will expose your system to sql injection.

@@ -128,6 +128,23 @@ describe('Get general', () => {
         });
     });
 
+    it('Simple with string literal', () => {
+        var expected = {
+            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE (`users`.`id` = ?) OR (`users`.`username` = \'chriss\');',
+            values: [3]
+        };
+        usersTable.returnQuery().getAll({
+            where: [
+                { id: 3 },
+                { username: "\\'chriss'" }
+            ]
+        }).then((query: Models.Query) => {
+            expect(query).toEqual(expected);
+        }).catch((err: any) => {
+            console.error(err)
+        });
+    });
+
     it('Multiple fields with OR', () => {
         var expected = {
             sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE (`users`.`id` = ? AND `users`.`email` = ?) OR (`users`.`username` = ?);',

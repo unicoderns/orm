@@ -121,14 +121,14 @@ describe('Joins', () => {
             console.error(err);
         });
     });
-    it('Left join update with where at users', () => {
+    it('Inner join update with where at users', () => {
         var expected = {
-            sql: 'UPDATE `sessions` LEFT JOIN `users` ON `sessions`.`user` = `users`.`id` SET `ip` = ? WHERE `users`.`id` = ?;',
+            sql: 'UPDATE `sessions` INNER JOIN `users` ON `sessions`.`user` = `users`.`id` SET `ip` = ? WHERE `users`.`id` = ?;',
             values: ["121.0.0.1", 3]
         };
         sessionsTable.returnQuery().join([{
                 keyField: sessionsTable.user,
-                kind: "LEFT"
+                kind: "INNER"
             }]).update({
             data: {
                 ip: "121.0.0.1"
@@ -136,6 +136,22 @@ describe('Joins', () => {
             where: {
                 "users__id": 3
             }
+        }).then((query) => {
+            expect(query).toEqual(expected);
+        }).catch((err) => {
+            console.error(err);
+        });
+    });
+    it('Inner join delete with where at users', () => {
+        var expected = {
+            sql: 'DELETE FROM `sessions` INNER JOIN `users` ON `sessions`.`user` = `users`.`id` WHERE `users`.`id` = ?;',
+            values: [3]
+        };
+        sessionsTable.returnQuery().join([{
+                keyField: sessionsTable.user,
+                kind: "INNER"
+            }]).delete({
+            "users__id": 3
         }).then((query) => {
             expect(query).toEqual(expected);
         }).catch((err) => {

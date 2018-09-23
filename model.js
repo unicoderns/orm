@@ -270,23 +270,27 @@ class Model {
         if (typeof where !== "undefined") {
             let sql = "";
             filteredKeys.forEach((item, id, array) => {
-                let joinkeys = item.split("__");
-                if (joinkeys.length == 2) {
-                    sql = sql + "`" + joinkeys[0] + "`.`" + joinkeys[1] + "` = ?";
-                    if (id < array.length - 1) {
-                        sql = sql + " AND ";
-                    }
+                if (String(where[item]).charAt(0) == "\\") {
+                    sql = sql + "`" + this.tableName + "`.`" + item + "` = " + String(where[item]).substring(1);
                 }
                 else {
-                    sql = sql + "`" + this.tableName + "`.`" + item + "` = ?";
-                    if (id < array.length - 1) {
-                        sql = sql + " AND ";
+                    let joinkeys = item.split("__");
+                    if (joinkeys.length == 2) {
+                        sql = sql + "`" + joinkeys[0] + "`.`" + joinkeys[1] + "` = ?";
                     }
+                    else {
+                        sql = sql + "`" + this.tableName + "`.`" + item + "` = ?";
+                    }
+                }
+                if (id < array.length - 1) {
+                    sql = sql + " AND ";
                 }
             });
             // getting values
             filteredKeys.forEach((item) => {
-                values.push(where[item]);
+                if (String(where[item]).charAt(0) != "\\") {
+                    values.push(where[item]);
+                }
             });
             return {
                 sql: sql,
@@ -551,6 +555,7 @@ class Model {
      */
     delete(where) {
         let whereCode;
+        let joinCode = this.generateJoinCode();
         if ((typeof where === "undefined") ||
             ((!util_1.isArray(where)) && (!Object.keys(where).length))) {
             whereCode = {
@@ -561,7 +566,7 @@ class Model {
         else {
             whereCode = this.generateWhereCode(where);
         }
-        let query = "DELETE FROM `" + this.tableName + "`" + whereCode.sql + ";";
+        let query = "DELETE FROM `" + this.tableName + "`" + joinCode + whereCode.sql + ";";
         return this.query({ sql: query, values: whereCode.values });
     }
 }
