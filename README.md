@@ -276,6 +276,35 @@ UPDATE `sessions` INNER JOIN `users` ON `sessions`.`user` = `users`.`id` SET `ip
 
 `kind` Type of Join to apply E.g.: INNER, LEFT.
 
+### Update with columns as reference
+
+```typescript
+sessionsTable.join([{
+    keyField: usersTwoTable.user,
+    fields: ["username"],
+    kind: "INNER"
+}]).update({
+    data: {
+        username: "users__username"
+    },
+    where: "*"
+}).then((data: any) => {
+    console.log(data);
+}).catch((err: any) => {
+    console.error(err)
+});
+```
+
+Query executed: 
+```sql
+UPDATE `usersTwo` INNER JOIN `users` ON `usersTwo`.`user` = `users`.`id` SET `usersTwo`.`username` = `users`.`username`;
+```
+
+#### Params ####
+`keyField` Model foreign key.
+
+`kind` Type of Join to apply E.g.: INNER, LEFT.
+
 ### Delete
 
 ```typescript
