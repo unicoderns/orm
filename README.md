@@ -183,6 +183,9 @@ Query executed:
 * Key/Value object used to filter the query
 * Array of Key/Value objects will generate a multiple filters separated by an "OR".
 
+### Special values
+* `now()` Insert a mysql now() function.
+
 ## Delete
 
 ```typescript

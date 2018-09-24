@@ -557,10 +557,13 @@ export class Model {
         let data = update.data;
         let where = update.where;
         for (let key in data) {
-            if (data[key] == "now()") {
-                fields.push("`" + key + "` = now()");
+            let joinkeys = String(data[key]).split("__");
+            if (joinkeys.length == 2) {
+                fields.push("`" + this.tableName + "`.`" + key + "` = " + "`" + joinkeys[0] + "`.`" + joinkeys[1] + "`");
+            } else if (data[key] == "now()") {
+                fields.push("`" + this.tableName + "`.`" + key + "` = now()");
             } else {
-                fields.push("`" + key + "` = ?");
+                fields.push("`" + this.tableName + "`.`" + key + "` = ?");
                 values.push(data[key]);
             }
         }

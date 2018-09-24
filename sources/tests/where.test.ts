@@ -70,7 +70,7 @@ describe('Get general', () => {
 
     it('Simple update with empty where object should fail', () => {
         var expected = {
-            sql: 'UPDATE `users` SET `username` = ?ERROR;',
+            sql: 'UPDATE `users` SET `users`.`username` = ?ERROR;',
             values: ["chriss"]
         };
         usersTable.returnQuery().update({

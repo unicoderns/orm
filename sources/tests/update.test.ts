@@ -56,7 +56,7 @@ beforeAll(done => {
 describe('Update', () => {
     it('Fails if where is an object', () => {
         var expected = {
-            sql: 'UPDATE `users` SET `firstName` = ?ERROR;',
+            sql: 'UPDATE `users` SET `users`.`firstName` = ?ERROR;',
             values: ["Chriss"]
         };
         usersTable.returnQuery().update({
@@ -73,7 +73,7 @@ describe('Update', () => {
 
     it('Fails if where is an array', () => {
         var expected = {
-            sql: 'UPDATE `users` SET `firstName` = ?ERROR;',
+            sql: 'UPDATE `users` SET `users`.`firstName` = ?ERROR;',
             values: ["Chriss"]
         };
         usersTable.returnQuery().update({
@@ -105,7 +105,7 @@ describe('Update', () => {
 
     it('1 field 1 where', () => {
         var expected = {
-            sql: 'UPDATE `users` SET `firstName` = ? WHERE `users`.`id` = ?;',
+            sql: 'UPDATE `users` SET `users`.`firstName` = ? WHERE `users`.`id` = ?;',
             values: ["Chriss", 3]
         };
         usersTable.returnQuery().update({
@@ -119,5 +119,22 @@ describe('Update', () => {
             console.error(err)
         });
     });
+
+    it('1 field 1 where spacial now() function', () => {
+        var expected = {
+            sql: 'UPDATE `users` SET `users`.`created` = now() WHERE `users`.`id` = ?;',
+            values: [3]
+        };
+        usersTable.returnQuery().update({
+            data: {
+                created: "now()"
+            },
+            where: { id: 3 }
+        }).then((query: Models.Query) => {
+            expect(query).toEqual(expected);
+        }).catch((err: any) => {
+            console.error(err)
+        });
+    });    
 
 });
