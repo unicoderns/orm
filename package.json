@@ -1,6 +1,6 @@
 {
   "name": "@unicoderns/orm",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Unicoderns Object/Relational Mapping",
   "author": {
     "name": "Unicoderns SA",
@@ -26,7 +26,6 @@
   ],
   "license": "MIT",
   "devDependencies": {
-    "@types/chalk": "^2.2.0",
     "@types/jasmine": "^2.8.8",
     "@types/mysql": "^2.15.5",
     "jasmine": "^3.2.0",
