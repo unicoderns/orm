@@ -11,6 +11,7 @@ export declare class Model {
     private fields;
     private joins;
     private plainQuery;
+    private specialFunctions;
     /**
      * Create a table object.
      *

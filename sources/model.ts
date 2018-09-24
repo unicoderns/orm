@@ -43,6 +43,7 @@ export class Model {
     private fields: Map<string, string> | undefined = undefined;
     private joins: Models.Join[] = [];
     private plainQuery: boolean = false;
+    private specialFunctions = ["now()"];
 
     /**
      * Create a table object.
@@ -295,16 +296,23 @@ export class Model {
                     sql = sql + "`" + this.tableName + "`.`" + item + "` = " + String(where[item]).substring(1);
                 } else {
                     let joinkeys = item.split("__");
+                    // string literal
                     if (joinkeys.length == 2) {
                         sql = sql + "`" + joinkeys[0] + "`.`" + joinkeys[1];
                     } else {
                         sql = sql + "`" + this.tableName + "`.`" + item;
                     }
                     joinkeys = String(where[item]).split("__");
+                    // joined column
                     if (joinkeys.length == 2) {
                         sql = sql + "` = `" + joinkeys[0] + "`.`" + joinkeys[1] + "`";
                     } else {
-                        sql = sql + "` = ?"
+                        // special functiom
+                        if (this.specialFunctions.indexOf(where[item]) >= 0) {
+                            sql = sql + "` = " + where[item];
+                        } else {
+                            sql = sql + "` = ?"
+                        }
                     }
                 }
                 if (id < array.length - 1) {
@@ -314,7 +322,7 @@ export class Model {
             // getting values
             filteredKeys.forEach((item: string) => {
                 let joinkeys = String(where[item]).split("__");
-                if ((String(where[item]).charAt(0) != "\\") && (joinkeys.length != 2)) {
+                if ((String(where[item]).charAt(0) != "\\") && (joinkeys.length != 2) && (this.specialFunctions.indexOf(where[item]) < 0)) {
                     values.push(where[item]);
                 }
             });
@@ -560,8 +568,8 @@ export class Model {
             let joinkeys = String(data[key]).split("__");
             if (joinkeys.length == 2) {
                 fields.push("`" + this.tableName + "`.`" + key + "` = " + "`" + joinkeys[0] + "`.`" + joinkeys[1] + "`");
-            } else if (data[key] == "now()") {
-                fields.push("`" + this.tableName + "`.`" + key + "` = now()");
+            } else if (this.specialFunctions.indexOf(data[key]) >= 0) {
+                fields.push("`" + this.tableName + "`.`" + key + "` = " + data[key]);
             } else {
                 fields.push("`" + this.tableName + "`.`" + key + "` = ?");
                 values.push(data[key]);

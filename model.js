@@ -46,6 +46,7 @@ class Model {
         this.fields = undefined;
         this.joins = [];
         this.plainQuery = false;
+        this.specialFunctions = ["now()"];
         this.DB = DB;
         if (privacy == "unsafe") {
             this.unsafe = true;
@@ -275,6 +276,7 @@ class Model {
                 }
                 else {
                     let joinkeys = item.split("__");
+                    // string literal
                     if (joinkeys.length == 2) {
                         sql = sql + "`" + joinkeys[0] + "`.`" + joinkeys[1];
                     }
@@ -282,11 +284,18 @@ class Model {
                         sql = sql + "`" + this.tableName + "`.`" + item;
                     }
                     joinkeys = String(where[item]).split("__");
+                    // joined column
                     if (joinkeys.length == 2) {
                         sql = sql + "` = `" + joinkeys[0] + "`.`" + joinkeys[1] + "`";
                     }
                     else {
-                        sql = sql + "` = ?";
+                        // special functiom
+                        if (this.specialFunctions.indexOf(where[item]) >= 0) {
+                            sql = sql + "` = " + where[item];
+                        }
+                        else {
+                            sql = sql + "` = ?";
+                        }
                     }
                 }
                 if (id < array.length - 1) {
@@ -296,7 +305,7 @@ class Model {
             // getting values
             filteredKeys.forEach((item) => {
                 let joinkeys = String(where[item]).split("__");
-                if ((String(where[item]).charAt(0) != "\\") && (joinkeys.length != 2)) {
+                if ((String(where[item]).charAt(0) != "\\") && (joinkeys.length != 2) && (this.specialFunctions.indexOf(where[item]) < 0)) {
                     values.push(where[item]);
                 }
             });
@@ -532,11 +541,15 @@ class Model {
         let data = update.data;
         let where = update.where;
         for (let key in data) {
-            if (data[key] == "now()") {
-                fields.push("`" + key + "` = now()");
+            let joinkeys = String(data[key]).split("__");
+            if (joinkeys.length == 2) {
+                fields.push("`" + this.tableName + "`.`" + key + "` = " + "`" + joinkeys[0] + "`.`" + joinkeys[1] + "`");
+            }
+            else if (this.specialFunctions.indexOf(data[key]) >= 0) {
+                fields.push("`" + this.tableName + "`.`" + key + "` = " + data[key]);
             }
             else {
-                fields.push("`" + key + "` = ?");
+                fields.push("`" + this.tableName + "`.`" + key + "` = ?");
                 values.push(data[key]);
             }
         }

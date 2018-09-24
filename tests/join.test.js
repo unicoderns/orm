@@ -123,7 +123,7 @@ describe('Joins', () => {
     });
     it('Inner join update with where at users', () => {
         var expected = {
-            sql: 'UPDATE `sessions` INNER JOIN `users` ON `sessions`.`user` = `users`.`id` SET `ip` = ? WHERE `users`.`id` = ?;',
+            sql: 'UPDATE `sessions` INNER JOIN `users` ON `sessions`.`user` = `users`.`id` SET `sessions`.`ip` = ? WHERE `users`.`id` = ?;',
             values: ["121.0.0.1", 3]
         };
         sessionsTable.returnQuery().join([{
@@ -175,27 +175,25 @@ describe('Joins', () => {
             console.error(err);
         });
     });
-    /*
-        it('INNER join update usersTwo with literal from users', () => {
-            var expected = {
-                sql: 'SELECT `sessions`.`id`, `sessions`.`created`, `sessions`.`ip`, `sessions`.`user`, `users`.`username` AS `users__username`, `users`.`email` AS `users__email`, `users`.`firstName` AS `users__firstName`, `users`.`lastName` AS `users__lastName` FROM `sessions` LEFT JOIN `users` ON `sessions`.`user` = `users`.`id` WHERE `users`.`id` = ?;',
-                values: [3]
-            };
-            usersTwoTable.returnQuery().join([{
+    it('INNER join update usersTwo with literal from users', () => {
+        var expected = {
+            sql: 'UPDATE `usersTwo` INNER JOIN `users` ON `usersTwo`.`user` = `users`.`id` SET `usersTwo`.`username` = `users`.`username`;',
+            values: []
+        };
+        usersTwoTable.returnQuery().join([{
                 keyField: usersTwoTable.user,
                 fields: ["username"],
                 kind: "INNER"
             }]).update({
-                data: {
-                    username: "users__username"
-                },
-                where: "*"
-            }).then((query: Models.Query) => {
-                expect(query).toEqual(expected);
-            }).catch((err: any) => {
-                console.error(err)
-            });
+            data: {
+                username: "users__username"
+            },
+            where: "*"
+        }).then((query) => {
+            expect(query).toEqual(expected);
+        }).catch((err) => {
+            console.error(err);
         });
-    */
+    });
 });
 //# sourceMappingURL=join.test.js.map

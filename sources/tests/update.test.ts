@@ -120,6 +120,8 @@ describe('Update', () => {
         });
     });
 
+    // Special mysql functions
+
     it('1 field 1 where spacial now() function', () => {
         var expected = {
             sql: 'UPDATE `users` SET `users`.`created` = now() WHERE `users`.`id` = ?;',

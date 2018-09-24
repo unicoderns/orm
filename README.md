@@ -183,9 +183,6 @@ Query executed:
 * Key/Value object used to filter the query
 * Array of Key/Value objects will generate a multiple filters separated by an "OR".
 
-### Special values
-* `now()` Insert a mysql now() function.
-
 ## Delete
 
 ```typescript
@@ -356,6 +353,11 @@ DELETE FROM `usersTwo` INNER JOIN `users` ON `usersTwo`.`user` = `users`.`id` WH
 `keyField` Model foreign key.
 
 `kind` Type of Join to apply E.g.: INNER, LEFT.
+
+## Special values
+Supported out the box mysql functions as where and set values.
+
+* `now()` Insert a mysql now() function.
 
 ## Advanced
 

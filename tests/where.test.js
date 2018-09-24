@@ -70,7 +70,7 @@ describe('Get general', () => {
     });
     it('Simple update with empty where object should fail', () => {
         var expected = {
-            sql: 'UPDATE `users` SET `username` = ?ERROR;',
+            sql: 'UPDATE `users` SET `users`.`username` = ?ERROR;',
             values: ["chriss"]
         };
         usersTable.returnQuery().update({
@@ -203,6 +203,23 @@ describe('Get general', () => {
         usersTable.returnQuery().getAll({
             orderBy: "id ASC",
             groupBy: "username, active"
+        }).then((query) => {
+            expect(query).toEqual(expected);
+        }).catch((err) => {
+            console.error(err);
+        });
+    });
+    // Special mysql functions
+    it('Simple with now() function', () => {
+        var expected = {
+            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE (`users`.`id` = ?) OR (`users`.`created` = now());',
+            values: [3]
+        };
+        usersTable.returnQuery().getAll({
+            where: [
+                { id: 3 },
+                { created: "now()" }
+            ]
         }).then((query) => {
             expect(query).toEqual(expected);
         }).catch((err) => {

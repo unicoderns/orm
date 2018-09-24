@@ -219,4 +219,23 @@ describe('Get general', () => {
         });
     });
 
+
+    // Special mysql functions
+    it('Simple with now() function', () => {
+        var expected = {
+            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE (`users`.`id` = ?) OR (`users`.`created` = now());',
+            values: [3]
+        };
+        usersTable.returnQuery().getAll({
+            where: [
+                { id: 3 },
+                { created: "now()" }
+            ]
+        }).then((query: Models.Query) => {
+            expect(query).toEqual(expected);
+        }).catch((err: any) => {
+            console.error(err)
+        });
+    });
+
 });
