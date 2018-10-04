@@ -46,10 +46,6 @@ export namespace Fields {
         zeroFill?: boolean;
         autoincrement?: boolean;
         generated?: boolean;
-    }
-
-    /*** Datatype interface. */
-    export interface DataType extends CommonTypes {
         size?: number;
     }
 
@@ -58,7 +54,6 @@ export namespace Fields {
     }
 
     export interface FloatType extends CommonTypes {
-        size?: number;
         precision?: number;
     }
 
@@ -74,7 +69,7 @@ export namespace Fields {
      * Foreign key to model
      */
 
-    export interface ForeignKey extends DataType {
+    export interface ForeignKey extends CommonTypes {
         localField: string;
         linkedField: string;
         model: Model;
@@ -84,7 +79,7 @@ export namespace Fields {
      * Foreign key to static enum model
      */
 
-    export interface StaticKey extends DataType {
+    export interface StaticKey extends CommonTypes {
         keys: any;
     }
 

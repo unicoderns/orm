@@ -20,10 +20,10 @@ export declare class Datatypes {
      * @return Object with defaults
      */
     private fillDefault;
-    TINYINT(settings?: Types.General): Fields.DataType;
-    SMALLINT(settings?: Types.General): Fields.DataType;
-    INT(settings?: Types.General): Fields.DataType;
-    ID(settings?: Types.General): Fields.DataType;
+    TINYINT(settings?: Types.General): Fields.CommonTypes;
+    SMALLINT(settings?: Types.General): Fields.CommonTypes;
+    INT(settings?: Types.General): Fields.CommonTypes;
+    ID(settings?: Types.General): Fields.CommonTypes;
     /**
      * Define a foreign key
      *
@@ -36,11 +36,11 @@ export declare class Datatypes {
     FLOAT(settings?: Types.General): Fields.FloatType;
     DOUBLE(settings?: Types.General): Fields.FloatType;
     DECIMAL(settings?: Types.General): Fields.FloatType;
-    CHAR(settings?: Types.General): Fields.DataType;
-    VARCHAR(settings?: Types.General): Fields.DataType;
-    TINYTEXT(settings?: Types.General): Fields.DataType;
-    TEXT(settings?: Types.General): Fields.DataType;
-    LONGTEXT(settings?: Types.General): Fields.DataType;
+    CHAR(settings?: Types.General): Fields.VarCharType;
+    VARCHAR(settings?: Types.General): Fields.VarCharType;
+    TINYTEXT(settings?: Types.General): Fields.VarCharType;
+    TEXT(settings?: Types.General): Fields.CommonTypes;
+    LONGTEXT(settings?: Types.General): Fields.CommonTypes;
     BOOL(settings?: Types.Bool): Fields.BoolType;
     YEAR(settings?: Types.Timestamp): Fields.DataTimestampType;
     DATE(settings?: Types.Timestamp): Fields.DataTimestampType;

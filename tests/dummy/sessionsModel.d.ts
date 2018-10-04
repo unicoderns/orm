@@ -1,4 +1,3 @@
-import { Fields } from "../../interfaces/db/fields";
 import { Model } from "../../model";
 export interface Row {
     id?: number;
@@ -10,8 +9,8 @@ export interface Row {
  * User Model
  */
 export declare class Sessions extends Model {
-    id: Fields.DataType;
-    created: Fields.DataTimestampType;
-    ip: Fields.DataType;
-    user: Fields.ForeignKey;
+    id: import("../../interfaces/db/fields").Fields.CommonTypes;
+    created: import("../../interfaces/db/fields").Fields.DataTimestampType;
+    ip: import("../../interfaces/db/fields").Fields.VarCharType;
+    user: import("../../interfaces/db/fields").Fields.ForeignKey;
 }

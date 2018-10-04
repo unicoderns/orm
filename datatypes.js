@@ -158,7 +158,7 @@ class Datatypes {
         let commonType = this.fillDefault(settings);
         let customType = {
             type: "CHAR",
-            size: settings.size
+            size: settings.size || 0
         };
         return this.mergeTypes(commonType, customType);
     }
@@ -174,7 +174,7 @@ class Datatypes {
         let commonType = this.fillDefault(settings);
         let customType = {
             type: "TINYTEXT",
-            size: settings.size
+            size: settings.size || 0
         };
         return this.mergeTypes(commonType, customType);
     }

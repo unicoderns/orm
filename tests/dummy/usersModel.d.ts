@@ -1,4 +1,3 @@
-import { Fields } from "../../interfaces/db/fields";
 import { Model } from "../../model";
 export interface Row {
     id?: number;
@@ -17,15 +16,15 @@ export interface Row {
  * User Model
  */
 export declare class Users extends Model {
-    id: Fields.DataType;
-    created: Fields.DataTimestampType;
-    username: Fields.DataType;
-    email: Fields.DataType;
-    password: Fields.DataType;
-    salt: Fields.DataType;
-    firstName: Fields.DataType;
-    lastName: Fields.DataType;
-    admin: Fields.BoolType;
-    verified: Fields.BoolType;
-    active: Fields.BoolType;
+    id: import("../../interfaces/db/fields").Fields.CommonTypes;
+    created: import("../../interfaces/db/fields").Fields.DataTimestampType;
+    username: import("../../interfaces/db/fields").Fields.VarCharType;
+    email: import("../../interfaces/db/fields").Fields.VarCharType;
+    password: import("../../interfaces/db/fields").Fields.VarCharType;
+    salt: import("../../interfaces/db/fields").Fields.VarCharType;
+    firstName: import("../../interfaces/db/fields").Fields.VarCharType;
+    lastName: import("../../interfaces/db/fields").Fields.VarCharType;
+    admin: import("../../interfaces/db/fields").Fields.BoolType;
+    verified: import("../../interfaces/db/fields").Fields.BoolType;
+    active: import("../../interfaces/db/fields").Fields.BoolType;
 }

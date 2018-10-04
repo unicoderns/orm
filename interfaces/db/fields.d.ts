@@ -15,16 +15,12 @@ export declare namespace Fields {
         zeroFill?: boolean;
         autoincrement?: boolean;
         generated?: boolean;
-    }
-    /*** Datatype interface. */
-    interface DataType extends CommonTypes {
         size?: number;
     }
     interface VarCharType extends CommonTypes {
         size: number;
     }
     interface FloatType extends CommonTypes {
-        size?: number;
         precision?: number;
     }
     interface BoolType extends CommonTypes {
@@ -36,7 +32,7 @@ export declare namespace Fields {
     /**
      * Foreign key to model
      */
-    interface ForeignKey extends DataType {
+    interface ForeignKey extends CommonTypes {
         localField: string;
         linkedField: string;
         model: Model;
@@ -44,7 +40,7 @@ export declare namespace Fields {
     /**
      * Foreign key to static enum model
      */
-    interface StaticKey extends DataType {
+    interface StaticKey extends CommonTypes {
         keys: any;
     }
 }

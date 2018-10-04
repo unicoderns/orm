@@ -8,7 +8,7 @@ Declare a field (public) or secret (private) and also takes a string as field al
 
 ```typescript
 @field("first_name")
-public firstName: Fields.DataType = new Datatypes().VARCHAR({
+public firstName = new Datatypes().VARCHAR({
     size: 45
 });
 ```
@@ -23,7 +23,7 @@ Secret field, will be returned **ONLY** if the model you query is on *unsafe mod
 
 ```typescript
 @secret()
-public password: Fields.DataType = new Datatypes().CHAR({
+public password = new Datatypes().CHAR({
     notNull: true,
     size: 60
 });
@@ -33,25 +33,6 @@ public password: Fields.DataType = new Datatypes().CHAR({
 
 Fields are always public and each name is directly related to the name of the table field.
 
-### Type
+### Settings object
 
-All types inherit from `CommonTypes` and cointain the following properties diretly related with the table:
-
-```typescript
-primaryKey?: boolean;
-notNull?: boolean;
-unique?: boolean;
-unsigned?: boolean;
-zeroFill?: boolean;
-autoincrement?: boolean;
-generated?: boolean;
-```
-
-Also includes system specific properties:
-
-```typescript
-type?: string;
-alias?: string;
-protected?: boolean;
-private?: boolean;
-```
+Full list available [here](types.md)

@@ -23,7 +23,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 import { field, secret } from "../../decorators"
-import { Fields } from "../../interfaces/db/fields"
 import { Defaults } from "../../interfaces/db/defaults"
 import { Datatypes } from "../../datatypes"
 import { Model } from "../../model"
@@ -48,56 +47,56 @@ export interface Row {
 export class Users extends Model {
 
     @field()
-    public id: Fields.DataType = new Datatypes().ID();
+    public id = new Datatypes().ID();
 
     @field()
-    public created: Fields.DataTimestampType = new Datatypes().TIMESTAMP({
+    public created = new Datatypes().TIMESTAMP({
         notNull: true,
         default: Defaults.Timestamp.CURRENT_TIMESTAMP
     });
 
     @field()
-    public username: Fields.DataType = new Datatypes().VARCHAR({
+    public username = new Datatypes().VARCHAR({
         size: 45,
         unique: true
     });
 
     @field()
-    public email: Fields.DataType = new Datatypes().VARCHAR({
+    public email = new Datatypes().VARCHAR({
         notNull: true,
         size: 45,
         unique: true
     });
 
     @secret()
-    public password: Fields.DataType = new Datatypes().CHAR({
+    public password = new Datatypes().CHAR({
         notNull: true,
         size: 60
     });
 
     @secret("added_salt")
-    public salt: Fields.DataType = new Datatypes().VARCHAR({
+    public salt = new Datatypes().VARCHAR({
         notNull: true,
         size: 20
     });
 
     @field("first_name")
-    public firstName: Fields.DataType = new Datatypes().VARCHAR({
+    public firstName = new Datatypes().VARCHAR({
         size: 45
     });
 
     @field("last_name")
-    public lastName: Fields.DataType = new Datatypes().VARCHAR({
+    public lastName = new Datatypes().VARCHAR({
         size: 45
     });
 
     @field()
-    public admin: Fields.BoolType = new Datatypes().BOOL();
+    public admin = new Datatypes().BOOL();
 
     @field()
-    public verified: Fields.BoolType = new Datatypes().BOOL();
+    public verified = new Datatypes().BOOL();
 
     @field()
-    public active: Fields.BoolType = new Datatypes().BOOL();
+    public active = new Datatypes().BOOL();
 
 }

@@ -25,7 +25,6 @@
 import * as usersModel from "./usersModel";
 
 import { field } from "../../decorators"
-import { Fields } from "../../interfaces/db/fields"
 import { Defaults } from "../../interfaces/db/defaults"
 import { Datatypes } from "../../datatypes"
 import { Model } from "../../model"
@@ -43,23 +42,23 @@ export interface Row {
 export class Sessions extends Model {
 
     @field()
-    public id: Fields.DataType = new Datatypes().ID();
+    public id = new Datatypes().ID();
 
     @field()
-    public created: Fields.DataTimestampType = new Datatypes().TIMESTAMP({
+    public created = new Datatypes().TIMESTAMP({
         notNull: true,
         default: Defaults.Timestamp.CURRENT_TIMESTAMP
     });
 
     @field()
-    public ip: Fields.DataType = new Datatypes().VARCHAR({
+    public ip = new Datatypes().VARCHAR({
         size: 39,
         notNull: true
     });
 
     // ToDo: Specify the localField looks redundant
     @field()
-    public user: Fields.ForeignKey = new Datatypes().FOREIGNKEY("user", "id", new usersModel.Users(this.DB), {
+    public user = new Datatypes().FOREIGNKEY("user", "id", new usersModel.Users(this.DB), {
         notNull: true,
         unique: true
     });
