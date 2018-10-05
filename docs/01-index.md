@@ -9,7 +9,7 @@ Premise based typescript light layer package that allow you to query the DB in a
 
 ## Quick start
 
-Made to be ready to go you only need to create a [model](models/index.md), provide the [settings](settings.md) and start quering.
+Made to be ready to go you only need to create a [model](04-models.md), provide the [settings](02-settings.md) and start quering.
 
 ```typescript
 import * as users from './dummy/usersModel';

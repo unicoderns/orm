@@ -35,4 +35,4 @@ Fields are always public and each name is directly related to the name of the ta
 
 ### Settings object
 
-Full list available [here](types.md)
+Full list available [here](02-types.md)

@@ -1,4 +1,4 @@
-# Settings
+# Field Settings
 
 ```typescript
 let db = new DB({
@@ -55,4 +55,4 @@ Validate fields to exists in the model (Only working with SELECT [fields] for no
 
 .. note::
 
-   Disallowed by default in dev mode.
+   Disallowed by default in production mode.
