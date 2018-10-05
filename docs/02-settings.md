@@ -1,4 +1,6 @@
-# Field Settings
+# Settings
+
+Library and connection settings.
 
 ```typescript
 let db = new DB({
@@ -41,18 +43,16 @@ Port where MySQL service is running, default: 3306. | `string`
 
 ### host
 
-Host where MySQL is running. | ``string``
+Host where MySQL is running. | `string`
 
 ### connectionLimit
 
-Max concurrent connections in the pool. | ``number``
+Max concurrent connections in the pool. | `number`
 
 ### validations
 
 #### fields ####
 
-Validate fields to exists in the model (Only working with SELECT [fields] for now). | `boolean``
+Validate fields to exists in the model (Only working with `SELECT [fields]` for now). | `boolean`
 
-.. note::
-
-   Disallowed by default in production mode.
+> Disallowed by default in production mode.

@@ -4,7 +4,7 @@ Fields in Unicoderns ORM are composed from a decorator and a public property wit
 
 ## Decorator
 
-Declare a field (public) or secret (private) and also takes a string as field alias
+Declare a field (public) or secret (private) and also takes an optional string as field alias
 
 ```typescript
 @field("first_name")
@@ -19,7 +19,7 @@ Regular field, will be returned everytime you query the model.
 
 ### Secret
 
-Secret field, will be returned **ONLY** if the model you query is on *unsafe mode*, this will prevent leak of sensitive information by mistake even if that data is added later on the development process.
+Secret field, will be returned **ONLY** if the model you query is on (unsafe mode)[../models.md#Unsafe mode], this will prevent leak of sensitive information by mistake even if that field is added later on the development process.
 
 ```typescript
 @secret()
@@ -35,4 +35,4 @@ Fields are always public and each name is directly related to the name of the ta
 
 ### Settings object
 
-Full list available [here](02-types.md)
+Full list available [here](02-settings.md)

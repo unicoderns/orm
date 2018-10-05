@@ -1,7 +1,7 @@
 # Unicoderns ORM
 ### Unicoderns Object/Relational Mapping
 
-Premise based typescript light layer package that allow you to query the DB in a easier way, without SQL knowledge.
+Premise based typescript light package that allow you to query the DB in a easier way, without SQL knowledge.
 
 [![Travis](https://travis-ci.org/unicoderns/ORM.svg?branch=master)](https://travis-ci.org/unicoderns/ORM)
 [![Dependencies](https://david-dm.org/unicoderns/ORM.svg)](https://david-dm.org/unicoderns/ORM/)
@@ -9,7 +9,7 @@ Premise based typescript light layer package that allow you to query the DB in a
 
 ## Quick start
 
-Made to be ready to go you only need to create a [model](04-models.md), provide the [settings](02-settings.md) and start quering.
+Code it to be plug and play, you only need to create a [model](04-models.md), provide the [settings](02-settings.md) and [start quering](03-functions.md).
 
 ```typescript
 import * as users from './dummy/usersModel';
