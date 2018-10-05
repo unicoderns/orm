@@ -79,7 +79,7 @@ export class Users extends Model {
 
 ### Unsafe mode
 
-[Secret fields](fields/index.md#Secret) are protected system wide, they will be returned **ONLY** if the model you query is on *unsafe mode*, this will prevent leak of sensitive information by mistake even if that field is added later on the development process.
+[Secret fields](05-fields/01-index.md#Secret) are protected system wide, they will be returned **ONLY** if the model you query is on *unsafe mode*, this will prevent leak of sensitive information by mistake even if that field is added later on the development process.
 
 ```typescript
 import * as users from './dummy/usersModel';
