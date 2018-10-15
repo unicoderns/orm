@@ -7,6 +7,8 @@ Premise based typescript light layer package that allow you to query the DB in a
 [![Dependencies](https://david-dm.org/unicoderns/ORM.svg)](https://david-dm.org/unicoderns/ORM/)
 [![Dev Dependencies](https://david-dm.org/unicoderns/ORM/dev-status.svg)](https://david-dm.org/unicoderns/ORM/)
 
+Docs available at [unicoderns.com](http://unicoderns.com/docs/ORM/)
+
 ```typescript
 import * as users from './dummy/usersModel';
 import * as sessions from './dummy/sessionsModel';
