@@ -1,14 +1,14 @@
 {
   "name": "@unicoderns/orm",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Unicoderns Object/Relational Mapping",
   "author": {
-    "name": "Unicoderns SA",
+    "name": "Unicoderns S.A.",
     "email": "info@unicoderns.com",
     "url": "https://unicoderns.com/"
   },
-  "main": "index.js",
-  "types": "index.d.ts",
+  "main": "index",
+  "types": "index.d",
   "scripts": {
     "build": "tsc",
     "prepare": "tsc",
