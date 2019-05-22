@@ -121,6 +121,28 @@ describe('Joins', () => {
             console.error(err);
         });
     });
+    it('Left join sessions with where at users and != operator', () => {
+        var expected = {
+            sql: 'SELECT `sessions`.`id`, `sessions`.`created`, `sessions`.`ip`, `sessions`.`user`, `users`.`username` AS `users__username`, `users`.`email` AS `users__email`, `users`.`firstName` AS `users__firstName`, `users`.`lastName` AS `users__lastName` FROM `sessions` LEFT JOIN `users` ON `sessions`.`user` = `users`.`id` WHERE `users`.`id` != ?;',
+            values: [3]
+        };
+        sessionsTable.returnQuery().join([{
+                keyField: sessionsTable.user,
+                fields: ["username", "email", "firstName", "lastName"],
+                kind: "LEFT"
+            }]).getAll({
+            where: {
+                "users__id": {
+                    operator: "!=",
+                    value: 3
+                }
+            }
+        }).then((query) => {
+            expect(query).toEqual(expected);
+        }).catch((err) => {
+            console.error(err);
+        });
+    });
     it('Inner join update with where at users', () => {
         var expected = {
             sql: 'UPDATE `sessions` INNER JOIN `users` ON `sessions`.`user` = `users`.`id` SET `sessions`.`ip` = ? WHERE `users`.`id` = ?;',

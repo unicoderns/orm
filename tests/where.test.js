@@ -156,6 +156,32 @@ describe('Get general', () => {
             console.error(err);
         });
     });
+    it('Simple with multiple AND', () => {
+        var expected = {
+            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE `users`.`id` = ? AND `users`.`username` = ? AND `users`.`email` = ?;',
+            values: [3, "chriss", "chriss@unicoderns.com"]
+        };
+        usersTable.returnQuery().getAll({
+            where: { id: 3, username: "chriss", email: "chriss@unicoderns.com" }
+        }).then((query) => {
+            expect(query).toEqual(expected);
+        }).catch((err) => {
+            console.error(err);
+        });
+    });
+    it('Simple with multiple AND and != operator', () => {
+        var expected = {
+            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE `users`.`id` != ? AND `users`.`username` = ? AND `users`.`email` = ?;',
+            values: [3, "chriss", "chriss@unicoderns.com"]
+        };
+        usersTable.returnQuery().getAll({
+            where: { id: { operator: "!=", value: 3 }, username: "chriss", email: "chriss@unicoderns.com" }
+        }).then((query) => {
+            expect(query).toEqual(expected);
+        }).catch((err) => {
+            console.error(err);
+        });
+    });
     it('Simple with multiple OR', () => {
         var expected = {
             sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE (`users`.`id` = ?) OR (`users`.`username` = ?) OR (`users`.`email` = ?);',
@@ -209,6 +235,47 @@ describe('Get general', () => {
             console.error(err);
         });
     });
+    it('Simple with <= operator', () => {
+        var expected = {
+            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE (`users`.`id` <= ?);',
+            values: [3]
+        };
+        usersTable.returnQuery().getAll({
+            where: [
+                {
+                    id: {
+                        operator: "<=",
+                        value: 3
+                    }
+                }
+            ]
+        }).then((query) => {
+            expect(query).toEqual(expected);
+        }).catch((err) => {
+            console.error(err);
+        });
+    });
+    it('Simple with string literal', () => {
+        var expected = {
+            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE (`users`.`id` = ?) OR (`users`.`username` != \'chriss\');',
+            values: [3]
+        };
+        usersTable.returnQuery().getAll({
+            where: [
+                { id: 3 },
+                {
+                    username: {
+                        operator: "!=",
+                        value: "\\'chriss'"
+                    }
+                }
+            ]
+        }).then((query) => {
+            expect(query).toEqual(expected);
+        }).catch((err) => {
+            console.error(err);
+        });
+    });
     // Special mysql functions
     it('Simple with now() function', () => {
         var expected = {
@@ -219,6 +286,27 @@ describe('Get general', () => {
             where: [
                 { id: 3 },
                 { created: "now()" }
+            ]
+        }).then((query) => {
+            expect(query).toEqual(expected);
+        }).catch((err) => {
+            console.error(err);
+        });
+    });
+    it('Simple with now() function and != operator', () => {
+        var expected = {
+            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE (`users`.`id` = ?) OR (`users`.`created` >= now());',
+            values: [3]
+        };
+        usersTable.returnQuery().getAll({
+            where: [
+                { id: 3 },
+                {
+                    created: {
+                        operator: ">=",
+                        value: "now()"
+                    }
+                }
             ]
         }).then((query) => {
             expect(query).toEqual(expected);

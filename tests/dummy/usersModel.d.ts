@@ -16,15 +16,15 @@ export interface Row {
  * User Model
  */
 export declare class Users extends Model {
-    id: import("../../interfaces/db/fields").Fields.CommonTypes;
-    created: import("../../interfaces/db/fields").Fields.DataTimestampType;
-    username: import("../../interfaces/db/fields").Fields.VarCharType;
-    email: import("../../interfaces/db/fields").Fields.VarCharType;
-    password: import("../../interfaces/db/fields").Fields.VarCharType;
-    salt: import("../../interfaces/db/fields").Fields.VarCharType;
-    firstName: import("../../interfaces/db/fields").Fields.VarCharType;
-    lastName: import("../../interfaces/db/fields").Fields.VarCharType;
-    admin: import("../../interfaces/db/fields").Fields.BoolType;
-    verified: import("../../interfaces/db/fields").Fields.BoolType;
-    active: import("../../interfaces/db/fields").Fields.BoolType;
+    id: import("../..").Fields.CommonTypes;
+    created: import("../..").Fields.DataTimestampType;
+    username: import("../..").Fields.VarCharType;
+    email: import("../..").Fields.VarCharType;
+    password: import("../..").Fields.VarCharType;
+    salt: import("../..").Fields.VarCharType;
+    firstName: import("../..").Fields.VarCharType;
+    lastName: import("../..").Fields.VarCharType;
+    admin: import("../..").Fields.BoolType;
+    verified: import("../..").Fields.BoolType;
+    active: import("../..").Fields.BoolType;
 }

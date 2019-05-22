@@ -16,8 +16,8 @@ export interface Row {
  * User Model
  */
 export declare class UsersTwo extends Model {
-    id: import("../../interfaces/db/fields").Fields.CommonTypes;
-    created: import("../../interfaces/db/fields").Fields.DataTimestampType;
-    username: import("../../interfaces/db/fields").Fields.VarCharType;
-    user: import("../../interfaces/db/fields").Fields.ForeignKey;
+    id: import("../..").Fields.CommonTypes;
+    created: import("../..").Fields.DataTimestampType;
+    username: import("../..").Fields.VarCharType;
+    user: import("../..").Fields.ForeignKey;
 }

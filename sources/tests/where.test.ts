@@ -32,7 +32,7 @@ import { Models } from "../interfaces/db/models"
  * Starting mock system
  */
 let db = new DB({
-    dev: true, 
+    dev: true,
     connection: {
         "user": "apiUser",
         "password": "password",
@@ -109,7 +109,7 @@ describe('Get general', () => {
         }).catch((err: any) => {
             console.error(err)
         });
-    });    
+    });
 
     it('Simple with OR', () => {
         var expected = {
@@ -155,6 +155,34 @@ describe('Get general', () => {
                 { id: 3, email: "chriss@unicoderns.com" },
                 { username: "chriss" }
             ]
+        }).then((query: Models.Query) => {
+            expect(query).toEqual(expected);
+        }).catch((err: any) => {
+            console.error(err)
+        });
+    });
+
+    it('Simple with multiple AND', () => {
+        var expected = {
+            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE `users`.`id` = ? AND `users`.`username` = ? AND `users`.`email` = ?;',
+            values: [3, "chriss", "chriss@unicoderns.com"]
+        };
+        usersTable.returnQuery().getAll({
+            where: { id: 3, username: "chriss", email: "chriss@unicoderns.com" }
+        }).then((query: Models.Query) => {
+            expect(query).toEqual(expected);
+        }).catch((err: any) => {
+            console.error(err)
+        });
+    });
+
+    it('Simple with multiple AND and != operator', () => {
+        var expected = {
+            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE `users`.`id` != ? AND `users`.`username` = ? AND `users`.`email` = ?;',
+            values: [3, "chriss", "chriss@unicoderns.com"]
+        };
+        usersTable.returnQuery().getAll({
+            where: { id: {operator: "!=", value: 3}, username: "chriss", email: "chriss@unicoderns.com" }
         }).then((query: Models.Query) => {
             expect(query).toEqual(expected);
         }).catch((err: any) => {
@@ -219,6 +247,49 @@ describe('Get general', () => {
         });
     });
 
+    it('Simple with <= operator', () => {
+        var expected = {
+            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE (`users`.`id` <= ?);',
+            values: [3]
+        };
+        usersTable.returnQuery().getAll({
+            where: [
+                {
+                    id: {
+                        operator: "<=",
+                        value: 3
+                    }
+                }
+            ]
+        }).then((query: Models.Query) => {
+            expect(query).toEqual(expected);
+        }).catch((err: any) => {
+            console.error(err)
+        });
+    });
+
+    it('Simple with string literal', () => {
+        var expected = {
+            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE (`users`.`id` = ?) OR (`users`.`username` != \'chriss\');',
+            values: [3]
+        };
+        usersTable.returnQuery().getAll({
+            where: [
+                { id: 3 },
+                {
+                    username: {
+                        operator: "!=",
+                        value: "\\'chriss'"
+                    }
+                }
+            ]
+        }).then((query: Models.Query) => {
+            expect(query).toEqual(expected);
+        }).catch((err: any) => {
+            console.error(err)
+        });
+    });
+
 
     // Special mysql functions
     it('Simple with now() function', () => {
@@ -230,6 +301,28 @@ describe('Get general', () => {
             where: [
                 { id: 3 },
                 { created: "now()" }
+            ]
+        }).then((query: Models.Query) => {
+            expect(query).toEqual(expected);
+        }).catch((err: any) => {
+            console.error(err)
+        });
+    });
+
+    it('Simple with now() function and != operator', () => {
+        var expected = {
+            sql: 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE (`users`.`id` = ?) OR (`users`.`created` >= now());',
+            values: [3]
+        };
+        usersTable.returnQuery().getAll({
+            where: [
+                { id: 3 },
+                {
+                    created: {
+                        operator: ">=",
+                        value: "now()"
+                    }
+                }
             ]
         }).then((query: Models.Query) => {
             expect(query).toEqual(expected);

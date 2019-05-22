@@ -77,12 +77,29 @@ describe('Delete', () => {
             console.error(err);
         });
     });
-    it('DELETE FROM `users` WHERE `users`.`user` = ? AND `users`.`id` = ?;', () => {
+    it('Delete with 2 conditions', () => {
         var expected = {
             sql: 'DELETE FROM `users` WHERE `users`.`username` = ? AND `users`.`id` = ?;',
             values: ["chriss", 3]
         };
         usersTable.returnQuery().delete({ username: "chriss", id: 3 }).then((query) => {
+            expect(query).toEqual(expected);
+        }).catch((err) => {
+            console.error(err);
+        });
+    });
+    it('Delete with 2 conditions and different operator', () => {
+        var expected = {
+            sql: 'DELETE FROM `users` WHERE `users`.`username` = ? AND `users`.`id` != ?;',
+            values: ["chriss", 3]
+        };
+        usersTable.returnQuery().delete({
+            username: "chriss",
+            id: {
+                operator: "!=",
+                value: 3
+            }
+        }).then((query) => {
             expect(query).toEqual(expected);
         }).catch((err) => {
             console.error(err);

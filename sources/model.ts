@@ -292,8 +292,14 @@ export class Model {
             let sql: string = "";
 
             filteredKeys.forEach((item: string, id: number, array: string[]) => {
+                let operator = "=";
+
+                if (typeof where[item].operator !== "undefined") {
+                    operator = where[item].operator;
+                    where[item] = where[item].value;
+                }
                 if (String(where[item]).charAt(0) == "\\") {
-                    sql = sql + "`" + this.tableName + "`.`" + item + "` = " + String(where[item]).substring(1);
+                    sql = sql + "`" + this.tableName + "`.`" + item + "` " + operator + " " + String(where[item]).substring(1);
                 } else {
                     let joinkeys = item.split("__");
                     // string literal
@@ -305,13 +311,13 @@ export class Model {
                     joinkeys = String(where[item]).split("__");
                     // joined column
                     if (joinkeys.length == 2) {
-                        sql = sql + "` = `" + joinkeys[0] + "`.`" + joinkeys[1] + "`";
+                        sql = sql + "` " + operator + " `" + joinkeys[0] + "`.`" + joinkeys[1] + "`";
                     } else {
                         // special functiom
                         if (this.specialFunctions.indexOf(where[item]) >= 0) {
-                            sql = sql + "` = " + where[item];
+                            sql = sql + "` " + operator + " " + where[item];
                         } else {
-                            sql = sql + "` = ?"
+                            sql = sql + "` " + operator + " ?"
                         }
                     }
                 }

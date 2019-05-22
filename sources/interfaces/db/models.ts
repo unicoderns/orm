@@ -37,7 +37,14 @@ export namespace Models {
      * Key/Value object
      */
     export interface KeyValue {
-        [key: string]: string | number;
+        [key: string]: string | number | OperatorValue;
+    }
+
+    /**
+     * Operator/Value object
+     */
+    export interface OperatorValue {
+        [operator: string]: string | number;
     }
 
     /**

@@ -25,11 +25,9 @@
 import { Defaults } from "./defaults";
 import { Model } from "../../model";
 
-// export enum Privacy {"PUBLIC", "PRIVATE", "PROTECTED"};
-
 export namespace Fields {
 
-    // JSloth internal flags
+    // Field internal flags
     export interface SystemTypes {
         type?: string;
         alias?: string;
@@ -68,7 +66,6 @@ export namespace Fields {
     /**
      * Foreign key to model
      */
-
     export interface ForeignKey extends CommonTypes {
         localField: string;
         linkedField: string;
@@ -78,7 +75,6 @@ export namespace Fields {
     /**
      * Foreign key to static enum model
      */
-
     export interface StaticKey extends CommonTypes {
         keys: any;
     }

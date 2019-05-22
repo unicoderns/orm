@@ -61,6 +61,9 @@ Query executed:
 `where` 
 * Key/Value object used to filter the query
 * Array of Key/Value objects will generate a multiple filters separated by an "OR".
+* Array of [Key/Operator/Value](#operators) objects will generate a multiple filters separated by an "OR".
+* Mixed Array of Key/Value and Key/Operator/Value objects will generate a multiple filters separated by an "OR".
+
 
 `orderBy` String with column names and direction E.g.: "id, name ASC"
 
@@ -95,6 +98,8 @@ Query executed:
 `where` 
 * Key/Value object used to filter the query
 * Array of Key/Value objects will generate a multiple filters separated by an "OR".
+* Array of [Key/Operator/Value](#operators) objects will generate a multiple filters separated by an "OR".
+* Mixed Array of Key/Value and Key/Operator/Value objects will generate a multiple filters separated by an "OR".
 
 `orderBy` String with column names and direction E.g.: "id, name ASC"
 
@@ -132,6 +137,8 @@ Query executed:
 `where` 
 * Key/Value object used to filter the query
 * Array of Key/Value objects will generate a multiple filters separated by an "OR".
+* Array of [Key/Operator/Value](#operators) objects will generate a multiple filters separated by an "OR".
+* Mixed Array of Key/Value and Key/Operator/Value objects will generate a multiple filters separated by an "OR".
 
 `orderBy` String with column names and direction E.g.: "id, name ASC"
 
@@ -184,6 +191,9 @@ Query executed:
 * `*` string wildcard is required for security reasons if you want to match all rows
 * Key/Value object used to filter the query
 * Array of Key/Value objects will generate a multiple filters separated by an "OR".
+* Array of [Key/Operator/Value](#operators) objects will generate a multiple filters separated by an "OR".
+* Mixed Array of Key/Value and Key/Operator/Value objects will generate a multiple filters separated by an "OR".
+
 
 ## Delete
 
@@ -209,6 +219,34 @@ Expecting:
 * `*` string wildcard is required for security reasons if you want to match all rows
 * Key/Value object used to filter the query
 * Array of Key/Value objects will generate a multiple filters separated by an "OR".
+* Array of [Key/Operator/Value](#operators) objects will generate a multiple filters separated by an "OR".
+* Mixed Array of Key/Value and Key/Operator/Value objects will generate a multiple filters separated by an "OR".
+
+## Operators
+You can change your where condition operator from the default `=` to any operator that you want, as `!=` or `<` following this format:
+
+```typescript
+ usersTable.returnQuery().getAll({
+    where: [
+        { id: 3 },
+        {
+            created: {
+                operator: ">=",
+                value: "now()"
+            }
+        }
+    ]
+}).then((data: any) => {
+    console.log(data);
+}).catch((err: any) => {
+    console.error(err)
+});
+```
+
+Query executed: 
+```sql
+'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE (`users`.`id` = ?) OR (`users`.`created` >= now());'
+```
 
 ## Join
 Please notice:

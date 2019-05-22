@@ -10,7 +10,13 @@ export declare namespace Models {
      * Key/Value object
      */
     interface KeyValue {
-        [key: string]: string | number;
+        [key: string]: string | number | OperatorValue;
+    }
+    /**
+     * Operator/Value object
+     */
+    interface OperatorValue {
+        [operator: string]: string | number;
     }
     /**
      * Plain query
