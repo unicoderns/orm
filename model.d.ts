@@ -1,24 +1,38 @@
-import { Promise } from "es6-promise";
-import { Models } from "./interfaces/db/models";
-import { DB } from "./connection";
+import { Promise } from 'es6-promise';
+import { ORMModelJoin, ORMModelQuery, ORMModelSelectLimit, ORMModelSelect, ORMModelRow, ORMModelUpdate, ORMModelKeyValue, ORMModelSelectReturn } from './interfaces';
+import { Config } from './interfaces/config';
+import { ORMAllowedFields } from './enums';
 /**
  * Model Abstract
  */
-export declare class Model {
-    private tableName;
-    protected DB: DB;
+export declare class ORMModel {
+    protected tableName: string;
+    protected config: Config;
     private unsafe;
-    private fields;
     private joins;
-    private plainQuery;
     private specialFunctions;
+    readonly fields: ORMAllowedFields;
+    readonly secured: ORMAllowedFields;
+    private currentParamPosition;
+    private emptyValues;
     /**
      * Create a table object.
      *
-     * @param jsloth Core library
+     * @param config Config
      * @param privacy To get all fields (secrets included), you need to set privacy as "unsafe" explicitly, in that way we ensure that this will not be a security breach in any wrong future upgrade.
      */
-    constructor(DB: DB, privacy?: string);
+    constructor(config?: Config, privacy?: string);
+    /**
+     * Restore shared params to original state
+     */
+    private restore;
+    /**
+     * Set config.
+     *
+     * @todo Make private after improve joins
+     * @param config Config
+     */
+    protected setConfig(config?: Config): this;
     /**
      * Current table name.
      *
@@ -32,29 +46,24 @@ export declare class Model {
      */
     isSafe(): boolean;
     /**
-     * Avoid query execution and return models query instead.
-     */
-    returnQuery(): Model;
-    /**
-     * Create cache and return the model field list.
+     * Get field list for the table
      *
-     * If this.unsafe is set then merge public with secret fields.
-     *
-     * @return Fields Mapped
+     * @param target Db table name.
+     * @return Field map.
      */
-    getFields(): Map<string, string> | undefined;
+    getFields: () => ORMAllowedFields;
     /**
-     * Convert a map in a array.
+     * Convert a field keys into array.
      */
-    private mapInArray;
+    private fieldsInArray;
     /**
-     * Filter one array if keys don't exists in other array.
+     * Filter target fields if don't exists in model.
      */
-    private filterArrayInArray;
+    private filterFields;
     /**
-     * Log if keys don't exists in other array.
+     * Log if keys don't exists in model.
      */
-    private logArrayInArray;
+    private logMissingFields;
     /**
      * Clean and validate a select if is need it
      *
@@ -75,6 +84,7 @@ export declare class Model {
      * @return String with the where sql code
      */
     private generateJoinCode;
+    private validateAndTransform;
     private generateWhereCodeChain;
     /**
      * Generate where sql code
@@ -91,11 +101,11 @@ export declare class Model {
      * Warnings:
      * - Field privacity or data integrity will not apply to a direct query, you are responsable for the data security.
      *
-     * @var sql MySQL query
+     * @var sql SQL query
      * @var values Values to replace in the query
      * @return Promise with query result
      */
-    query(query: Models.Query): Promise<any>;
+    query(query: ORMModelQuery): Promise<any>;
     /**
      * Select private query
      *
@@ -115,6 +125,13 @@ export declare class Model {
      */
     private select;
     /**
+     * Format selected data for consistent return
+     *
+     * @var data Data from db engine.
+     * @return Promise with query result
+     */
+    selectConsistentReturn(keys: string[], data: any): ORMModelSelectReturn;
+    /**
      * Get item - Select query
      *
      * @var fields If is NOT set "*" will be used, if there's a string then it will be used as is, a plain query will be
@@ -124,7 +141,7 @@ export declare class Model {
      * @var groupBy String with column names E.g.: "id, name"
      * @return Promise with query result
      */
-    get(select: Models.Select): Promise<any>;
+    get(select: ORMModelSelect): Promise<any>;
     /**
      * Get some item - Select query
      *
@@ -136,7 +153,7 @@ export declare class Model {
      * @var limit Number of rows to retrieve
      * @return Promise with query result
      */
-    getSome(select: Models.SelectLimit): Promise<any>;
+    getSome(select: ORMModelSelectLimit): Promise<any>;
     /**
      * Get all items - Select query
      *
@@ -147,7 +164,7 @@ export declare class Model {
      * @var groupBy String with column names E.g.: "id, name"
      * @return Promise with query result
      */
-    getAll(select: Models.Select): Promise<any>;
+    getAll(select: ORMModelSelect): Promise<any>;
     /**
      * Join a table
      *
@@ -160,14 +177,14 @@ export declare class Model {
      * @var kind Type of Join to apply E.g.: INNER, LEFT
      * @return Model
      */
-    join(joins: Models.Join[]): Model;
+    join(joins: ORMModelJoin[]): ORMModel;
     /**
      * Insert query
      *
      * @var data object to be inserted in the table
      * @return Promise with query result
      */
-    insert(data: Models.Row): Promise<any>;
+    insert(data: ORMModelRow): Promise<any>;
     /**
      * Update query
      *
@@ -175,12 +192,12 @@ export declare class Model {
      * @var where Key/Value object used to filter the query, an array of Key/Value objects will generate a multiple filter separated by an "OR".
      * @return Promise with query result
      */
-    update(update: Models.Update): Promise<any>;
+    update(update: ORMModelUpdate): Promise<any>;
     /**
      * Delete query
      *
      * @var where Key/Value object used to filter the query, an array of Key/Value objects will generate a multiple filter separated by an "OR", a "*" string wildcard is required for security reasons if you want to match all rows.
      * @return Promise with query result
      */
-    delete(where: string | Models.KeyValue | Models.KeyValue[]): Promise<any>;
+    delete(where: string | ORMModelKeyValue | ORMModelKeyValue[]): Promise<any>;
 }

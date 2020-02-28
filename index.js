@@ -27,11 +27,10 @@ function __export(m) {
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 /**
-* Unicoderns ORM central module
-*/
-__export(require("./connection"));
+ * Unicoderns ORM central module
+ */
 __export(require("./model"));
-__export(require("./decorators"));
 __export(require("./datatypes"));
-__export(require("./interfaces/db/defaults"));
+__export(require("./interfaces"));
+__export(require("./enums"));
 //# sourceMappingURL=index.js.map

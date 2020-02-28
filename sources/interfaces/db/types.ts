@@ -22,24 +22,19 @@
 // SOFTWARE.                                                                              //
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-import { Fields } from "./fields";
-import { Defaults } from "./defaults";
+import { ORMCommonFields, ORMBinaryDefault, ORMTimestampDefault } from '../../enums'
 
 /**
  * Internal abstract types
  */
-export namespace Types {
+export interface ORMGeneralFieldType extends ORMCommonFields {
+    size?: number
+}
 
-    export interface General extends Fields.CommonTypes {
-        size?: number;
-    }
+export interface ORMBoolFieldType extends ORMCommonFields {
+    default?: ORMBinaryDefault
+}
 
-    export interface Bool extends Fields.CommonTypes {
-        default?: Defaults.Binary;
-    }
-
-    export interface Timestamp extends Fields.CommonTypes {
-        default?: Defaults.Timestamp;
-    }
-
+export interface ORMTimestampFieldType extends ORMCommonFields {
+    default?: ORMTimestampDefault
 }

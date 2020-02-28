@@ -23,4 +23,33 @@
 // SOFTWARE.                                                                              //
 ////////////////////////////////////////////////////////////////////////////////////////////
 Object.defineProperty(exports, "__esModule", { value: true });
+var Fields;
+(function (Fields) {
+    let Supported;
+    (function (Supported) {
+        Supported[Supported["TINYINT"] = 0] = "TINYINT";
+        Supported[Supported["SMALLINT"] = 1] = "SMALLINT";
+        Supported[Supported["BIGINT"] = 2] = "BIGINT";
+        Supported[Supported["INT"] = 3] = "INT";
+        Supported[Supported["FLOAT"] = 4] = "FLOAT";
+        Supported[Supported["REAL"] = 5] = "REAL";
+        Supported[Supported["DOUBLE"] = 6] = "DOUBLE";
+        Supported[Supported["DECIMAL"] = 7] = "DECIMAL";
+        Supported[Supported["CHAR"] = 8] = "CHAR";
+        Supported[Supported["VARCHAR"] = 9] = "VARCHAR";
+        Supported[Supported["TINYTEXT"] = 10] = "TINYTEXT";
+        Supported[Supported["TEXT"] = 11] = "TEXT";
+        Supported[Supported["LONGTEXT"] = 12] = "LONGTEXT";
+        Supported[Supported["BOOL"] = 13] = "BOOL";
+        Supported[Supported["YEAR"] = 14] = "YEAR";
+        Supported[Supported["DATE"] = 15] = "DATE";
+        Supported[Supported["TIME"] = 16] = "TIME";
+        Supported[Supported["DATETIME"] = 17] = "DATETIME";
+        Supported[Supported["TIMESTAMP"] = 18] = "TIMESTAMP";
+        Supported[Supported["BLOB"] = 19] = "BLOB";
+        Supported[Supported["BINARY"] = 20] = "BINARY";
+        Supported[Supported["LONGVARBINARY"] = 21] = "LONGVARBINARY";
+        Supported[Supported["VARBINARY"] = 22] = "VARBINARY";
+    })(Supported = Fields.Supported || (Fields.Supported = {}));
+})(Fields = exports.Fields || (exports.Fields = {}));
 //# sourceMappingURL=fields.js.map

@@ -23,11 +23,11 @@
 // SOFTWARE.                                                                              //
 ////////////////////////////////////////////////////////////////////////////////////////////
 Object.defineProperty(exports, "__esModule", { value: true });
-const defaults_1 = require("./interfaces/db/defaults");
+const enums_1 = require("./enums");
 /**
  * JSloth DB Datatypes
  */
-class Datatypes {
+class ORMDatatypes {
     /**
      * Merge 2 objects
      *
@@ -35,8 +35,9 @@ class Datatypes {
      * @var customType Object 2 (will overwrite Object 1 keys)
      * @return Merged object
      */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     mergeTypes(commonType, customType) {
-        let type = Object.assign({}, commonType, customType);
+        const type = { ...commonType, ...customType };
         return type;
     }
     /**
@@ -46,7 +47,7 @@ class Datatypes {
      * @return Object with defaults
      */
     fillDefault(settings = {}) {
-        let type = {
+        const type = {
             primaryKey: settings.primaryKey || false,
             notNull: settings.notNull || false,
             unique: settings.unique || false,
@@ -55,8 +56,9 @@ class Datatypes {
             zeroFill: settings.zeroFill || false,
             autoincrement: settings.autoincrement || false,
             generated: settings.generated || false,
+            alias: settings.alias || undefined,
             protected: settings.protected || false,
-            private: settings.private || false
+            private: settings.private || false,
         };
         return type;
     }
@@ -64,23 +66,23 @@ class Datatypes {
     // Numbers
     /////////////////////////////////////////////////////////////////////
     TINYINT(settings = {}) {
-        let commonType = this.fillDefault(settings);
-        let customType = {
-            type: "TINYINT"
+        const commonType = this.fillDefault(settings);
+        const customType = {
+            type: enums_1.ORMSupportedFields.TINYINT,
         };
         return this.mergeTypes(commonType, customType);
     }
     SMALLINT(settings = {}) {
-        let commonType = this.fillDefault(settings);
-        let customType = {
-            type: "SMALLINT"
+        const commonType = this.fillDefault(settings);
+        const customType = {
+            type: enums_1.ORMSupportedFields.SMALLINT,
         };
         return this.mergeTypes(commonType, customType);
     }
     INT(settings = {}) {
-        let commonType = this.fillDefault(settings);
-        let customType = {
-            type: "INT"
+        const commonType = this.fillDefault(settings);
+        const customType = {
+            type: enums_1.ORMSupportedFields.INT,
         };
         return this.mergeTypes(commonType, customType);
     }
@@ -88,15 +90,15 @@ class Datatypes {
     // Special Numbers
     // ------------------------------------------------------------------
     ID(settings = {}) {
-        let commonType = this.fillDefault(settings);
-        let customType = {
-            type: "INT",
+        const commonType = this.fillDefault(settings);
+        const customType = {
+            type: enums_1.ORMSupportedFields.INT,
             size: settings.size || 0,
             primaryKey: true,
             notNull: true,
             unique: true,
             unsigned: true,
-            autoincrement: true
+            autoincrement: true,
         };
         return this.mergeTypes(commonType, customType);
     }
@@ -104,26 +106,27 @@ class Datatypes {
      * Define a foreign key
      *
      * @param name Name of the db field.
-     * @param model Db Model to link.
+     * @param ORMModel Db ORMModel to link.
      * @param settings Field settings.
      */
     FOREIGNKEY(localField, linkedField, model, settings = {}) {
-        let commonType = this.fillDefault(settings);
-        let customType = {
-            type: "INT",
+        const commonType = this.fillDefault(settings);
+        const customType = {
+            type: enums_1.ORMSupportedFields.INT,
             size: settings.size || 0,
-            model: model,
-            localField: localField,
-            linkedField: linkedField
+            model,
+            localField,
+            linkedField,
         };
         return this.mergeTypes(commonType, customType);
     }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     STATICKEY(keys, settings = {}) {
-        let commonType = this.fillDefault(settings);
-        let customType = {
-            type: "INT",
+        const commonType = this.fillDefault(settings);
+        const customType = {
+            type: enums_1.ORMSupportedFields.INT,
             size: settings.size || 0,
-            keys: keys
+            keys: keys,
         };
         return this.mergeTypes(commonType, customType);
     }
@@ -131,23 +134,23 @@ class Datatypes {
     // Float Numbers
     // ------------------------------------------------------------------
     FLOAT(settings = {}) {
-        let commonType = this.fillDefault(settings);
-        let customType = {
-            type: "FLOAT"
+        const commonType = this.fillDefault(settings);
+        const customType = {
+            type: enums_1.ORMSupportedFields.FLOAT,
         };
         return this.mergeTypes(commonType, customType);
     }
     DOUBLE(settings = {}) {
-        let commonType = this.fillDefault(settings);
-        let customType = {
-            type: "DOUBLE"
+        const commonType = this.fillDefault(settings);
+        const customType = {
+            type: enums_1.ORMSupportedFields.DOUBLE,
         };
         return this.mergeTypes(commonType, customType);
     }
     DECIMAL(settings = {}) {
-        let commonType = this.fillDefault(settings);
-        let customType = {
-            type: "DECIMAL"
+        const commonType = this.fillDefault(settings);
+        const customType = {
+            type: enums_1.ORMSupportedFields.DECIMAL,
         };
         return this.mergeTypes(commonType, customType);
     }
@@ -155,40 +158,40 @@ class Datatypes {
     // Strings
     /////////////////////////////////////////////////////////////////////
     CHAR(settings = {}) {
-        let commonType = this.fillDefault(settings);
-        let customType = {
-            type: "CHAR",
-            size: settings.size || 0
+        const commonType = this.fillDefault(settings);
+        const customType = {
+            type: enums_1.ORMSupportedFields.CHAR,
+            size: settings.size || 0,
         };
         return this.mergeTypes(commonType, customType);
     }
     VARCHAR(settings = {}) {
-        let commonType = this.fillDefault(settings);
-        let customType = {
-            type: "VARCHAR",
-            size: settings.size || 0
+        const commonType = this.fillDefault(settings);
+        const customType = {
+            type: enums_1.ORMSupportedFields.VARCHAR,
+            size: settings.size || 0,
         };
         return this.mergeTypes(commonType, customType);
     }
     TINYTEXT(settings = {}) {
-        let commonType = this.fillDefault(settings);
-        let customType = {
-            type: "TINYTEXT",
-            size: settings.size || 0
+        const commonType = this.fillDefault(settings);
+        const customType = {
+            type: enums_1.ORMSupportedFields.TINYTEXT,
+            size: settings.size || 0,
         };
         return this.mergeTypes(commonType, customType);
     }
     TEXT(settings = {}) {
-        let commonType = this.fillDefault(settings);
-        let customType = {
-            type: "TEXT"
+        const commonType = this.fillDefault(settings);
+        const customType = {
+            type: enums_1.ORMSupportedFields.TEXT,
         };
         return this.mergeTypes(commonType, customType);
     }
     LONGTEXT(settings = {}) {
-        let commonType = this.fillDefault(settings);
-        let customType = {
-            type: "LONGTEXT",
+        const commonType = this.fillDefault(settings);
+        const customType = {
+            type: enums_1.ORMSupportedFields.LONGTEXT,
         };
         return this.mergeTypes(commonType, customType);
     }
@@ -196,10 +199,10 @@ class Datatypes {
     // Binary
     /////////////////////////////////////////////////////////////////////
     BOOL(settings = {}) {
-        let commonType = this.fillDefault(settings);
-        let customType = {
-            type: "BOOL",
-            default: settings.default || 0
+        const commonType = this.fillDefault(settings);
+        const customType = {
+            type: enums_1.ORMSupportedFields.BOOL,
+            default: settings.default || 0,
         };
         return this.mergeTypes(commonType, customType);
     }
@@ -207,41 +210,41 @@ class Datatypes {
     // Date/Time
     /////////////////////////////////////////////////////////////////////
     YEAR(settings = {}) {
-        let commonType = this.fillDefault(settings);
-        let customType = {
-            type: "YEAR"
+        const commonType = this.fillDefault(settings);
+        const customType = {
+            type: enums_1.ORMSupportedFields.YEAR,
         };
         return this.mergeTypes(commonType, customType);
     }
     DATE(settings = {}) {
-        let commonType = this.fillDefault(settings);
-        let customType = {
-            type: "DATE"
+        const commonType = this.fillDefault(settings);
+        const customType = {
+            type: enums_1.ORMSupportedFields.DATE,
         };
         return this.mergeTypes(commonType, customType);
     }
     TIME(settings = {}) {
-        let commonType = this.fillDefault(settings);
-        let customType = {
-            type: "TIME"
+        const commonType = this.fillDefault(settings);
+        const customType = {
+            type: enums_1.ORMSupportedFields.TIME,
         };
         return this.mergeTypes(commonType, customType);
     }
     DATETIME(settings = {}) {
-        let commonType = this.fillDefault(settings);
-        let customType = {
-            type: "DATETIME"
+        const commonType = this.fillDefault(settings);
+        const customType = {
+            type: enums_1.ORMSupportedFields.DATETIME,
         };
         return this.mergeTypes(commonType, customType);
     }
     TIMESTAMP(settings = {}) {
-        let commonType = this.fillDefault(settings);
-        let customType = {
-            type: "TIMESTAMP",
-            default: settings.default || defaults_1.Defaults.Timestamp["CURRENT_TIMESTAMP"]
+        const commonType = this.fillDefault(settings);
+        const customType = {
+            type: enums_1.ORMSupportedFields.TIMESTAMP,
+            default: settings.default || enums_1.ORMTimestampDefault['CURRENT_TIMESTAMP'],
         };
         return this.mergeTypes(commonType, customType);
     }
 }
-exports.Datatypes = Datatypes;
+exports.ORMDatatypes = ORMDatatypes;
 //# sourceMappingURL=datatypes.js.map

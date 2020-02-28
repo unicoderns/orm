@@ -1,19 +1,24 @@
+export declare enum Drivers {
+    'DataAPI' = 0,
+    'Native' = 1
+}
+export declare enum Engines {
+    'PostgreSQL' = 0,
+    'MySQL' = 1
+}
 /*** Main configuration interface */
 export interface Config {
-    dev: boolean;
-    connection: Connection;
+    debug?: boolean;
+    connection?: Connection;
+    driver?: Drivers;
+    engine?: Engines;
+    settings?: Settings;
 }
 /*** Connection configuration interface. */
 export interface Connection {
-    user: string;
-    password: string;
-    database: string;
-    port: number;
-    host: string;
-    connectionLimit: number;
-    validations: ValidationSettings;
+    query: any;
 }
-/*** Validation settings interface. */
-export interface ValidationSettings {
-    fields: boolean;
+/*** Connection configuration interface. */
+export interface Settings {
+    consistentReturn: boolean;
 }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 ////////////////////////////////////////////////////////////////////////////////////////////
 // The MIT License (MIT)                                                                  //
 //                                                                                        //
@@ -22,73 +23,105 @@
 // SOFTWARE.                                                                              //
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-import * as users from './dummy/usersModel';
+import 'jasmine'
 
-import { DB } from "../connection"
+import * as users from './dummy/usersModel'
 
+import { Engines, Drivers } from '../interfaces/config'
+import { ORMAllowedFields, ORMTimestampDefault } from '../enums'
+import { ORMDatatypes } from '../datatypes'
 
-/**
- * Starting mock system
- */
-let db = new DB({
-    dev: true,
-    connection: {
-        "user": "apiUser",
-        "password": "password",
-        "database": "apiDB",
-        "port": 3306,
-        "host": "localhost",
-        "connectionLimit": 10,
-        "validations": {
-            "fields": true
-        }
-    }
-});
-
-let usersTable: users.Users;
-let usersUnsafeTable: users.Users;
+let usersTable: users.Users
+let usersUnsafeTable: users.Users
 
 beforeAll(done => {
-    usersTable = new users.Users(db);
-    usersUnsafeTable = new users.Users(db, "unsafe");
-    done();
-});
+    usersTable = new users.Users({
+        debug: false,
+        engine: Engines.MySQL,
+        driver: Drivers.Native,
+    })
+    usersUnsafeTable = new users.Users(
+        {
+            debug: false,
+            engine: Engines.MySQL,
+            driver: Drivers.Native,
+        },
+        'unsafe',
+    )
+    done()
+})
 
 describe('Fields', () => {
     it('Model to have fields', () => {
-        expect(usersTable.getFields()).not.toBeNull();
-    });
+        expect(usersTable.getFields()).not.toBeNull()
+    })
 
-    it('Model returns correct map', () => {
-        let map: Map<string, string> = new Map([
-            ['id', 'id'],
-            ['created', 'created'],
-            ['username', 'username'],
-            ['email', 'email'],
-            ['firstName', 'first_name'],
-            ['lastName', 'last_name'],
-            ['admin', 'admin'],
-            ['verified', 'verified'],
-            ['active', 'active']
-        ]);
-        expect(usersTable.getFields()).toEqual(map);
-    });
+    it('Model returns correct fields', () => {
+        const fields: ORMAllowedFields = {
+            id: new ORMDatatypes().ID(),
+            created: new ORMDatatypes().TIMESTAMP({
+                notNull: true,
+                default: ORMTimestampDefault.CURRENT_TIMESTAMP,
+            }),
+            username: new ORMDatatypes().VARCHAR({
+                size: 45,
+                unique: true,
+            }),
+            email: new ORMDatatypes().VARCHAR({
+                notNull: true,
+                size: 45,
+                unique: true,
+            }),
+            firstName: new ORMDatatypes().VARCHAR({
+                alias: 'first_name',
+                size: 45,
+            }),
+            lastName: new ORMDatatypes().VARCHAR({
+                alias: 'last_name',
+                size: 45,
+            }),
+            admin: new ORMDatatypes().BOOL(),
+            verified: new ORMDatatypes().BOOL(),
+            active: new ORMDatatypes().BOOL(),
+        }
 
-    it('Unsafe Model returns correct map', () => {
-        let map: Map<string, string> = new Map([
-            ['id', 'id'],
-            ['created', 'created'],
-            ['username', 'username'],
-            ['email', 'email'],
-            ['firstName', 'first_name'],
-            ['lastName', 'last_name'],
-            ['admin', 'admin'],
-            ['verified', 'verified'],
-            ['active', 'active'],
-            ['salt', 'added_salt'],
-            ['password', 'password']
-        ]);
-        expect(usersUnsafeTable.getFields()).toEqual(map);
-    });
+        expect(usersTable.getFields()).toEqual(fields)
+    })
 
-});
+    it('Unsafe Model returns correct fields', () => {
+        const fields: ORMAllowedFields = {
+            id: new ORMDatatypes().ID(),
+            created: new ORMDatatypes().TIMESTAMP({
+                notNull: true,
+                default: ORMTimestampDefault.CURRENT_TIMESTAMP,
+            }),
+            username: new ORMDatatypes().VARCHAR({
+                size: 45,
+                unique: true,
+            }),
+            email: new ORMDatatypes().VARCHAR({
+                notNull: true,
+                size: 45,
+                unique: true,
+            }),
+            firstName: new ORMDatatypes().VARCHAR({
+                alias: 'first_name',
+                size: 45,
+            }),
+            lastName: new ORMDatatypes().VARCHAR({
+                alias: 'last_name',
+                size: 45,
+            }),
+            admin: new ORMDatatypes().BOOL(),
+            verified: new ORMDatatypes().BOOL(),
+            active: new ORMDatatypes().BOOL(),
+            password: new ORMDatatypes().VARCHAR({
+                notNull: true,
+                protected: true,
+                size: 60,
+            }),
+        }
+
+        expect(usersUnsafeTable.getFields()).toEqual(fields)
+    })
+})

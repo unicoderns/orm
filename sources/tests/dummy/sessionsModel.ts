@@ -22,45 +22,37 @@
 // SOFTWARE.                                                                              //
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-import * as usersModel from "./usersModel";
-
-import { field } from "../../decorators"
-import { Defaults } from "../../interfaces/db/defaults"
-import { Datatypes } from "../../datatypes"
-import { Model } from "../../model"
+import * as usersModel from './usersModel'
+import { ORMModel, ORMDatatypes } from '../..'
+import { ORMTimestampDefault } from '../../enums'
 
 export interface Row {
-    id?: number;
-    created?: number;
-    ip: string;
-    user: number;
+    id?: number
+    created?: number
+    ip: string
+    user: number
 }
 
 /**
  * User Model
  */
-export class Sessions extends Model {
+export class Sessions extends ORMModel {
+    protected tableName = 'sessions'
 
-    @field()
-    public id = new Datatypes().ID();
-
-    @field()
-    public created = new Datatypes().TIMESTAMP({
-        notNull: true,
-        default: Defaults.Timestamp.CURRENT_TIMESTAMP
-    });
-
-    @field()
-    public ip = new Datatypes().VARCHAR({
-        size: 39,
-        notNull: true
-    });
-
-    // ToDo: Specify the localField looks redundant
-    @field()
-    public user = new Datatypes().FOREIGNKEY("user", "id", new usersModel.Users(this.DB), {
-        notNull: true,
-        unique: true
-    });
-
+    public readonly fields = {
+        id: new ORMDatatypes().ID(),
+        created: new ORMDatatypes().TIMESTAMP({
+            notNull: true,
+            default: ORMTimestampDefault.CURRENT_TIMESTAMP,
+        }),
+        ip: new ORMDatatypes().VARCHAR({
+            size: 39,
+            notNull: true,
+        }),
+        // ToDo: Specify the localField looks redundant
+        user: new ORMDatatypes().FOREIGNKEY('user', 'id', new usersModel.Users(), {
+            notNull: true,
+            unique: true,
+        }),
+    }
 }

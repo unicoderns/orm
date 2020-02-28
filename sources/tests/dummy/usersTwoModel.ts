@@ -22,51 +22,45 @@
 // SOFTWARE.                                                                              //
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-import * as usersModel from "./usersModel";
-
-import { field, secret } from "../../decorators"
-import { Defaults } from "../../interfaces/db/defaults"
-import { Datatypes } from "../../datatypes"
-import { Model } from "../../model"
+import * as usersModel from './usersModel'
+import { ORMModel } from '../..'
+import { ORMDatatypes } from '../../datatypes'
+import { ORMTimestampDefault } from '../../enums'
 
 export interface Row {
-    id?: number;
-    created?: number;
-    username: string;
-    email: string;
-    password: string;
-    salt: string;
-    firstName?: string;
-    lastName?: string;
-    admin?: boolean;
-    verified?: boolean;
-    active?: boolean;
+    id?: number
+    created?: number
+    username: string
+    email: string
+    password: string
+    salt: string
+    firstName?: string
+    lastName?: string
+    admin?: boolean
+    verified?: boolean
+    active?: boolean
 }
 
 /**
  * User Model
  */
-export class UsersTwo extends Model {
+export class UsersTwo extends ORMModel {
+    protected tableName = 'usersTwo'
 
-    @field()
-    public id = new Datatypes().ID();
-
-    @field()
-    public created = new Datatypes().TIMESTAMP({
-        notNull: true,
-        default: Defaults.Timestamp.CURRENT_TIMESTAMP
-    });
-
-    @field()
-    public username = new Datatypes().VARCHAR({
-        size: 45,
-        unique: true
-    });
-
-    // ToDo: Specify the localField looks redundant
-    @field()
-    public user = new Datatypes().FOREIGNKEY("user", "id", new usersModel.Users(this.DB), {
-        notNull: true,
-        unique: true
-    });    
+    public readonly fields = {
+        id: new ORMDatatypes().ID(),
+        created: new ORMDatatypes().TIMESTAMP({
+            notNull: true,
+            default: ORMTimestampDefault.CURRENT_TIMESTAMP,
+        }),
+        username: new ORMDatatypes().VARCHAR({
+            size: 45,
+            unique: true,
+        }),
+        // ToDo: Specify the localField looks redundant
+        user: new ORMDatatypes().FOREIGNKEY('user', 'id', new usersModel.Users(), {
+            notNull: true,
+            unique: true,
+        }),
+    }
 }

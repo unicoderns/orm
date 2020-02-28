@@ -23,4 +23,14 @@
 // SOFTWARE.                                                                              //
 ////////////////////////////////////////////////////////////////////////////////////////////
 Object.defineProperty(exports, "__esModule", { value: true });
+var Drivers;
+(function (Drivers) {
+    Drivers[Drivers["DataAPI"] = 0] = "DataAPI";
+    Drivers[Drivers["Native"] = 1] = "Native";
+})(Drivers = exports.Drivers || (exports.Drivers = {}));
+var Engines;
+(function (Engines) {
+    Engines[Engines["PostgreSQL"] = 0] = "PostgreSQL";
+    Engines[Engines["MySQL"] = 1] = "MySQL";
+})(Engines = exports.Engines || (exports.Engines = {}));
 //# sourceMappingURL=config.js.map

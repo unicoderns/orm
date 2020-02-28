@@ -22,37 +22,46 @@
 // SOFTWARE.                                                                              //
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-import { Fields } from "./interfaces/db/fields";
-import { Types } from "./interfaces/db/types";
-import { Defaults } from "./interfaces/db/defaults";
-
-import { Model } from "./model"
+import {
+    ORMCommonFields,
+    ORMDataTimestampField,
+    ORMSupportedFields,
+    ORMForeignKeyField,
+    ORMStaticKeyField,
+    ORMFloatField,
+    ORMVarCharField,
+    ORMBoolField,
+    ORMTimestampDefault,
+} from './enums'
+import { ORMGeneralFieldType, ORMTimestampFieldType, ORMBoolFieldType } from './interfaces/db/types'
+import { ORMModel } from '.'
 
 /**
  * JSloth DB Datatypes
  */
-export class Datatypes {
-
+export class ORMDatatypes {
     /**
      * Merge 2 objects
-     * 
+     *
      * @var commonType Object 1
      * @var customType Object 2 (will overwrite Object 1 keys)
      * @return Merged object
      */
-    private mergeTypes(commonType: any, customType: any) {
-        let type = { ...commonType, ...customType };
-        return type;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    private mergeTypes(commonType: any, customType: any): any {
+        const type = { ...commonType, ...customType }
+
+        return type
     }
 
     /**
      * Fill SQl defaults for fields
-     * 
+     *
      * @var settings Object with custom settings
      * @return Object with defaults
      */
-    private fillDefault(settings: Types.General = {}): Types.General {
-        let type: Types.General = {
+    private fillDefault(settings: ORMGeneralFieldType = {}): ORMGeneralFieldType {
+        const type: ORMGeneralFieldType = {
             primaryKey: settings.primaryKey || false,
             notNull: settings.notNull || false,
             unique: settings.unique || false,
@@ -61,216 +70,243 @@ export class Datatypes {
             zeroFill: settings.zeroFill || false,
             autoincrement: settings.autoincrement || false,
             generated: settings.generated || false,
+            alias: settings.alias || undefined,
             protected: settings.protected || false,
-            private: settings.private || false
-        };
-        return type;
+            private: settings.private || false,
+        }
+
+        return type
     }
 
     /////////////////////////////////////////////////////////////////////
     // Numbers
     /////////////////////////////////////////////////////////////////////
 
-    public TINYINT(settings: Types.General = {}): Fields.CommonTypes {
-        let commonType = this.fillDefault(settings);
-        let customType: Fields.CommonTypes = {
-            type: "TINYINT"
-        };
-        return this.mergeTypes(commonType, customType);
+    public TINYINT(settings: ORMGeneralFieldType = {}): ORMCommonFields {
+        const commonType = this.fillDefault(settings)
+        const customType: ORMCommonFields = {
+            type: ORMSupportedFields.TINYINT,
+        }
+
+        return this.mergeTypes(commonType, customType)
     }
 
-    public SMALLINT(settings: Types.General = {}): Fields.CommonTypes {
-        let commonType = this.fillDefault(settings);
-        let customType: Fields.CommonTypes = {
-            type: "SMALLINT"
-        };
-        return this.mergeTypes(commonType, customType);
+    public SMALLINT(settings: ORMGeneralFieldType = {}): ORMCommonFields {
+        const commonType = this.fillDefault(settings)
+        const customType: ORMCommonFields = {
+            type: ORMSupportedFields.SMALLINT,
+        }
+
+        return this.mergeTypes(commonType, customType)
     }
 
-    public INT(settings: Types.General = {}): Fields.CommonTypes {
-        let commonType = this.fillDefault(settings);
-        let customType: Fields.CommonTypes = {
-            type: "INT"
-        };
-        return this.mergeTypes(commonType, customType);
+    public INT(settings: ORMGeneralFieldType = {}): ORMCommonFields {
+        const commonType = this.fillDefault(settings)
+        const customType: ORMCommonFields = {
+            type: ORMSupportedFields.INT,
+        }
+
+        return this.mergeTypes(commonType, customType)
     }
 
     // ------------------------------------------------------------------
     // Special Numbers
     // ------------------------------------------------------------------
-    public ID(settings: Types.General = {}): Fields.CommonTypes {
-        let commonType = this.fillDefault(settings);
-        let customType: Fields.CommonTypes = {
-            type: "INT",
+    public ID(settings: ORMGeneralFieldType = {}): ORMCommonFields {
+        const commonType = this.fillDefault(settings)
+        const customType: ORMCommonFields = {
+            type: ORMSupportedFields.INT,
             size: settings.size || 0,
             primaryKey: true,
             notNull: true,
             unique: true,
             unsigned: true,
-            autoincrement: true
-        };
-        return this.mergeTypes(commonType, customType);
+            autoincrement: true,
+        }
+
+        return this.mergeTypes(commonType, customType)
     }
 
     /**
      * Define a foreign key
-     * 
+     *
      * @param name Name of the db field.
-     * @param model Db Model to link.
+     * @param ORMModel Db ORMModel to link.
      * @param settings Field settings.
      */
-    public FOREIGNKEY(localField: string, linkedField: string, model: Model, settings: Types.General = {}): Fields.ForeignKey {
-        let commonType = this.fillDefault(settings);
-        let customType: Fields.ForeignKey = {
-            type: "INT",
+    public FOREIGNKEY(
+        localField: string,
+        linkedField: string,
+        model: ORMModel,
+        settings: ORMGeneralFieldType = {},
+    ): ORMForeignKeyField {
+        const commonType = this.fillDefault(settings)
+        const customType: ORMForeignKeyField = {
+            type: ORMSupportedFields.INT,
             size: settings.size || 0,
-            model: model,
-            localField: localField,
-            linkedField: linkedField
-        };
-        return this.mergeTypes(commonType, customType);
+            model,
+            localField,
+            linkedField,
+        }
+
+        return this.mergeTypes(commonType, customType)
     }
 
-    public STATICKEY(keys: any, settings: Types.General = {}): Fields.StaticKey {
-        let commonType = this.fillDefault(settings);
-        let customType: Fields.StaticKey = {
-            type: "INT",
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    public STATICKEY(keys: any, settings: ORMGeneralFieldType = {}): ORMStaticKeyField {
+        const commonType = this.fillDefault(settings)
+        const customType: ORMStaticKeyField = {
+            type: ORMSupportedFields.INT,
             size: settings.size || 0,
-            keys: keys
-        };
-        return this.mergeTypes(commonType, customType);
+            keys: keys,
+        }
+
+        return this.mergeTypes(commonType, customType)
     }
 
     // ------------------------------------------------------------------
     // Float Numbers
     // ------------------------------------------------------------------
-    public FLOAT(settings: Types.General = {}): Fields.FloatType {
-        let commonType = this.fillDefault(settings);
-        let customType: Fields.FloatType = {
-            type: "FLOAT"
-        };
-        return this.mergeTypes(commonType, customType);
+    public FLOAT(settings: ORMGeneralFieldType = {}): ORMFloatField {
+        const commonType = this.fillDefault(settings)
+        const customType: ORMFloatField = {
+            type: ORMSupportedFields.FLOAT,
+        }
+
+        return this.mergeTypes(commonType, customType)
     }
 
-    public DOUBLE(settings: Types.General = {}): Fields.FloatType {
-        let commonType = this.fillDefault(settings);
-        let customType: Fields.FloatType = {
-            type: "DOUBLE"
-        };
-        return this.mergeTypes(commonType, customType);
+    public DOUBLE(settings: ORMGeneralFieldType = {}): ORMFloatField {
+        const commonType = this.fillDefault(settings)
+        const customType: ORMFloatField = {
+            type: ORMSupportedFields.DOUBLE,
+        }
+
+        return this.mergeTypes(commonType, customType)
     }
 
-    public DECIMAL(settings: Types.General = {}): Fields.FloatType {
-        let commonType = this.fillDefault(settings);
-        let customType: Fields.FloatType = {
-            type: "DECIMAL"
-        };
-        return this.mergeTypes(commonType, customType);
+    public DECIMAL(settings: ORMGeneralFieldType = {}): ORMFloatField {
+        const commonType = this.fillDefault(settings)
+        const customType: ORMFloatField = {
+            type: ORMSupportedFields.DECIMAL,
+        }
+
+        return this.mergeTypes(commonType, customType)
     }
 
     /////////////////////////////////////////////////////////////////////
     // Strings
     /////////////////////////////////////////////////////////////////////
 
-    public CHAR(settings: Types.General = <Types.General>{}): Fields.VarCharType {
-        let commonType = this.fillDefault(settings);
-        let customType: Fields.VarCharType = {
-            type: "CHAR",
-            size: settings.size || 0
-        };
-        return this.mergeTypes(commonType, customType);
+    public CHAR(settings: ORMGeneralFieldType = {}): ORMVarCharField {
+        const commonType = this.fillDefault(settings)
+        const customType: ORMVarCharField = {
+            type: ORMSupportedFields.CHAR,
+            size: settings.size || 0,
+        }
+
+        return this.mergeTypes(commonType, customType)
     }
 
-    public VARCHAR(settings: Types.General = <Types.General>{}): Fields.VarCharType {
-        let commonType = this.fillDefault(settings);
-        let customType: Fields.VarCharType = {
-            type: "VARCHAR",
-            size: settings.size || 0
-        };
-        return this.mergeTypes(commonType, customType);
+    public VARCHAR(settings: ORMGeneralFieldType = {}): ORMVarCharField {
+        const commonType = this.fillDefault(settings)
+        const customType: ORMVarCharField = {
+            type: ORMSupportedFields.VARCHAR,
+            size: settings.size || 0,
+        }
+
+        return this.mergeTypes(commonType, customType)
     }
 
-    public TINYTEXT(settings: Types.General = <Types.General>{}): Fields.VarCharType {
-        let commonType = this.fillDefault(settings);
-        let customType: Fields.VarCharType = {
-            type: "TINYTEXT",
-            size: settings.size || 0
-        };
-        return this.mergeTypes(commonType, customType);
+    public TINYTEXT(settings: ORMGeneralFieldType = {}): ORMVarCharField {
+        const commonType = this.fillDefault(settings)
+        const customType: ORMVarCharField = {
+            type: ORMSupportedFields.TINYTEXT,
+            size: settings.size || 0,
+        }
+
+        return this.mergeTypes(commonType, customType)
     }
 
-    public TEXT(settings: Types.General = <Types.General>{}): Fields.CommonTypes {
-        let commonType = this.fillDefault(settings);
-        let customType: Fields.CommonTypes = {
-            type: "TEXT"
-        };
-        return this.mergeTypes(commonType, customType);
+    public TEXT(settings: ORMGeneralFieldType = {}): ORMCommonFields {
+        const commonType = this.fillDefault(settings)
+        const customType: ORMCommonFields = {
+            type: ORMSupportedFields.TEXT,
+        }
+
+        return this.mergeTypes(commonType, customType)
     }
 
-    public LONGTEXT(settings: Types.General = <Types.General>{}): Fields.CommonTypes {
-        let commonType = this.fillDefault(settings);
-        let customType: Fields.CommonTypes = {
-            type: "LONGTEXT",
-        };
-        return this.mergeTypes(commonType, customType);
+    public LONGTEXT(settings: ORMGeneralFieldType = {}): ORMCommonFields {
+        const commonType = this.fillDefault(settings)
+        const customType: ORMCommonFields = {
+            type: ORMSupportedFields.LONGTEXT,
+        }
+
+        return this.mergeTypes(commonType, customType)
     }
 
     /////////////////////////////////////////////////////////////////////
     // Binary
     /////////////////////////////////////////////////////////////////////
 
-    public BOOL(settings: Types.Bool = <Types.Bool>{}): Fields.BoolType {
-        let commonType = this.fillDefault(settings);
-        let customType: Fields.BoolType = {
-            type: "BOOL",
-            default: settings.default || 0
-        };
-        return this.mergeTypes(commonType, customType);
+    public BOOL(settings: ORMBoolFieldType = {}): ORMBoolField {
+        const commonType = this.fillDefault(settings)
+        const customType: ORMBoolField = {
+            type: ORMSupportedFields.BOOL,
+            default: settings.default || 0,
+        }
+
+        return this.mergeTypes(commonType, customType)
     }
 
     /////////////////////////////////////////////////////////////////////
     // Date/Time
     /////////////////////////////////////////////////////////////////////
 
-    public YEAR(settings: Types.Timestamp = <Types.Timestamp>{}): Fields.DataTimestampType {
-        let commonType = this.fillDefault(settings);
-        let customType: Fields.CommonTypes = {
-            type: "YEAR"
-        };
-        return this.mergeTypes(commonType, customType);
+    public YEAR(settings: ORMTimestampFieldType = {}): ORMDataTimestampField {
+        const commonType = this.fillDefault(settings)
+        const customType: ORMCommonFields = {
+            type: ORMSupportedFields.YEAR,
+        }
+
+        return this.mergeTypes(commonType, customType)
     }
 
-    public DATE(settings: Types.Timestamp = <Types.Timestamp>{}): Fields.DataTimestampType {
-        let commonType = this.fillDefault(settings);
-        let customType: Fields.CommonTypes = {
-            type: "DATE"
-        };
-        return this.mergeTypes(commonType, customType);
+    public DATE(settings: ORMTimestampFieldType = {}): ORMDataTimestampField {
+        const commonType = this.fillDefault(settings)
+        const customType: ORMCommonFields = {
+            type: ORMSupportedFields.DATE,
+        }
+
+        return this.mergeTypes(commonType, customType)
     }
 
-    public TIME(settings: Types.Timestamp = <Types.Timestamp>{}): Fields.DataTimestampType {
-        let commonType = this.fillDefault(settings);
-        let customType: Fields.CommonTypes = {
-            type: "TIME"
-        };
-        return this.mergeTypes(commonType, customType);
+    public TIME(settings: ORMTimestampFieldType = {}): ORMDataTimestampField {
+        const commonType = this.fillDefault(settings)
+        const customType: ORMCommonFields = {
+            type: ORMSupportedFields.TIME,
+        }
+
+        return this.mergeTypes(commonType, customType)
     }
 
-    public DATETIME(settings: Types.Timestamp = <Types.Timestamp>{}): Fields.DataTimestampType {
-        let commonType = this.fillDefault(settings);
-        let customType: Fields.CommonTypes = {
-            type: "DATETIME"
-        };
-        return this.mergeTypes(commonType, customType);
+    public DATETIME(settings: ORMTimestampFieldType = {}): ORMDataTimestampField {
+        const commonType = this.fillDefault(settings)
+        const customType: ORMCommonFields = {
+            type: ORMSupportedFields.DATETIME,
+        }
+
+        return this.mergeTypes(commonType, customType)
     }
 
-    public TIMESTAMP(settings: Types.Timestamp = <Types.Timestamp>{}): Fields.DataTimestampType {
-        let commonType = this.fillDefault(settings);
-        let customType: Fields.DataTimestampType = {
-            type: "TIMESTAMP",
-            default: settings.default || Defaults.Timestamp["CURRENT_TIMESTAMP"]
-        };
-        return this.mergeTypes(commonType, customType);
-    }
+    public TIMESTAMP(settings: ORMTimestampFieldType = {}): ORMDataTimestampField {
+        const commonType = this.fillDefault(settings)
+        const customType: ORMDataTimestampField = {
+            type: ORMSupportedFields.TIMESTAMP,
+            default: settings.default || ORMTimestampDefault['CURRENT_TIMESTAMP'],
+        }
 
+        return this.mergeTypes(commonType, customType)
+    }
 }

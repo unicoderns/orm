@@ -33,12 +33,10 @@ var Defaults;
         Timestamp[Timestamp["NULL ON UPDATE CURRENT_TIMESTAMP"] = 3] = "NULL ON UPDATE CURRENT_TIMESTAMP";
         Timestamp[Timestamp["CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"] = 4] = "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP";
     })(Timestamp = Defaults.Timestamp || (Defaults.Timestamp = {}));
-    ;
     let Binary;
     (function (Binary) {
         Binary[Binary["FALSE"] = 0] = "FALSE";
         Binary[Binary["TRUE"] = 1] = "TRUE";
     })(Binary = Defaults.Binary || (Defaults.Binary = {}));
-    ;
 })(Defaults = exports.Defaults || (exports.Defaults = {}));
 //# sourceMappingURL=defaults.js.map

@@ -22,24 +22,32 @@
 // SOFTWARE.                                                                              //
 ////////////////////////////////////////////////////////////////////////////////////////////
 
+export enum Drivers {
+    'DataAPI',
+    'Native',
+}
+
+export enum Engines {
+    'PostgreSQL',
+    'MySQL',
+}
+
 /*** Main configuration interface */
 export interface Config {
-  dev: boolean;
-  connection: Connection;
+    debug?: boolean
+    connection?: Connection
+    driver?: Drivers
+    engine?: Engines
+    settings?: Settings
 }
 
 /*** Connection configuration interface. */
 export interface Connection {
-  user: string;
-  password: string;
-  database: string;
-  port: number;
-  host: string;
-  connectionLimit: number;
-  validations: ValidationSettings;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    query: any
 }
 
-/*** Validation settings interface. */
-export interface ValidationSettings {
-  fields: boolean;
+/*** Connection configuration interface. */
+export interface Settings {
+    consistentReturn: boolean
 }

@@ -1,6 +1,6 @@
 {
   "name": "@unicoderns/orm",
-  "version": "0.2.0",
+  "version": "0.4.2",
   "description": "Unicoderns Object/Relational Mapping",
   "author": {
     "name": "Unicoderns S.A.",
@@ -12,7 +12,23 @@
   "scripts": {
     "build": "tsc",
     "prepare": "tsc",
-    "test": "ts-node node_modules/jasmine/bin/jasmine sources/tests/**/*.test.ts"
+    "test": "nyc --all --require ts-node/register jasmine sources/tests/**/*.test.ts"
+  },
+  "nyc": {
+    "extension": [
+      ".ts"
+    ],
+    "exclude": [
+      "**/*.d.ts",
+      "**/*.js",
+      "**/.eslintrc.js",
+      "**/.prettierrc.js",
+      "**/coverage/**"
+    ],
+    "reporter": [
+      "html"
+    ],
+    "all": true
   },
   "bugs": {
     "url": "https://github.com/unicoderns/ORM/issues",
@@ -26,15 +42,20 @@
   ],
   "license": "MIT",
   "devDependencies": {
-    "@types/mysql": "^2.15.6",
-    "@types/jasmine": "^3.3.12",
-    "jasmine": "^3.4.0",
-    "ts-node": "^8.1.0",
-    "typescript": "^3.4.5"
+    "@types/jasmine": "^3.5.2",
+    "@typescript-eslint/eslint-plugin": "^2.19.2",
+    "@typescript-eslint/parser": "^2.19.2",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.10.0",
+    "eslint-plugin-prettier": "^3.1.2",
+    "jasmine": "^3.5.0",
+    "nyc": "^15.0.0",
+    "prettier": "^1.19.1",
+    "ts-node": "^8.6.2",
+    "typescript": "^3.7.5"
   },
   "dependencies": {
     "chalk": "^2.4.2",
-    "es6-promise": "^4.2.6",
-    "mysql": "^2.17.1"
+    "es6-promise": "^4.2.6"
   }
 }

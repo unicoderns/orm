@@ -1,16 +1,13 @@
-import { Fields } from "./fields";
-import { Defaults } from "./defaults";
+import { ORMCommonFields, ORMBinaryDefault, ORMTimestampDefault } from '../../enums';
 /**
  * Internal abstract types
  */
-export declare namespace Types {
-    interface General extends Fields.CommonTypes {
-        size?: number;
-    }
-    interface Bool extends Fields.CommonTypes {
-        default?: Defaults.Binary;
-    }
-    interface Timestamp extends Fields.CommonTypes {
-        default?: Defaults.Timestamp;
-    }
+export interface ORMGeneralFieldType extends ORMCommonFields {
+    size?: number;
+}
+export interface ORMBoolFieldType extends ORMCommonFields {
+    default?: ORMBinaryDefault;
+}
+export interface ORMTimestampFieldType extends ORMCommonFields {
+    default?: ORMTimestampDefault;
 }

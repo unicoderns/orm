@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 ////////////////////////////////////////////////////////////////////////////////////////////
 // The MIT License (MIT)                                                                  //
 //                                                                                        //
@@ -22,49 +23,42 @@
 // SOFTWARE.                                                                              //
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-import * as users from './dummy/usersModel';
+import 'jasmine'
 
-import { DB } from "../connection"
+import * as users from './dummy/usersModel'
 
+import { Engines, Drivers } from '../interfaces/config'
 
-/**
- * Starting mock system
- */
-let db = new DB({
-    dev: true, 
-    connection:
-    {
-        "user": "apiUser",
-        "password": "password",
-        "database": "apiDB",
-        "port": 3306,
-        "host": "localhost",
-        "connectionLimit": 10,
-        "validations": {
-            "fields": true
-        }
-    }
-});
-
-let usersTable: users.Users;
-let usersUnsafeTable: users.Users;
+let usersTable: users.Users
+let usersUnsafeTable: users.Users
 
 beforeAll(done => {
-    usersTable = new users.Users(db);
-    usersUnsafeTable = new users.Users(db, "unsafe");
-    done();
-});
+    usersTable = new users.Users({
+        debug: false,
+        engine: Engines.MySQL,
+        driver: Drivers.Native,
+    })
+    usersUnsafeTable = new users.Users(
+        {
+            debug: false,
+            engine: Engines.MySQL,
+            driver: Drivers.Native,
+        },
+        'unsafe',
+    )
+    done()
+})
 
 describe('General', () => {
     it('Model has correct table name', () => {
-        expect(usersTable.getTableName()).toEqual("users");
-    });
+        expect(usersTable.getTableName()).toEqual('users')
+    })
 
     it('Safe Model should be a safe model', () => {
-        expect(usersTable.isSafe()).toBeTruthy;
-    });
+        expect(usersTable.isSafe()).toBeTruthy
+    })
 
     it('Unsafe Model should be a unsafe model', () => {
-        expect(usersUnsafeTable.isSafe()).toBeFalsy;
-    });
-});
+        expect(usersUnsafeTable.isSafe()).toBeFalsy
+    })
+})

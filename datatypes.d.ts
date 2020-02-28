@@ -1,10 +1,10 @@
-import { Fields } from "./interfaces/db/fields";
-import { Types } from "./interfaces/db/types";
-import { Model } from "./model";
+import { ORMCommonFields, ORMDataTimestampField, ORMForeignKeyField, ORMStaticKeyField, ORMFloatField, ORMVarCharField, ORMBoolField } from './enums';
+import { ORMGeneralFieldType, ORMTimestampFieldType, ORMBoolFieldType } from './interfaces/db/types';
+import { ORMModel } from '.';
 /**
  * JSloth DB Datatypes
  */
-export declare class Datatypes {
+export declare class ORMDatatypes {
     /**
      * Merge 2 objects
      *
@@ -20,31 +20,31 @@ export declare class Datatypes {
      * @return Object with defaults
      */
     private fillDefault;
-    TINYINT(settings?: Types.General): Fields.CommonTypes;
-    SMALLINT(settings?: Types.General): Fields.CommonTypes;
-    INT(settings?: Types.General): Fields.CommonTypes;
-    ID(settings?: Types.General): Fields.CommonTypes;
+    TINYINT(settings?: ORMGeneralFieldType): ORMCommonFields;
+    SMALLINT(settings?: ORMGeneralFieldType): ORMCommonFields;
+    INT(settings?: ORMGeneralFieldType): ORMCommonFields;
+    ID(settings?: ORMGeneralFieldType): ORMCommonFields;
     /**
      * Define a foreign key
      *
      * @param name Name of the db field.
-     * @param model Db Model to link.
+     * @param ORMModel Db ORMModel to link.
      * @param settings Field settings.
      */
-    FOREIGNKEY(localField: string, linkedField: string, model: Model, settings?: Types.General): Fields.ForeignKey;
-    STATICKEY(keys: any, settings?: Types.General): Fields.StaticKey;
-    FLOAT(settings?: Types.General): Fields.FloatType;
-    DOUBLE(settings?: Types.General): Fields.FloatType;
-    DECIMAL(settings?: Types.General): Fields.FloatType;
-    CHAR(settings?: Types.General): Fields.VarCharType;
-    VARCHAR(settings?: Types.General): Fields.VarCharType;
-    TINYTEXT(settings?: Types.General): Fields.VarCharType;
-    TEXT(settings?: Types.General): Fields.CommonTypes;
-    LONGTEXT(settings?: Types.General): Fields.CommonTypes;
-    BOOL(settings?: Types.Bool): Fields.BoolType;
-    YEAR(settings?: Types.Timestamp): Fields.DataTimestampType;
-    DATE(settings?: Types.Timestamp): Fields.DataTimestampType;
-    TIME(settings?: Types.Timestamp): Fields.DataTimestampType;
-    DATETIME(settings?: Types.Timestamp): Fields.DataTimestampType;
-    TIMESTAMP(settings?: Types.Timestamp): Fields.DataTimestampType;
+    FOREIGNKEY(localField: string, linkedField: string, model: ORMModel, settings?: ORMGeneralFieldType): ORMForeignKeyField;
+    STATICKEY(keys: any, settings?: ORMGeneralFieldType): ORMStaticKeyField;
+    FLOAT(settings?: ORMGeneralFieldType): ORMFloatField;
+    DOUBLE(settings?: ORMGeneralFieldType): ORMFloatField;
+    DECIMAL(settings?: ORMGeneralFieldType): ORMFloatField;
+    CHAR(settings?: ORMGeneralFieldType): ORMVarCharField;
+    VARCHAR(settings?: ORMGeneralFieldType): ORMVarCharField;
+    TINYTEXT(settings?: ORMGeneralFieldType): ORMVarCharField;
+    TEXT(settings?: ORMGeneralFieldType): ORMCommonFields;
+    LONGTEXT(settings?: ORMGeneralFieldType): ORMCommonFields;
+    BOOL(settings?: ORMBoolFieldType): ORMBoolField;
+    YEAR(settings?: ORMTimestampFieldType): ORMDataTimestampField;
+    DATE(settings?: ORMTimestampFieldType): ORMDataTimestampField;
+    TIME(settings?: ORMTimestampFieldType): ORMDataTimestampField;
+    DATETIME(settings?: ORMTimestampFieldType): ORMDataTimestampField;
+    TIMESTAMP(settings?: ORMTimestampFieldType): ORMDataTimestampField;
 }

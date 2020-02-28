@@ -22,81 +22,63 @@
 // SOFTWARE.                                                                              //
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-import { field, secret } from "../../decorators"
-import { Defaults } from "../../interfaces/db/defaults"
-import { Datatypes } from "../../datatypes"
-import { Model } from "../../model"
+import { ORMModel } from '../..'
+import { ORMDatatypes } from '../../datatypes'
+import { ORMTimestampDefault } from '../../enums'
 
 export interface Row {
-    id?: number;
-    created?: number;
-    username: string;
-    email: string;
-    password: string;
-    salt: string;
-    firstName?: string;
-    lastName?: string;
-    admin?: boolean;
-    verified?: boolean;
-    active?: boolean;
+    id?: number
+    created?: number
+    username: string
+    email: string
+    password: string
+    salt: string
+    firstName?: string
+    lastName?: string
+    admin?: boolean
+    verified?: boolean
+    active?: boolean
 }
 
 /**
  * User Model
  */
-export class Users extends Model {
+export class Users extends ORMModel {
+    protected tableName = 'users'
 
-    @field()
-    public id = new Datatypes().ID();
+    public readonly fields = {
+        id: new ORMDatatypes().ID(),
+        created: new ORMDatatypes().TIMESTAMP({
+            notNull: true,
+            default: ORMTimestampDefault.CURRENT_TIMESTAMP,
+        }),
+        username: new ORMDatatypes().VARCHAR({
+            size: 45,
+            unique: true,
+        }),
+        email: new ORMDatatypes().VARCHAR({
+            notNull: true,
+            size: 45,
+            unique: true,
+        }),
+        firstName: new ORMDatatypes().VARCHAR({
+            alias: 'first_name',
+            size: 45,
+        }),
+        lastName: new ORMDatatypes().VARCHAR({
+            alias: 'last_name',
+            size: 45,
+        }),
+        admin: new ORMDatatypes().BOOL(),
+        verified: new ORMDatatypes().BOOL(),
+        active: new ORMDatatypes().BOOL(),
+    }
 
-    @field()
-    public created = new Datatypes().TIMESTAMP({
-        notNull: true,
-        default: Defaults.Timestamp.CURRENT_TIMESTAMP
-    });
-
-    @field()
-    public username = new Datatypes().VARCHAR({
-        size: 45,
-        unique: true
-    });
-
-    @field()
-    public email = new Datatypes().VARCHAR({
-        notNull: true,
-        size: 45,
-        unique: true
-    });
-
-    @secret()
-    public password = new Datatypes().CHAR({
-        notNull: true,
-        size: 60
-    });
-
-    @secret("added_salt")
-    public salt = new Datatypes().VARCHAR({
-        notNull: true,
-        size: 20
-    });
-
-    @field("first_name")
-    public firstName = new Datatypes().VARCHAR({
-        size: 45
-    });
-
-    @field("last_name")
-    public lastName = new Datatypes().VARCHAR({
-        size: 45
-    });
-
-    @field()
-    public admin = new Datatypes().BOOL();
-
-    @field()
-    public verified = new Datatypes().BOOL();
-
-    @field()
-    public active = new Datatypes().BOOL();
-
+    public readonly secured = {
+        password: new ORMDatatypes().VARCHAR({
+            notNull: true,
+            protected: true,
+            size: 60,
+        }),
+    }
 }

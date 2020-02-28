@@ -22,369 +22,500 @@
 // SOFTWARE.                                                                              //
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-import chalk from "chalk";
-import * as mysql from "mysql";
+import chalk from 'chalk'
 
-import { Promise } from "es6-promise";
-import { getList } from "./decorators";
-import { Models } from "./interfaces/db/models";
-
-import { Config } from "./interfaces/config";
-import { DB } from "./connection";
-import { isArray } from "util";
+import { Promise } from 'es6-promise'
+import {
+    ORMModelJoin,
+    ORMModelQuery,
+    ORMModelSelectLimit,
+    ORMModelSelect,
+    ORMModelRow,
+    ORMModelUpdate,
+    ORMModelKeyValue,
+    ORMModelSelectReturn,
+} from './interfaces'
+import { Config, Drivers, Engines } from './interfaces/config'
+import { ORMAllowedFields, ORMSupportedFields } from './enums'
 
 /**
  * Model Abstract
  */
-export class Model {
-    private tableName: string = ((<any>this).constructor.name).charAt(0).toLowerCase() + ((<any>this).constructor.name).slice(1); // Get the table name from the model name in camelcase.
-    protected DB: DB;
-    private unsafe: boolean = false;
-    private fields: Map<string, string> | undefined = undefined;
-    private joins: Models.Join[] = [];
-    private plainQuery: boolean = false;
-    private specialFunctions = ["now()"];
+export class ORMModel {
+    protected tableName = 'dummyTable'
+    protected config: Config = {}
+    private unsafe = false
+    private joins: ORMModelJoin[] = []
+    private specialFunctions = ['now()']
+    public readonly fields: ORMAllowedFields = {}
+    public readonly secured: ORMAllowedFields = {}
+    private currentParamPosition = 0
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    private emptyValues: any = []
 
     /**
      * Create a table object.
-     * 
-     * @param jsloth Core library
+     *
+     * @param config Config
      * @param privacy To get all fields (secrets included), you need to set privacy as "unsafe" explicitly, in that way we ensure that this will not be a security breach in any wrong future upgrade.
      */
-    constructor(DB: DB, privacy?: string) {
-        this.DB = DB;
-        if (privacy == "unsafe") {
-            this.unsafe = true;
+    constructor(config?: Config, privacy?: string) {
+        this.setConfig(config)
+
+        if (privacy == 'unsafe') {
+            this.unsafe = true
         }
+    }
+
+    /**
+     * Restore shared params to original state
+     */
+    private restore(): void {
+        this.currentParamPosition = 0
+    }
+
+    /**
+     * Set config.
+     *
+     * @todo Make private after improve joins
+     * @param config Config
+     */
+    protected setConfig(config?: Config): this {
+        config = config || {}
+        this.config = {
+            debug: config.debug ? true : false,
+            connection: config.connection || undefined,
+            engine: config.engine ? config.engine : Engines.PostgreSQL,
+            driver: config.driver ? config.driver : Drivers.DataAPI,
+            settings: {
+                consistentReturn: config.settings && !config.settings.consistentReturn ? false : true,
+            },
+        }
+
+        return this
     }
 
     /**
      * Current table name.
-     * 
+     *
      * @return string
      */
     public getTableName(): string {
-        return this.tableName;
+        return this.tableName
     }
 
     /**
      * Current table is safe.
-     * 
+     *
      * @return boolean
      */
     public isSafe(): boolean {
-        return !this.unsafe;
+        return !this.unsafe
     }
 
     /**
-     * Avoid query execution and return models query instead.
+     * Get field list for the table
+     *
+     * @param target Db table name.
+     * @return Field map.
      */
-    public returnQuery(): Model {
-        this.plainQuery = true;
-        return this;
-    }
-
-    /**
-     * Create cache and return the model field list.
-     * 
-     * If this.unsafe is set then merge public with secret fields.
-     * 
-     * @return Fields Mapped
-     */
-    public getFields(): Map<string, string> | undefined {
-        let fields = this.fields;
-        if (typeof fields == "undefined") {
-            let tmp: Map<string, Map<string, string>> = getList(this.tableName);
-            fields = tmp.get("public");
-            if (this.unsafe) {
-                var secret: Map<string, string> | undefined = tmp.get("secret");
-                if ((secret) && (secret.size)) {
-                    secret.forEach(function (value, key) {
-                        if (typeof fields != "undefined") {
-                            fields.set(key, value);
-                        }
-                    });
-                }
-            }
-            this.fields = fields;
+    public getFields = (): ORMAllowedFields => {
+        if (this.unsafe) {
+            return { ...this.fields, ...this.secured }
         }
-        return fields;
+
+        return this.fields
     }
 
     /**
-     * Convert a map in a array.
+     * Convert a field keys into array.
      */
-    private mapInArray(target: Map<string, string> | undefined): string[] {
-        let keys: string[] = [];
-        if (typeof target !== "undefined") {
-            target.forEach((value: string, key: string) => {
-                if (value != key) {
-                    keys.push(key + "` AS `" + value);
+    private fieldsInArray(target: ORMAllowedFields): string[] {
+        const keys: string[] = []
+
+        if (typeof target !== 'undefined') {
+            Object.keys(target).forEach(key => {
+                const alias = target[key].alias
+
+                if (typeof alias !== 'undefined' && alias != key) {
+                    keys.push(`${key} AS ${alias}`)
                 } else {
-                    keys.push(key);
+                    keys.push(key)
                 }
-            });
+            })
         } else {
-            console.error(chalk.red("No fields in the model"));
+            console.error(chalk.red('No fields in the model'))
         }
-        return keys;
+        return keys
     }
 
     /**
-     * Filter one array if keys don't exists in other array.
+     * Filter target fields if don't exists in model.
      */
-    private filterArrayInArray(target: string[], scope: Map<string, string> | undefined): string[] {
-        let keys: string[] = [];
+    private filterFields(target: string[], scope: ORMAllowedFields): string[] {
+        const keys: string[] = []
 
-        if (typeof scope !== "undefined") {
+        if (typeof scope !== 'undefined') {
             target.forEach(item => {
-                if (scope.has(item)) {
-                    keys.push(item);
+                if (typeof scope[item] !== 'undefined') {
+                    keys.push(item)
                 }
-            });
+            })
         } else {
-            console.error(chalk.red("No fields in the model"));
+            console.error(chalk.red('No fields in the model'))
         }
-        return keys;
+        return keys
     }
 
     /**
-     * Log if keys don't exists in other array.
+     * Log if keys don't exists in model.
      */
-    private logArrayInArray(target: string[], scope: Map<string, string> | undefined): void {
-        if (typeof scope !== "undefined") {
+    private logMissingFields(target: string[], scope: ORMAllowedFields): void {
+        if (typeof scope !== 'undefined') {
             target.forEach(item => {
                 // Validation for joined table not available yet.
-                let joinkeys = item.split("__");
+                const joinkeys = item.split('__')
+
                 if (joinkeys.length == 1) {
-                    if (!scope.has(item)) {
-                        console.error(chalk.yellow(item + " field doesn't exists!"));
+                    if (typeof scope[item] === 'undefined') {
+                        console.error(chalk.yellow(`${item} field doesn't exists!`))
                     }
                 }
-            });
+            })
         } else {
-            console.error(chalk.red("No fields in the model"));
+            console.error(chalk.red('No fields in the model'))
         }
     }
 
     /**
      * Clean and validate a select if is need it
-     * 
+     *
      * @var fields String array with field names.
      * @return Object cointaining the SQL and a field report
      */
     private getSelectFieldsSQL(fields: string | string[] | undefined, prefix?: boolean): string {
-        let fieldsSQL = "";
-        let selectableFields: string[] = [];
-        let modelFields = this.getFields();
-        let config: Config = this.DB.config;
+        let fieldsSQL = ''
+        let selectableFields: string[] = []
+        const modelFields = this.getFields()
+        const config: Config = this.config
 
-        if (typeof fields === "string") {
-            return fields;
+        if (typeof fields === 'string') {
+            return fields
         } else {
             // Check if is an array or just SQL code
-            if ((Array.isArray(fields)) && (fields.length)) {
-
-                // Log missing fields in dev mode
-                if (config.dev) {
-                    this.logArrayInArray(fields, modelFields);
+            if (Array.isArray(fields) && fields.length) {
+                if (config.debug) {
+                    this.logMissingFields(fields, modelFields)
                 }
-
-                // Check if the validations of fields is on and then filter (Always disallowed in dev mode)
-                if (config.connection.validations.fields) {
-                    selectableFields = this.filterArrayInArray(fields, modelFields);
-                } else {
-                    selectableFields = this.mapInArray(modelFields);
-                }
-
+                selectableFields = this.filterFields(fields, modelFields)
             } else {
-                selectableFields = this.mapInArray(modelFields);
+                selectableFields = this.fieldsInArray(modelFields)
             }
-
-            if (typeof prefix == "undefined") {
-                fieldsSQL = "`" + this.tableName + "`.`";
-                fieldsSQL = fieldsSQL + selectableFields.join("`, `" + this.tableName + "`.`") + "`";
-            } else {
-                let formatedFields: string[] = [];
-                selectableFields.forEach((field: string) => {
-                    formatedFields.push("`" + this.tableName + "`.`" + field + "` AS `" + this.tableName + "__" + field + "`");
-                });
-                fieldsSQL = formatedFields.join(", ")
-            }
-
-            return fieldsSQL;
         }
 
+        if (typeof prefix == 'undefined') {
+            fieldsSQL = `${this.tableName}.`
+            fieldsSQL = fieldsSQL + selectableFields.join(`, ${this.tableName}.`)
+        } else {
+            const formatedFields: string[] = []
+
+            selectableFields.forEach((field: string) => {
+                formatedFields.push(`${this.tableName}.${field} AS ${this.tableName}__${field}`)
+            })
+            fieldsSQL = formatedFields.join(', ')
+        }
+
+        return fieldsSQL
     }
 
     /**
      * Generates a select string from the Join configuration
-     * 
+     *
      * @var fields String array with field names.
      * @return Object cointaining the SQL and a field report
      */
     private getJoinSelectFieldsSQL(): string {
-        let joins = this.joins;
-        let joinsStringArray: string[] = [];
-        let joinsSQL = "";
-        if ((typeof joins !== "undefined") && (joins.length)) {
-            joins.forEach(function (join: Models.Join) {
-                if (typeof join.fields !== "undefined") {
-                    joinsStringArray.push(join.keyField.model.getSelectFieldsSQL(join.fields, true));
+        const joins = this.joins
+        const joinsStringArray: string[] = []
+        let joinsSQL = ''
+        const config = this.config
+
+        if (typeof joins !== 'undefined' && joins.length) {
+            joins.forEach((join: ORMModelJoin) => {
+                if (typeof join.fields !== 'undefined') {
+                    joinsStringArray.push(join.keyField.model.setConfig(config).getSelectFieldsSQL(join.fields, true))
+                } else {
+                    joinsStringArray.push('ERROR;')
                 }
-            });
-            joinsSQL = joinsStringArray.join(", ")
-            joinsSQL = ", " + joinsSQL;
+            })
+            joinsSQL = joinsStringArray.join(', ')
+            joinsSQL = `, ${joinsSQL}`
         }
-        return joinsSQL;
+        return joinsSQL
     }
 
     /**
      * Generate join sql code
-     * 
-     * @return String with the where sql code 
+     *
+     * @return String with the where sql code
      */
     private generateJoinCode(): string {
-        let joins = this.joins;
-        let joinsStringArray: string[] = [];
-        let joinsSQL = "";
+        const joins = this.joins
+        const joinsStringArray: string[] = []
+        let joinsSQL = ''
+
         if (joins.length) {
-            joins.forEach((join: Models.Join) => {
-                let linkedTableName = join.keyField.model.tableName;
-                joinsStringArray.push(
-                    " " + join.kind.toUpperCase() + " JOIN " +
-                    "`" + linkedTableName + "`" +
-                    " ON `" + this.tableName + "`.`" + join.keyField.localField + "` = " +
-                    "`" + linkedTableName + "`.`" + join.keyField.linkedField + "`"
-                );
-            });
-            joinsSQL = joinsStringArray.join(" ");
+            joins.forEach((join: ORMModelJoin) => {
+                const linkedTableName = join.keyField.model.tableName
+                // eslint-disable-next-line prettier/prettier
+                const sql = ` ${join.kind.toUpperCase()} JOIN ${linkedTableName} ON ${this.tableName}.${join.keyField.localField} = ${linkedTableName}.${join.keyField.linkedField}`
+
+                joinsStringArray.push(sql)
+            })
+            joinsSQL = joinsStringArray.join(' ')
         }
-        return joinsSQL;
+        return joinsSQL
+    }
+
+    /////////////////////////////////////////////////////////////////////
+    // Validate and transform value against model type
+    // Only for DataApi so far.
+    // Join could only be an INT.
+    /////////////////////////////////////////////////////////////////////
+    private validateAndTransform(key: string, value: string | number): {} {
+        const joinkeys = key.split('__')
+        // Join is always INT
+
+        if (joinkeys.length == 2) {
+            return {
+                name: key,
+                value: { longValue: value },
+            }
+        }
+
+        if (this.fields[key]) {
+            const type = this.fields[key].type
+
+            if (type === ORMSupportedFields.BOOL) {
+                return {
+                    name: key,
+                    value: { booleanValue: value ? true : false },
+                }
+            } else if (
+                type === ORMSupportedFields.INT ||
+                type === ORMSupportedFields.TINYINT ||
+                type === ORMSupportedFields.SMALLINT ||
+                type === ORMSupportedFields.BIGINT
+            ) {
+                return {
+                    name: key,
+                    value: { longValue: value },
+                }
+            } else if (
+                type === ORMSupportedFields.FLOAT ||
+                type === ORMSupportedFields.REAL ||
+                type === ORMSupportedFields.DOUBLE
+            ) {
+                return {
+                    name: key,
+                    value: { doubleValue: value },
+                }
+            } else if (
+                type === ORMSupportedFields.BLOB ||
+                type === ORMSupportedFields.BINARY ||
+                type === ORMSupportedFields.LONGVARBINARY ||
+                type === ORMSupportedFields.VARBINARY
+            ) {
+                return {
+                    name: key,
+                    value: { blobValue: value },
+                }
+            }
+            // ORMSupportedFields.DECIMAL, Clob?, Date, Hour
+            return {
+                name: key,
+                value: { stringValue: value },
+            }
+        }
+
+        return { [key]: value }
     }
 
     /////////////////////////////////////////////////////////////////////
     // Generate "AND" chained where sql code
     // @return string
     /////////////////////////////////////////////////////////////////////
-    private generateWhereCodeChain(where: any): { sql: string, values: string[] } {
-        let values: string[] = [];
-        let keys: string[] = [];
-        let filteredKeys: string[] = [];
-        let modelFields = this.getFields();
-        let config: Config = this.DB.config;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    private generateWhereCodeChain(where: any): { sql: string; values: string[] } {
+        const values: string[] = []
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const valuesObj: any = []
+        const keys: string[] = []
+        let filteredKeys: string[] = []
+        // let modelFields = this.getFields();
+        // let config: Config = this.config;
 
-        for (let key in where) {
-            keys.push(key);
-        }
+        for (const key in where) {
+            keys.push(key)
 
-        // Check if the validations of fields is on and then filter (Always disallowed in dev mode)
-        if ((config.connection.validations.fields) && (!config.dev)) {
-            filteredKeys = this.filterArrayInArray(keys, modelFields);
-        } else {
-            if (config.dev) {
-                this.logArrayInArray(keys, modelFields);
-            }
-            filteredKeys = keys;
-        }
+            if (this.config.driver === Drivers.DataAPI) {
+                let value
 
-        if (typeof where !== "undefined") {
-            let sql: string = "";
-
-            filteredKeys.forEach((item: string, id: number, array: string[]) => {
-                let operator = "=";
-
-                if (typeof where[item].operator !== "undefined") {
-                    operator = where[item].operator;
-                    where[item] = where[item].value;
-                }
-                if (String(where[item]).charAt(0) == "\\") {
-                    sql = sql + "`" + this.tableName + "`.`" + item + "` " + operator + " " + String(where[item]).substring(1);
+                if (typeof where[key].value === 'undefined') {
+                    value = where[key]
                 } else {
-                    let joinkeys = item.split("__");
+                    value = where[key].value
+                }
+
+                const joinkeys = String(value).split('__')
+
+                if (
+                    String(value).charAt(0) !== '\\' &&
+                    joinkeys.length !== 2 &&
+                    this.specialFunctions.indexOf(value) < 0
+                ) {
+                    valuesObj.push(this.validateAndTransform(key, value))
+                }
+            }
+        }
+
+        filteredKeys = keys
+        // ToDo: Rewrite where keys to be able to test them
+        // if (config.debug) {
+        //    this.logMissingFields(keys, modelFields);
+        // }
+        // filteredKeys = this.filterFields(keys, modelFields);
+
+        if (typeof where !== 'undefined') {
+            let sql = ''
+
+            filteredKeys.forEach((item: string, index: number, array: string[]) => {
+                let operator = '='
+
+                if (typeof where[item].operator !== 'undefined') {
+                    operator = where[item].operator
+                    where[item] = where[item].value
+                }
+                if (String(where[item]).charAt(0) == '\\') {
+                    sql = `${sql + this.tableName}.${item} ${operator} ${String(where[item]).substring(1)}`
+                } else {
+                    let joinkeys = item.split('__')
                     // string literal
+
                     if (joinkeys.length == 2) {
-                        sql = sql + "`" + joinkeys[0] + "`.`" + joinkeys[1];
+                        sql = `${sql + joinkeys[0]}.${joinkeys[1]}`
                     } else {
-                        sql = sql + "`" + this.tableName + "`.`" + item;
+                        sql = `${sql + this.tableName}.${item}`
                     }
-                    joinkeys = String(where[item]).split("__");
+                    joinkeys = String(where[item]).split('__')
                     // joined column
                     if (joinkeys.length == 2) {
-                        sql = sql + "` " + operator + " `" + joinkeys[0] + "`.`" + joinkeys[1] + "`";
+                        sql = `${sql} ${operator} ${joinkeys[0]}.${joinkeys[1]}`
                     } else {
                         // special functiom
                         if (this.specialFunctions.indexOf(where[item]) >= 0) {
-                            sql = sql + "` " + operator + " " + where[item];
+                            sql = `${sql} ${operator} ${where[item]}`
                         } else {
-                            sql = sql + "` " + operator + " ?"
+                            if (this.config.driver === Drivers.DataAPI) {
+                                sql = `${sql} ${operator} :${item}`
+                            } else if (this.config.engine === Engines.PostgreSQL) {
+                                sql = `${sql} ${operator} $${++this.currentParamPosition}`
+                            } else if (this.config.engine === Engines.MySQL) {
+                                sql = `${sql} ${operator} ?`
+                            } else {
+                                sql = `${sql} ENGINE NOT SUPPORTED`
+                            }
                         }
                     }
                 }
-                if (id < array.length - 1) {
-                    sql = sql + " AND ";
+                if (index < array.length - 1) {
+                    sql = `${sql} AND `
                 }
-            });
-            // getting values
-            filteredKeys.forEach((item: string) => {
-                let joinkeys = String(where[item]).split("__");
-                if ((String(where[item]).charAt(0) != "\\") && (joinkeys.length != 2) && (this.specialFunctions.indexOf(where[item]) < 0)) {
-                    values.push(where[item]);
+            })
+            if (this.config.driver === Drivers.DataAPI) {
+                return {
+                    sql: sql,
+                    values: valuesObj,
                 }
-            });
-            return {
-                sql: sql,
-                values: values
-            };
+            } else {
+                // getting values
+                filteredKeys.forEach((item: string) => {
+                    const joinkeys = String(where[item]).split('__')
+
+                    if (
+                        String(where[item]).charAt(0) != '\\' &&
+                        joinkeys.length != 2 &&
+                        this.specialFunctions.indexOf(where[item]) < 0
+                    ) {
+                        values.push(where[item])
+                    }
+                })
+                return {
+                    sql: sql,
+                    values: values,
+                }
+            }
         } else {
             return {
-                sql: "",
-                values: []
-            };
+                sql: '',
+                values: this.emptyValues,
+            }
         }
     }
 
     /**
      * Generate where sql code
-     * 
+     *
      * @var where Array of key/value objects with the conditions
-     * @return String with the where sql code 
+     * @return String with the where sql code
      */
-    private generateWhereCode(where?: any): { sql: string, values: string[] } {
-        if (where == "*") {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    private generateWhereCode(where?: any): { sql: string; values: string[] } {
+        if (where == '*') {
             return {
-                sql: "",
-                values: []
-            };
-        } else if ((typeof where === "string") || ((isArray(where)) && (!where.length))) {
+                sql: '',
+                values: this.emptyValues,
+            }
+        } else if (typeof where === 'string' || (Array.isArray(where) && !where.length)) {
             return {
-                sql: "ERROR",
-                values: []
-            };
+                sql: 'ERROR',
+                values: this.emptyValues,
+            }
         } else {
-            let generated: { sql: string, values: string[] } = {
-                sql: "",
-                values: []
-            };
+            let generated: { sql: string; values: string[] } = {
+                sql: '',
+                values: this.emptyValues,
+            }
+
             if (Array.isArray(where)) {
-                let values: string[] = [];
-                let SQLChains: string[] = [];
+                let values: string[] = []
+                const SQLChains: string[] = []
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                let valuesObj: any = []
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
                 where.forEach((chain: any) => {
-                    let localChain = this.generateWhereCodeChain(chain);
-                    values = values.concat(localChain.values);
-                    SQLChains.push(localChain.sql);
-                });
-                generated.sql = "(" + SQLChains.join(") OR (") + ")";
-                generated.values = values;
+                    const localChain = this.generateWhereCodeChain(chain)
+
+                    valuesObj = valuesObj.concat(localChain.values)
+                    values = values.concat(localChain.values)
+                    SQLChains.push(localChain.sql)
+                })
+                generated.sql = `(${SQLChains.join(') OR (')})`
+                if (this.config.driver === Drivers.DataAPI) {
+                    generated.values = valuesObj
+                } else {
+                    generated.values = values
+                }
             } else {
-                generated = this.generateWhereCodeChain(where);
+                generated = this.generateWhereCodeChain(where)
             }
 
             if (generated.sql) {
-                generated.sql = " WHERE " + generated.sql;
-                return generated;
+                generated.sql = ` WHERE ${generated.sql}`
+                return generated
             } else {
-                return generated;
+                return generated
             }
         }
     }
@@ -396,105 +527,160 @@ export class Model {
      *
      * Warnings:
      * - Field privacity or data integrity will not apply to a direct query, you are responsable for the data security.
-     * 
-     * @var sql MySQL query
+     *
+     * @var sql SQL query
      * @var values Values to replace in the query
      * @return Promise with query result
      */
-    public query(query: Models.Query): Promise<any> {
-        if (this.plainQuery) {
-            // Create promise
-            const p: Promise<any> = new Promise(
-                (resolve: (data: Models.Query) => void) => {
-                    resolve(query);
-                }
-            );
-            return p;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    public query(query: ORMModelQuery): Promise<any> {
+        const connection = this.config.connection
+
+        if (this.config.debug) {
+            console.log('Query:', JSON.stringify(query, null, 2))
+        }
+
+        if (!connection) {
+            return Promise.resolve(query)
         } else {
-            return this.DB.query(query);
+            return connection.query(query)
         }
     }
 
     /**
      * Select private query
      *
-     * @var fields If is NOT set "*" will be used, if there's a string then it will be used as is, a plain query will be 
+     * @var fields If is NOT set "*" will be used, if there's a string then it will be used as is, a plain query will be
      * executed, if in the other hand an array is provided (Recommended), then it will filter the keys and run the query.
      * @var where Key/Value object used to filter the query, an array of Key/Value objects will generate a multiple filter separated by an "OR".
      * @var orderBy String with column names and direction E.g.: "id, name ASC"
      * @var groupBy String with column names E.g.: "id, name"
      * @var limit Number of rows to retrieve
      * @return Promise with query result
-     * 
-     * TODO: 
+     *
+     * TODO:
      * @var orderBy should be an array of fields, then they can be tested
      * @var groupBy should be an array of fields, then they can be tested
      * Join at least 2 tables is important
      * Group this using functions like select("").orderBy() is just easier to understand
      */
-    private select(select: Models.SelectLimit): Models.Query {
-        let fieldsSQL = this.getSelectFieldsSQL(select.fields);
-        let joinFieldsSQL = this.getJoinSelectFieldsSQL();
-        let joinCode = this.generateJoinCode();
-        let whereCode = this.generateWhereCode(select.where);
-        let groupBy = select.groupBy;
-        let orderBy = select.orderBy;
-        let limit = select.limit;
-        let extra = "";
-        if ((typeof groupBy !== "undefined") && (groupBy !== null)) {
-            extra += " GROUP BY " + groupBy;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    private select(select: ORMModelSelectLimit): Promise<any> {
+        this.restore()
+
+        const fieldsSQL = this.getSelectFieldsSQL(select.fields)
+        const joinFieldsSQL = this.getJoinSelectFieldsSQL()
+        const joinCode = this.generateJoinCode()
+        const whereCode = this.generateWhereCode(select.where)
+        const groupBy = select.groupBy
+        const orderBy = select.orderBy
+        const limit = select.limit
+        let extra = ''
+
+        if (typeof groupBy !== 'undefined' && groupBy !== null) {
+            extra += ` GROUP BY ${groupBy}`
         }
-        if ((typeof orderBy !== "undefined") && (orderBy !== null)) {
-            extra += " ORDER BY " + orderBy;
+        if (typeof orderBy !== 'undefined' && orderBy !== null) {
+            extra += ` ORDER BY ${orderBy}`
         }
-        if ((typeof limit !== "undefined") && (limit !== null)) {
-            extra += " LIMIT " + limit;
+        if (typeof limit !== 'undefined' && limit !== null) {
+            extra += ` LIMIT ${limit}`
         }
-        let sql = "SELECT " + fieldsSQL + joinFieldsSQL + " FROM `" + this.tableName + "`" + joinCode + whereCode.sql + extra + ";";
-        this.joins = [];
-        return { sql: sql, values: whereCode.values };
+        const sql = `SELECT ${fieldsSQL}${joinFieldsSQL} FROM ${this.tableName}${joinCode}${whereCode.sql}${extra};`
+
+        this.joins = []
+
+        const query: { sql: string; parameters?: string[]; values?: string[] } = { sql }
+
+        if (this.config.driver === Drivers.DataAPI) {
+            query.parameters = whereCode.values || []
+        } else {
+            query.values = whereCode.values
+        }
+
+        const keyArray = String(fieldsSQL + joinFieldsSQL).split(', ')
+        const keys: string[] = []
+
+        keyArray.forEach(key => {
+            let temp = key.split(' AS ')
+
+            if (temp.length === 2) {
+                keys.push(temp[1])
+            } else {
+                temp = key.split('.')
+                keys.push(temp[1])
+            }
+        })
+        return this.query(query).then(data => {
+            return Promise.resolve(this.selectConsistentReturn(keys, data))
+        })
+    }
+
+    /**
+     * Format selected data for consistent return
+     *
+     * @var data Data from db engine.
+     * @return Promise with query result
+     */
+    public selectConsistentReturn(keys: string[], data: any): ORMModelSelectReturn {
+        const settings = this.config.settings
+
+        if (settings && settings.consistentReturn) {
+            if (this.config.driver === Drivers.DataAPI) {
+                if (data.records && data.records.length) {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const cleanData: ORMModelSelectReturn = {
+                        numberOfRecordsUpdated: data.numberOfRecordsUpdated,
+                        records: [],
+                    }
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+                    data.records.forEach((row: any, rowIndex: number) => {
+                        cleanData.records[rowIndex] = {}
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        row.forEach((field: any, fieldIndex: number) => {
+                            cleanData.records[rowIndex][keys[fieldIndex]] = Object.values(field)[0]
+                        })
+                    })
+                    return cleanData
+                }
+            }
+        }
+        return data
     }
 
     /**
      * Get item - Select query
      *
-     * @var fields If is NOT set "*" will be used, if there's a string then it will be used as is, a plain query will be 
+     * @var fields If is NOT set "*" will be used, if there's a string then it will be used as is, a plain query will be
      * executed, if in the other hand an array is provided (Recommended), then it will filter the keys and run the query.
      * @var where Key/Value object used to filter the query, an array of Key/Value objects will generate a multiple filter separated by an "OR".
      * @var orderBy String with column names and direction E.g.: "id, name ASC"
      * @var groupBy String with column names E.g.: "id, name"
      * @return Promise with query result
      */
-    public get(select: Models.Select): Promise<any> {
-        // Create promise
-        const p: Promise<any> = new Promise(
-            (resolve: (data: any) => void, reject: (err: mysql.MysqlError) => void) => {
-                let selectQuery = this.select({
-                    fields: select.fields,
-                    where: select.where,
-                    groupBy: select.groupBy,
-                    orderBy: select.orderBy,
-                    limit: 1
-                });
-                let sqlPromise = this.query(selectQuery);
-                if (this.plainQuery) {
-                    resolve(sqlPromise);
-                } else {
-                    sqlPromise.then((data) => {
-                        resolve(data[0]);
-                    }).catch(err => {
-                        reject(err);
-                    });
-                }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    public get(select: ORMModelSelect): Promise<any> {
+        return this.select({
+            fields: select.fields,
+            where: select.where,
+            groupBy: select.groupBy,
+            orderBy: select.orderBy,
+            limit: 1,
+        }).then(data => {
+            if (data.length) {
+                return Promise.resolve(data[0])
+            } else {
+                // Return unexecuted query
+                return Promise.resolve(data)
             }
-        );
-        return p;
+        })
     }
 
     /**
      * Get some item - Select query
      *
-     * @var fields If is NOT set "*" will be used, if there's a string then it will be used as is, a plain query will be 
+     * @var fields If is NOT set "*" will be used, if there's a string then it will be used as is, a plain query will be
      * executed, if in the other hand an array is provided (Recommended), then it will filter the keys and run the query.
      * @var where Key/Value object used to filter the query, an array of Key/Value objects will generate a multiple filter separated by an "OR".
      * @var orderBy String with column names and direction E.g.: "id, name ASC"
@@ -502,121 +688,176 @@ export class Model {
      * @var limit Number of rows to retrieve
      * @return Promise with query result
      */
-    public getSome(select: Models.SelectLimit): Promise<any> {
-        return this.query(this.select(select));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    public getSome(select: ORMModelSelectLimit): Promise<any> {
+        return this.select(select)
     }
 
     /**
      * Get all items - Select query
      *
-     * @var fields If is NOT set "*" will be used, if there's a string then it will be used as is, a plain query will be 
+     * @var fields If is NOT set "*" will be used, if there's a string then it will be used as is, a plain query will be
      * executed, if in the other hand an array is provided (Recommended), then it will filter the keys and run the query.
      * @var where Key/Value object used to filter the query, an array of Key/Value objects will generate a multiple filter separated by an "OR".
      * @var orderBy String with column names and direction E.g.: "id, name ASC"
      * @var groupBy String with column names E.g.: "id, name"
      * @return Promise with query result
      */
-    public getAll(select: Models.Select): Promise<any> {
-        return this.query(this.select(select));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    public getAll(select: ORMModelSelect): Promise<any> {
+        return this.select(select)
     }
 
     /**
      * Join a table
      *
      * Specify a field that needs to be joined
-     * 
+     *
      * Warning: It works only with select queries
-     * 
+     *
      * @var keyField Model foreign key
      * @var fields String array with names of fields to join
      * @var kind Type of Join to apply E.g.: INNER, LEFT
      * @return Model
      */
-    public join(joins: Models.Join[]): Model {
-        this.joins = joins;
-        return this;
+    public join(joins: ORMModelJoin[]): ORMModel {
+        this.joins = joins
+        return this
     }
 
     /**
      * Insert query
-     * 
+     *
      * @var data object to be inserted in the table
      * @return Promise with query result
      */
-    public insert(data: Models.Row): Promise<any> {
-        let fields = [];
-        let wildcards = [];
-        let values: string[] = [];
-        for (let key in data) {
-            fields.push(key);
-            wildcards.push("?");
-            values.push(data[key]);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    public insert(data: ORMModelRow): Promise<any> {
+        this.restore()
+
+        const fields: string[] = []
+        const wildcards: string[] = []
+        const values: string[] = []
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const valuesObj: any = []
+
+        for (const key in data) {
+            const value = data[key]
+
+            fields.push(key)
+            values.push(value)
+            valuesObj.push(this.validateAndTransform(key, value))
+
+            if (this.config.driver === Drivers.DataAPI) {
+                wildcards.push(`:${key}`)
+            } else if (this.config.engine === Engines.PostgreSQL) {
+                wildcards.push(`$${++this.currentParamPosition}`)
+            } else if (this.config.engine === Engines.MySQL) {
+                wildcards.push('?')
+            } else {
+                wildcards.push('ENGINE NOT SUPPORTED')
+            }
         }
-        let query = "INSERT INTO `" + this.tableName + "` (`" + fields.join("`, `") + "`) VALUES (" + wildcards.join(", ") + ");";
-        return this.query({ sql: query, values: values });
+
+        const query = `INSERT INTO ${this.tableName} (${fields.join(', ')}) VALUES (${wildcards.join(', ')});`
+
+        if (this.config.driver === Drivers.DataAPI) {
+            return this.query({ sql: query, parameters: valuesObj })
+        } else {
+            return this.query({ sql: query, values: values })
+        }
     }
 
     /**
      * Update query
-     * 
+     *
      * @var data object data to be update in the table
      * @var where Key/Value object used to filter the query, an array of Key/Value objects will generate a multiple filter separated by an "OR".
      * @return Promise with query result
      */
-    public update(update: Models.Update): Promise<any> {
-        let fields = [];
-        let values = [];
-        let unifiedValues = [];
-        let joinCode = this.generateJoinCode();
-        let data = update.data;
-        let where = update.where;
-        for (let key in data) {
-            let joinkeys = String(data[key]).split("__");
-            if (joinkeys.length == 2) {
-                fields.push("`" + this.tableName + "`.`" + key + "` = " + "`" + joinkeys[0] + "`.`" + joinkeys[1] + "`");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    public update(update: ORMModelUpdate): Promise<any> {
+        this.restore()
+
+        const fields = []
+        const values = []
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const valuesObj: any = []
+        let unifiedValues = []
+        const joinCode = this.generateJoinCode()
+        const data = update.data
+        const where = update.where
+
+        for (const key in data) {
+            const joinkeys = String(data[key]).split('__')
+
+            if (joinkeys.length === 2) {
+                fields.push(`${this.tableName}.${key} = ${joinkeys[0]}.${joinkeys[1]}`)
             } else if (this.specialFunctions.indexOf(data[key]) >= 0) {
-                fields.push("`" + this.tableName + "`.`" + key + "` = " + data[key]);
+                fields.push(`${this.tableName}.${key} = ${data[key]}`)
             } else {
-                fields.push("`" + this.tableName + "`.`" + key + "` = ?");
-                values.push(data[key]);
+                valuesObj.push(this.validateAndTransform(key, data[key]))
+                values.push(data[key])
+
+                if (this.config.driver === Drivers.DataAPI) {
+                    fields.push(`${this.tableName}.${key} = :${key}`)
+                } else if (this.config.engine === Engines.PostgreSQL) {
+                    fields.push(`${this.tableName}.${key} = $${++this.currentParamPosition}`)
+                } else if (this.config.engine === Engines.MySQL) {
+                    fields.push(`${this.tableName}.${key} = ?`)
+                } else {
+                    fields.push('ENGINE NOT SUPPORTED')
+                }
             }
         }
-        let whereCode;
-        if ((typeof where === "undefined") ||
-            ((!isArray(where)) && (!Object.keys(where).length))) {
+        let whereCode
+
+        if (typeof where === 'undefined' || (!Array.isArray(where) && !Object.keys(where).length)) {
             whereCode = {
-                sql: "ERROR",
-                values: []
+                sql: 'ERROR',
+                values: this.emptyValues,
             }
         } else {
             whereCode = this.generateWhereCode(where)
         }
 
-        let query = "UPDATE `" + this.tableName + "`" + joinCode + " SET " + fields.join(", ") + whereCode.sql + ";";
-        unifiedValues = values.concat(whereCode.values);
-        return this.query({ sql: query, values: unifiedValues });
+        const query = `UPDATE ${this.tableName}${joinCode} SET ${fields.join(', ')}${whereCode.sql};`
+
+        if (this.config.driver === Drivers.DataAPI) {
+            return this.query({ sql: query, parameters: valuesObj.concat(whereCode.values) })
+        } else {
+            unifiedValues = values.concat(whereCode.values)
+            return this.query({ sql: query, values: unifiedValues })
+        }
     }
 
     /**
      * Delete query
-     * 
+     *
      * @var where Key/Value object used to filter the query, an array of Key/Value objects will generate a multiple filter separated by an "OR", a "*" string wildcard is required for security reasons if you want to match all rows.
      * @return Promise with query result
      */
-    public delete(where: string | Models.KeyValue | Models.KeyValue[]): Promise<any> {
-        let whereCode;
-        let joinCode = this.generateJoinCode();
-        if ((typeof where === "undefined") ||
-            ((!isArray(where)) && (!Object.keys(where).length))) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    public delete(where: string | ORMModelKeyValue | ORMModelKeyValue[]): Promise<any> {
+        this.restore()
+
+        let whereCode
+        const joinCode = this.generateJoinCode()
+
+        if (typeof where === 'undefined' || (!Array.isArray(where) && !Object.keys(where).length)) {
             whereCode = {
-                sql: "ERROR",
-                values: []
+                sql: 'ERROR',
+                values: this.emptyValues,
             }
         } else {
             whereCode = this.generateWhereCode(where)
         }
-        let query = "DELETE FROM `" + this.tableName + "`" + joinCode + whereCode.sql + ";";
-        return this.query({ sql: query, values: whereCode.values });
-    }
+        const query = `DELETE FROM ${this.tableName}${joinCode}${whereCode.sql};`
 
+        if (this.config.driver === Drivers.DataAPI) {
+            return this.query({ sql: query, parameters: whereCode.values })
+        } else {
+            return this.query({ sql: query, values: whereCode.values })
+        }
+    }
 }
