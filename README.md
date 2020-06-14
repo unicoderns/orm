@@ -1,50 +1,61 @@
 # Unicoderns ORM
 ### Unicoderns Object/Relational Mapping
 
-Premise based typescript light layer package that allow you to query the DB in a easier way, without SQL knowledge.
+![](https://unicoderns.com/img/logoorm.e1a28eb9.svg)
 
 [![Travis](https://travis-ci.org/unicoderns/ORM.svg?branch=master)](https://travis-ci.org/unicoderns/ORM)
 [![Dependencies](https://david-dm.org/unicoderns/ORM.svg)](https://david-dm.org/unicoderns/ORM/)
 [![Dev Dependencies](https://david-dm.org/unicoderns/ORM/dev-status.svg)](https://david-dm.org/unicoderns/ORM/)
 
-Docs available at [unicoderns.com](http://unicoderns.com/docs/ORM/)
+This is a typescript light layer package that allows you to manage and do queries to the DB in an easier way, even without SQL knowledge.
 
+Docs available at [unicoderns.com](http://unicoderns.com/docs/ORM/) `Work in progress`
+
+## Table of Contents
+
+* [Quick Start](#quick-start)
+* [Bugs and features](#bugs-and-features)
+* [Do you want to contribute?](#do-you-want-to-contribute)
+* [Creators](#creators)
+* [Community](#community)
+* [Copyright and license](#copyright-and-license)
+
+## Quick Start
+1. First, create a connection model as in the following example:
 ```typescript
-import * as users from './dummy/usersModel';
-import * as sessions from './dummy/sessionsModel';
-import { DB } from "@unicoderns/orm/connection"
+import * as users from './dummy/usersModel'
+import { Config, Engines, Drivers } from '@unicoderns/orm'
 
-let db = new DB({
-    dev: true,
-    connection: {
-        "user": "apiUser",
-        "password": "password",
-        "database": "apiDB",
-        "port": 3306,
-        "host": "localhost",
-        "connectionLimit": 10,
-        "validations": {
-            "fields": true
-        }
-    }
-});
-
-let usersTable: users.Users = new users.Users(db);
-let sessionsTable: sessions.Sessions = new sessions.Sessions(db);
-
+let usersTable: users.Users
+    usersTable = new users.Users({
+        debug: false,
+        engine: Engines.MySQL,
+        driver: Drivers.Native,
+    })
 ```
+2. Use the queries available.
+* [Select](#select)
+* [Insert](#insert)
+* [Update](#update)
+* [Delete](#delete)
+* [Operators](#operators)
+* [Joins](#joins)
+* [Special Values](#special-values)
+* [Advanced queries](#advanced)
+* [Literal Strings](#literal-strings)
 
-## Select
-### Get
+##  Queries Available
+1. ### Select
+#### Get
 
-Get 1 matching row
+When you use this funtion you will get 1 matching row
 
 ```typescript
 usersTable.get({}).then((data: any) => {
     console.log(data);
 }).catch((err: any) => {
     console.error(err)
-});
+})
 ```
 
 Query executed: 
@@ -52,11 +63,11 @@ Query executed:
 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`first_name`, `users`.`last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` LIMIT 1;'
 ```
 
-#### Params ####
+##### Params
 `fields` 
 * If is NOT set `*` will be used
 * If there's a string then it will be used as is
-* If in the other hand an array is provided (Recommended), then it will filter the keys and add the table name.
+* If an array is provided (Recommended), then it will filter the keys and add the table name.
 
 `where` 
 * Key/Value object used to filter the query
@@ -70,9 +81,9 @@ Query executed:
 `groupBy` String with column names E.g.: "id, name"
 
 
-### Get Some
+#### Get Some
 
-Get a limited number of matching rows
+Whe you use this function you will get a limited number of matching rows. This happens beacuse you should pass the limit of rows you need.
 
 ```typescript
 usersTable.getSome({
@@ -81,7 +92,7 @@ usersTable.getSome({
     console.log(data);
 }).catch((err: any) => {
     console.error(err)
-});
+})
 ```
 
 Query executed: 
@@ -89,11 +100,12 @@ Query executed:
 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`first_name`, `users`.`last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` LIMIT 3;'
 ```
 
-#### Params ####
+##### Params
+
 `fields` 
 * If is NOT set `*` will be used
 * If there's a string then it will be used as is
-* If in the other hand an array is provided (Recommended), then it will filter the keys and add the table name.
+* If an array is provided (Recommended), then it will filter the keys and add the table name.
 
 `where` 
 * Key/Value object used to filter the query
@@ -109,7 +121,7 @@ Query executed:
 
 ### Get All
 
-Get all matching rows
+When you use this function you will get all matching rows, based on the filter you pass
 
 ```typescript
 usersTable.getAll({
@@ -120,7 +132,7 @@ usersTable.getAll({
     console.log(data);
 }).catch((err: any) => {
     console.error(err)
-});
+})
 ```
 
 Query executed: 
@@ -128,7 +140,7 @@ Query executed:
 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`first_name`, `users`.`last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE `users`.`id` = 3;'
 ```
 
-#### Params ####
+#### Params
 `fields` 
 * If is NOT set `*` will be used
 * If there's a string then it will be used as is
@@ -144,7 +156,9 @@ Query executed:
 
 `groupBy` String with column names E.g.: "id, name"
 
-## Insert
+2. ### Insert
+
+This function will let you insert information into the Database
 
 ```typescript
 usersTable.insert({
@@ -153,7 +167,7 @@ usersTable.insert({
     console.log(data);
 }).catch((err: any) => {
     console.error(err)
-});
+})
 ```
 
 Query executed: 
@@ -161,10 +175,10 @@ Query executed:
 'INSERT INTO `users` (`firstName`) VALUES (?);'
 ```
 
-#### Params ####
-Expecting object to be inserted in the table
+#### Params
+Expecting object to be inserted into the table
 
-## Update
+3. ### Update
 
 ```typescript
 usersTable.update({
@@ -176,7 +190,7 @@ usersTable.update({
     console.log(data);
 }).catch((err: any) => {
     console.error(err)
-});
+})
 ```
 
 Query executed: 
@@ -195,7 +209,9 @@ Query executed:
 * Mixed Array of Key/Value and Key/Operator/Value objects will generate a multiple filters separated by an "OR".
 
 
-## Delete
+4. ### Delete
+
+This function will let you delete information from the Database
 
 ```typescript
 usersTable.delete({ 
@@ -204,7 +220,7 @@ usersTable.delete({
     console.log(data);
 }).catch((err: any) => {
     console.error(err)
-});
+})
 ```
 
 Query executed: 
@@ -222,7 +238,7 @@ Expecting:
 * Array of [Key/Operator/Value](#operators) objects will generate a multiple filters separated by an "OR".
 * Mixed Array of Key/Value and Key/Operator/Value objects will generate a multiple filters separated by an "OR".
 
-## Operators
+5. ### Operators
 You can change your where condition operator from the default `=` to any operator that you want, as `!=` or `<` following this format:
 
 ```typescript
@@ -240,7 +256,7 @@ You can change your where condition operator from the default `=` to any operato
     console.log(data);
 }).catch((err: any) => {
     console.error(err)
-});
+})
 ```
 
 Query executed: 
@@ -248,7 +264,7 @@ Query executed:
 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE (`users`.`id` = ?) OR (`users`.`created` >= now());'
 ```
 
-## Join
+6. ## Join
 Please notice:
 * Fields from the joined table will not be validated (coming soon).
 * You can't assign 1 column value to a joined column value yet (coming soon).
@@ -300,7 +316,7 @@ sessionsTable.join([{
     console.log(data);
 }).catch((err: any) => {
     console.error(err)
-});
+})
 ```
 
 Query executed: 
@@ -329,7 +345,7 @@ sessionsTable.join([{
     console.log(data);
 }).catch((err: any) => {
     console.error(err)
-});
+})
 ```
 
 Query executed: 
@@ -354,7 +370,7 @@ sessionsTable.join([{
     console.log(data);
 }).catch((err: any) => {
     console.error(err)
-});
+})
 ```
 
 Query executed: 
@@ -381,7 +397,7 @@ sessionsTable.join([{
     console.log(data);
 }).catch((err: any) => {
     console.error(err)
-});
+})
 ```
 
 Query executed: 
@@ -414,7 +430,7 @@ sessionsTable.getAll({
     console.log(data);
 }).catch((err: any) => {
     console.error(err)
-});
+})
 ```
 
 Query *prepared*: 
@@ -423,3 +439,19 @@ SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `us
 ```
 
 This can be helpful in some scenarios but is **not recomended**, only use it if you know what are you doing and **never**, send a parameter unprepared, you will expose your system to sql injection.
+
+## Bugs and Features
+
+Do you have a bug or a feature request?  Please first check if the issue you found hasn´t been solved yet [here](https://github.com/unicoderns/orm/issues). If you want to open a bug or request a new feature, please refer to our [contributing guidelines](#CONTRIBUTING.md) and open your request [here](https://github.com/unicoderns/orm/issues).
+
+## Do you want to contribute? 
+ If you want to be part of this amazing project, please read through our [contributing guidelines](#CONTRIBUTING.md) to know the process you should follow. The community will be glad to receive your contribution.
+
+## Community
+Stay in touch with all members of the community and get updates about ORM's development. Follow us [on twitter](https://twitter.com/unicoderns).
+
+ ## Copyright and license
+
+ Code and documentation Copyright 2018–2020 to Contributors and Unicoderns S.A. Code released under the MIT License.
+
+
