@@ -442,10 +442,10 @@ This can be helpful in some scenarios but is **not recomended**, only use it if 
 
 ## Bugs and Features
 
-Do you have a bug or a feature request?  Please first check if the issue you found hasn´t been solved yet [here](https://github.com/unicoderns/orm/issues). If you want to open a bug or request a new feature, please refer to our [contributing guidelines](#CONTRIBUTING.md) and open your request [here](https://github.com/unicoderns/orm/issues).
+Do you have a bug or a feature request?  Please first check if the issue you found hasn´t been solved yet [here](https://github.com/unicoderns/orm/issues). If you want to open a bug or request a new feature, please refer to our [contributing guidelines](https://github.com/isaZuGo/orm/blob/update-documentation/CONTRIBUTING.md) and open your request [here](https://github.com/unicoderns/orm/issues).
 
 ## Do you want to contribute? 
- If you want to be part of this amazing project, please read through our [contributing guidelines](#CONTRIBUTING.md) to know the process you should follow. The community will be glad to receive your contribution.
+ If you want to be part of this amazing project, please read through our [contributing guidelines](https://github.com/isaZuGo/orm/blob/update-documentation/CONTRIBUTING.md) to know the process you should follow. The community will be glad to receive your contribution.
 
 ## Community
 Stay in touch with all members of the community and get updates about ORM's development. Follow us [on twitter](https://twitter.com/unicoderns).
