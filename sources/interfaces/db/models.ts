@@ -62,12 +62,12 @@ export interface ORMModelQuery {
  *
  * @var keyField Model foreign key
  * @var fields String array with names of fields to join
- * @var kind Type of Join to apply E.g.: INNER, LEFT
+ * @var type Type of Join to apply E.g.: INNER, LEFT
  */
 export interface ORMModelJoin {
     keyField: ORMForeignKeyField
     fields?: string[]
-    kind: string
+    type: string
 }
 
 /**

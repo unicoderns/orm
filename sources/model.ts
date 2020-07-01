@@ -268,7 +268,9 @@ export class ORMModel {
             joins.forEach((join: ORMModelJoin) => {
                 const linkedTableName = join.keyField.model.tableName
                 // eslint-disable-next-line prettier/prettier
-                const sql = ` ${join.kind.toUpperCase()} JOIN ${linkedTableName} ON ${this.tableName}.${join.keyField.localField} = ${linkedTableName}.${join.keyField.linkedField}`
+                const sql = ` ${join.type.toUpperCase()} JOIN ${linkedTableName} ON ${this.tableName}.${
+                    join.keyField.localField
+                } = ${linkedTableName}.${join.keyField.linkedField}`
 
                 joinsStringArray.push(sql)
             })
@@ -717,7 +719,7 @@ export class ORMModel {
      *
      * @var keyField Model foreign key
      * @var fields String array with names of fields to join
-     * @var kind Type of Join to apply E.g.: INNER, LEFT
+     * @var type Type of Join to apply E.g.: INNER, LEFT
      * @return Model
      */
     public join(joins: ORMModelJoin[]): ORMModel {
