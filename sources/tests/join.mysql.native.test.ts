@@ -61,7 +61,7 @@ describe('MYSQL', () => {
                 .join([
                     {
                         keyField: sessionsTable.fields.user,
-                        kind: 'LEFT',
+                        type: 'LEFT',
                     },
                 ])
                 .getAll({})
@@ -82,7 +82,7 @@ describe('MYSQL', () => {
                     {
                         keyField: sessionsTable.fields.user,
                         fields: ['username', 'email', 'firstName', 'lastName'],
-                        kind: 'LEFT',
+                        type: 'LEFT',
                     },
                 ])
                 .getAll({})
@@ -103,7 +103,7 @@ describe('MYSQL', () => {
                     {
                         keyField: sessionsTable.fields.user,
                         fields: ['username', 'email'],
-                        kind: 'RIGHT',
+                        type: 'RIGHT',
                     },
                 ])
                 .getAll({})
@@ -124,7 +124,7 @@ describe('MYSQL', () => {
                     {
                         keyField: sessionsTable.fields.user,
                         fields: ['username', 'email', 'firstName', 'lastName'],
-                        kind: 'LEFT',
+                        type: 'LEFT',
                     },
                 ])
                 .getAll({
@@ -149,7 +149,7 @@ describe('MYSQL', () => {
                     {
                         keyField: sessionsTable.fields.user,
                         fields: ['username', 'email', 'firstName', 'lastName'],
-                        kind: 'LEFT',
+                        type: 'LEFT',
                     },
                 ])
                 .getAll({
@@ -176,7 +176,7 @@ describe('MYSQL', () => {
                 .join([
                     {
                         keyField: sessionsTable.fields.user,
-                        kind: 'INNER',
+                        type: 'INNER',
                     },
                 ])
                 .update({
@@ -202,7 +202,7 @@ describe('MYSQL', () => {
                 .join([
                     {
                         keyField: sessionsTable.fields.user,
-                        kind: 'INNER',
+                        type: 'INNER',
                     },
                 ])
                 .delete({
@@ -225,7 +225,7 @@ describe('MYSQL', () => {
                     {
                         keyField: usersTwoTable.fields.user,
                         fields: ['username'],
-                        kind: 'INNER',
+                        type: 'INNER',
                     },
                 ])
                 .delete({
@@ -248,7 +248,7 @@ describe('MYSQL', () => {
                     {
                         keyField: usersTwoTable.fields.user,
                         fields: ['username'],
-                        kind: 'INNER',
+                        type: 'INNER',
                     },
                 ])
                 .update({

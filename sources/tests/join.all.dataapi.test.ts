@@ -61,7 +61,7 @@ describe('PostgreSQL', () => {
                 .join([
                     {
                         keyField: sessionsTable.fields.user,
-                        kind: 'LEFT',
+                        type: 'LEFT',
                     },
                 ])
                 .getAll({})
@@ -82,7 +82,7 @@ describe('PostgreSQL', () => {
                     {
                         keyField: sessionsTable.fields.user,
                         fields: ['username', 'email', 'firstName', 'lastName'],
-                        kind: 'LEFT',
+                        type: 'LEFT',
                     },
                 ])
                 .getAll({})
@@ -103,7 +103,7 @@ describe('PostgreSQL', () => {
                     {
                         keyField: sessionsTable.fields.user,
                         fields: ['username', 'email'],
-                        kind: 'RIGHT',
+                        type: 'RIGHT',
                     },
                 ])
                 .getAll({})
@@ -124,7 +124,7 @@ describe('PostgreSQL', () => {
                     {
                         keyField: sessionsTable.fields.user,
                         fields: ['username', 'email', 'firstName', 'lastName'],
-                        kind: 'LEFT',
+                        type: 'LEFT',
                     },
                 ])
                 .getAll({
@@ -149,7 +149,7 @@ describe('PostgreSQL', () => {
                     {
                         keyField: sessionsTable.fields.user,
                         fields: ['username', 'email', 'firstName', 'lastName'],
-                        kind: 'LEFT',
+                        type: 'LEFT',
                     },
                 ])
                 .getAll({
@@ -179,7 +179,7 @@ describe('PostgreSQL', () => {
                 .join([
                     {
                         keyField: sessionsTable.fields.user,
-                        kind: 'INNER',
+                        type: 'INNER',
                     },
                 ])
                 .update({
@@ -205,7 +205,7 @@ describe('PostgreSQL', () => {
                 .join([
                     {
                         keyField: sessionsTable.fields.user,
-                        kind: 'INNER',
+                        type: 'INNER',
                     },
                 ])
                 .delete({
@@ -228,7 +228,7 @@ describe('PostgreSQL', () => {
                     {
                         keyField: usersTwoTable.fields.user,
                         fields: ['username'],
-                        kind: 'INNER',
+                        type: 'INNER',
                     },
                 ])
                 .delete({
@@ -251,7 +251,7 @@ describe('PostgreSQL', () => {
                     {
                         keyField: usersTwoTable.fields.user,
                         fields: ['username'],
-                        kind: 'INNER',
+                        type: 'INNER',
                     },
                 ])
                 .update({
