@@ -4,7 +4,6 @@ node_js:
   - "10"
 install:
   - npm install
-  - npm install -g codecov
+  - npm install -g coveralls
 script:
   - npm test
-  - codecov
