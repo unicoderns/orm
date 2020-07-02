@@ -12,7 +12,8 @@
   "scripts": {
     "build": "tsc",
     "prepare": "tsc",
-    "test": "nyc --all --require ts-node/register jasmine sources/tests/**/*.test.ts && nyc report --reporter=text-lcov | coveralls"
+    "test": "nyc --all --require ts-node/register jasmine sources/tests/**/*.test.ts"
+    "coveralls": "nyc report --reporter=text-lcov | coveralls"
   },
   "nyc": {
     "extension": [
