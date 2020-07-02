@@ -26,7 +26,8 @@
       "**/coverage/**"
     ],
     "reporter": [
-      "html"
+      "html",
+      "text-lcov"
     ],
     "all": true
   },
