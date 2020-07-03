@@ -1,4 +1,8 @@
 .nyc_output/
-dist/
-node_modules/
 coverage/
+enums/
+interfaces/
+node_modules/
+*.d.js
+*.js
+*.js.map
