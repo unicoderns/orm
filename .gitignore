@@ -3,6 +3,6 @@ coverage/
 enums/
 interfaces/
 node_modules/
-*.d.js
+*.d.ts
 *.js
 *.js.map
