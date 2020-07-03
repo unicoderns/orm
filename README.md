@@ -5,6 +5,7 @@
 
 [![Travis](https://travis-ci.org/unicoderns/ORM.svg?branch=master)](https://travis-ci.org/unicoderns/ORM)
 [![Coverage Status](https://coveralls.io/repos/github/unicoderns/orm/badge.svg?branch=master)](https://coveralls.io/github/unicoderns/orm?branch=master)
+[![Known Vulnerabilities](https://snyk.io/test/github/unicoderns/orm/badge.svg?targetFile=package.json)](https://snyk.io/test/github/unicoderns/orm?targetFile=package.json)
 [![Dependencies](https://david-dm.org/unicoderns/orm.svg)](https://david-dm.org/unicoderns/orm/)
 [![Dev Dependencies](https://david-dm.org/unicoderns/orm/dev-status.svg)](https://david-dm.org/unicoderns/orm/?type=dev)
 
