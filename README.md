@@ -1,8 +1,5 @@
 # Unicoderns ORM
-![](https://unicoderns.com/img/logoorm.e1a28eb9.svg)
-
-[https://unicoderns.com/en/orm/](https://unicoderns.com/en/orm/)
-
+[![](https://unicoderns.com/img/logoorm.e1a28eb9.svg)](https://unicoderns.com/en/orm/)
 
 ### Unicoderns Object/Relational Mapping
 [![npm version](https://badge.fury.io/js/%40unicoderns%2Form.svg)](https://badge.fury.io/js/%40unicoderns%2Form)[![Travis](https://travis-ci.org/unicoderns/ORM.svg?branch=master)](https://travis-ci.org/unicoderns/ORM)
