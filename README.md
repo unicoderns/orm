@@ -1,9 +1,11 @@
 # Unicoderns ORM
-### Unicoderns Object/Relational Mapping
-
 ![](https://unicoderns.com/img/logoorm.e1a28eb9.svg)
 
-[![Travis](https://travis-ci.org/unicoderns/ORM.svg?branch=master)](https://travis-ci.org/unicoderns/ORM)
+[https://unicoderns.com/en/orm/](https://unicoderns.com/en/orm/)
+
+
+### Unicoderns Object/Relational Mapping
+[![npm version](https://badge.fury.io/js/%40unicoderns%2Form.svg)](https://badge.fury.io/js/%40unicoderns%2Form)[![Travis](https://travis-ci.org/unicoderns/ORM.svg?branch=master)](https://travis-ci.org/unicoderns/ORM)
 [![Coverage Status](https://coveralls.io/repos/github/unicoderns/orm/badge.svg?branch=master)](https://coveralls.io/github/unicoderns/orm?branch=master)
 [![Maintainability](https://api.codeclimate.com/v1/badges/ee1d8dc169ecc3800527/maintainability)](https://codeclimate.com/github/unicoderns/orm/maintainability)
 [![Known Vulnerabilities](https://snyk.io/test/github/unicoderns/orm/badge.svg?targetFile=package.json)](https://snyk.io/test/github/unicoderns/orm?targetFile=package.json)
