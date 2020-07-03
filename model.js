@@ -26,8 +26,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ORMModel = void 0;
 const chalk_1 = __importDefault(require("chalk"));
-const es6_promise_1 = require("es6-promise");
 const config_1 = require("./interfaces/config");
 const enums_1 = require("./enums");
 /**
@@ -243,7 +243,7 @@ class ORMModel {
             joins.forEach((join) => {
                 const linkedTableName = join.keyField.model.tableName;
                 // eslint-disable-next-line prettier/prettier
-                const sql = ` ${join.kind.toUpperCase()} JOIN ${linkedTableName} ON ${this.tableName}.${join.keyField.localField} = ${linkedTableName}.${join.keyField.linkedField}`;
+                const sql = ` ${join.type.toUpperCase()} JOIN ${linkedTableName} ON ${this.tableName}.${join.keyField.localField} = ${linkedTableName}.${join.keyField.linkedField}`;
                 joinsStringArray.push(sql);
             });
             joinsSQL = joinsStringArray.join(' ');
@@ -498,7 +498,7 @@ class ORMModel {
             console.log('Query:', JSON.stringify(query, null, 2));
         }
         if (!connection) {
-            return es6_promise_1.Promise.resolve(query);
+            return Promise.resolve(query);
         }
         else {
             return connection.query(query);
@@ -562,8 +562,8 @@ class ORMModel {
                 keys.push(temp[1]);
             }
         });
-        return this.query(query).then(data => {
-            return es6_promise_1.Promise.resolve(this.selectConsistentReturn(keys, data));
+        return this.query(query).then((data) => {
+            return Promise.resolve(this.selectConsistentReturn(keys, data));
         });
     }
     /**
@@ -614,13 +614,13 @@ class ORMModel {
             groupBy: select.groupBy,
             orderBy: select.orderBy,
             limit: 1,
-        }).then(data => {
+        }).then((data) => {
             if (data.length) {
-                return es6_promise_1.Promise.resolve(data[0]);
+                return Promise.resolve(data[0]);
             }
             else {
                 // Return unexecuted query
-                return es6_promise_1.Promise.resolve(data);
+                return Promise.resolve(data);
             }
         });
     }
@@ -662,7 +662,7 @@ class ORMModel {
      *
      * @var keyField Model foreign key
      * @var fields String array with names of fields to join
-     * @var kind Type of Join to apply E.g.: INNER, LEFT
+     * @var type Type of Join to apply E.g.: INNER, LEFT
      * @return Model
      */
     join(joins) {

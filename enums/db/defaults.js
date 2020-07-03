@@ -23,6 +23,7 @@
 // SOFTWARE.                                                                              //
 ////////////////////////////////////////////////////////////////////////////////////////////
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ORMBinaryDefault = exports.ORMTimestampDefault = void 0;
 var ORMTimestampDefault;
 (function (ORMTimestampDefault) {
     ORMTimestampDefault[ORMTimestampDefault["NULL"] = 0] = "NULL";

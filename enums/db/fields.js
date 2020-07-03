@@ -23,6 +23,7 @@
 // SOFTWARE.                                                                              //
 ////////////////////////////////////////////////////////////////////////////////////////////
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ORMSupportedFields = void 0;
 var ORMSupportedFields;
 (function (ORMSupportedFields) {
     ORMSupportedFields[ORMSupportedFields["TINYINT"] = 0] = "TINYINT";

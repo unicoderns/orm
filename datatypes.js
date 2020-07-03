@@ -23,6 +23,7 @@
 // SOFTWARE.                                                                              //
 ////////////////////////////////////////////////////////////////////////////////////////////
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ORMDatatypes = void 0;
 const enums_1 = require("./enums");
 /**
  * JSloth DB Datatypes

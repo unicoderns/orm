@@ -24,7 +24,6 @@
 
 import chalk from 'chalk'
 
-import { Promise } from 'es6-promise'
 import {
     ORMModelJoin,
     ORMModelQuery,
@@ -270,7 +269,7 @@ export class ORMModel {
                 // eslint-disable-next-line prettier/prettier
                 const sql = ` ${join.type.toUpperCase()} JOIN ${linkedTableName} ON ${this.tableName}.${
                     join.keyField.localField
-                } = ${linkedTableName}.${join.keyField.linkedField}`
+                    } = ${linkedTableName}.${join.keyField.linkedField}`
 
                 joinsStringArray.push(sql)
             })
@@ -613,7 +612,7 @@ export class ORMModel {
                 keys.push(temp[1])
             }
         })
-        return this.query(query).then(data => {
+        return this.query(query).then((data: any) => {
             return Promise.resolve(this.selectConsistentReturn(keys, data))
         })
     }
@@ -669,7 +668,7 @@ export class ORMModel {
             groupBy: select.groupBy,
             orderBy: select.orderBy,
             limit: 1,
-        }).then(data => {
+        }).then((data: any) => {
             if (data.length) {
                 return Promise.resolve(data[0])
             } else {

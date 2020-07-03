@@ -3,19 +3,19 @@ import { ORMForeignKeyField } from '../../enums';
  * Parent model row interface
  */
 export interface ORMModelRow {
-  [key: string]: any;
+    [key: string]: any;
 }
 /**
  * Key/Value object
  */
 export interface ORMModelKeyValue {
-  [key: string]: string | number | boolean | ORMModelOperatorValue;
+    [key: string]: string | number | boolean | ORMModelOperatorValue;
 }
 /**
  * Operator/Value object
  */
 export interface ORMModelOperatorValue {
-  [operator: string]: string | number;
+    [operator: string]: string | number;
 }
 /**
  * Plain query
@@ -24,9 +24,9 @@ export interface ORMModelOperatorValue {
  * @var parameters? Parameters to replace in the query for DataApi
  */
 export interface ORMModelQuery {
-  sql: string;
-  values?: (string | number)[] | Record<string, any>;
-  parameters?: (string | number)[] | Record<string, any>;
+    sql: string;
+    values?: (string | number)[] | Record<string, any>;
+    parameters?: (string | number)[] | Record<string, any>;
 }
 /**
  * Join declaration
@@ -36,9 +36,9 @@ export interface ORMModelQuery {
  * @var type Type of Join to apply E.g.: INNER, LEFT
  */
 export interface ORMModelJoin {
-  keyField: ORMForeignKeyField;
-  fields?: string[];
-  type: string;
+    keyField: ORMForeignKeyField;
+    fields?: string[];
+    type: string;
 }
 /**
  * Select declaration
@@ -50,10 +50,10 @@ export interface ORMModelJoin {
  * @var groupBy String with column_name E.g.: "id, name"
  */
 export interface ORMModelSelect {
-  fields?: string | string[];
-  where?: string | ORMModelKeyValue | ORMModelKeyValue[];
-  groupBy?: string;
-  orderBy?: string;
+    fields?: string | string[];
+    where?: string | ORMModelKeyValue | ORMModelKeyValue[];
+    groupBy?: string;
+    orderBy?: string;
 }
 /**
  * Select declaration with limit
@@ -66,7 +66,7 @@ export interface ORMModelSelect {
  * @var limit Number of rows to retrieve
  */
 export interface ORMModelSelectLimit extends ORMModelSelect {
-  limit?: number;
+    limit?: number;
 }
 /**
  * Select declaration with limit
@@ -79,8 +79,8 @@ export interface ORMModelSelectLimit extends ORMModelSelect {
  * @var limit Number of rows to retrieve
  */
 export interface ORMModelSelectReturn {
-  numberOfRecordsUpdated: number;
-  records: any[];
+    numberOfRecordsUpdated: number;
+    records: any[];
 }
 /**
  * Update declaration
@@ -89,6 +89,6 @@ export interface ORMModelSelectReturn {
  * @var where Key/Value object used to filter the query, an array of Key/Value objects will generate a multiple filter separated by an "OR", a "*" string wildcard is required for security reasons if you want to match all rows.
  */
 export interface ORMModelUpdate {
-  data: ORMModelRow;
-  where: string | ORMModelKeyValue | ORMModelKeyValue[];
+    data: ORMModelRow;
+    where: string | ORMModelKeyValue | ORMModelKeyValue[];
 }
