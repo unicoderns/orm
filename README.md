@@ -4,6 +4,7 @@
 ![](https://unicoderns.com/img/logoorm.e1a28eb9.svg)
 
 [![Travis](https://travis-ci.org/unicoderns/ORM.svg?branch=master)](https://travis-ci.org/unicoderns/ORM)
+[![Coverage Status](https://coveralls.io/repos/github/unicoderns/orm/badge.svg?branch=master)](https://coveralls.io/github/unicoderns/orm?branch=master)
 [![Dependencies](https://david-dm.org/unicoderns/ORM.svg)](https://david-dm.org/unicoderns/ORM/)
 [![Dev Dependencies](https://david-dm.org/unicoderns/ORM/dev-status.svg)](https://david-dm.org/unicoderns/ORM/)
 
