@@ -33,7 +33,7 @@ import { ORMModelQuery } from '..'
 let usersTable: users.Users
 let usersUnsafeTable: users.Users
 
-beforeAll(done => {
+beforeAll((done) => {
     usersTable = new users.Users({
         debug: false,
         engine: Engines.PostgreSQL,
@@ -51,7 +51,49 @@ beforeAll(done => {
 })
 
 describe('DataApi', () => {
-    it('Consistent return', () => {
+    it('Consistent return', async () => {
+        const data = {
+            numberOfRecordsUpdated: 0,
+            records: [
+                [
+                    {
+                        longValue: 1,
+                    },
+                    {
+                        stringValue: '2019-11-13 06:57:11.632234',
+                    },
+                    {
+                        username: 'chriss',
+                    },
+                ],
+            ],
+        }
+        const expected = {
+            numberOfRecordsUpdated: 0,
+            records: [
+                {
+                    id: 1,
+                    created: '2019-11-13 06:57:11.632234',
+                    username: 'chriss',
+                },
+            ],
+        }
+        const spyUserTable = new users.Users({
+            debug: false,
+            engine: Engines.PostgreSQL,
+            driver: Drivers.DataAPI,
+            connection: {
+                query: async () => {
+                    return await data
+                },
+            },
+        })
+        const result = await spyUserTable.getAll({})
+
+        expect(result).toEqual(expected)
+    })
+
+    it('Consistent manual return', () => {
         const data = {
             numberOfRecordsUpdated: 0,
             records: [
@@ -85,7 +127,7 @@ describe('DataApi', () => {
     describe('Get general', () => {
         it('Simple with plain text', () => {
             const expected = {
-                sql: 'SELECT username AS user FROM users;',
+                sql: 'SELECT username AS user FROM "users";',
                 parameters: [],
             }
 
@@ -100,7 +142,7 @@ describe('DataApi', () => {
         it('Simple with empty fields array', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users;',
+                    'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users";',
                 parameters: [],
             }
 
@@ -116,7 +158,7 @@ describe('DataApi', () => {
         it('Simple unsafe', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active, users.password FROM users;',
+                    'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active", "users"."password" FROM "users";',
                 parameters: [],
             }
 
@@ -134,7 +176,7 @@ describe('DataApi', () => {
         it('Simple', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users;',
+                    'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users";',
                 parameters: [],
             }
 
@@ -146,7 +188,7 @@ describe('DataApi', () => {
         it('Simple with boolean', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users WHERE users.active = :active;',
+                    'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" WHERE "users"."active" = :active;',
                 parameters: [
                     {
                         name: 'active',
@@ -167,7 +209,7 @@ describe('DataApi', () => {
         it('With where', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users WHERE users.id = :id;',
+                    'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" WHERE "users"."id" = :id;',
                 parameters: [{ name: 'id', value: { longValue: 3 } }],
             }
 
@@ -182,7 +224,7 @@ describe('DataApi', () => {
 
         it('With fields', () => {
             const expected = {
-                sql: 'SELECT users.created, users.email FROM users;',
+                sql: 'SELECT "users"."created", "users"."email" FROM "users";',
                 parameters: [],
             }
 
@@ -197,7 +239,7 @@ describe('DataApi', () => {
 
         it('With fields and where', () => {
             const expected = {
-                sql: 'SELECT users.created, users.email FROM users WHERE users.id = :id;',
+                sql: 'SELECT "users"."created", "users"."email" FROM "users" WHERE "users"."id" = :id;',
                 parameters: [{ name: 'id', value: { longValue: 3 } }],
             }
 
@@ -216,7 +258,7 @@ describe('DataApi', () => {
         it('Simple', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users LIMIT 3;',
+                    'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" LIMIT 3;',
                 parameters: [],
             }
 
@@ -232,7 +274,7 @@ describe('DataApi', () => {
         it('Simple without limit', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users;',
+                    'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users";',
                 parameters: [],
             }
 
@@ -244,7 +286,7 @@ describe('DataApi', () => {
         it('With where', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users WHERE users.id = :id LIMIT 3;',
+                    'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" WHERE "users"."id" = :id LIMIT 3;',
                 parameters: [{ name: 'id', value: { longValue: 3 } }],
             }
 
@@ -260,7 +302,7 @@ describe('DataApi', () => {
 
         it('With fields', () => {
             const expected = {
-                sql: 'SELECT users.created, users.email FROM users LIMIT 3;',
+                sql: 'SELECT "users"."created", "users"."email" FROM "users" LIMIT 3;',
                 parameters: [],
             }
 
@@ -276,7 +318,7 @@ describe('DataApi', () => {
 
         it('With fields and where', () => {
             const expected = {
-                sql: 'SELECT users.created, users.email FROM users WHERE users.id = :id LIMIT 3;',
+                sql: 'SELECT "users"."created", "users"."email" FROM "users" WHERE "users"."id" = :id LIMIT 3;',
                 parameters: [{ name: 'id', value: { longValue: 3 } }],
             }
 
@@ -296,7 +338,7 @@ describe('DataApi', () => {
         it('Simple', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users LIMIT 1;',
+                    'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" LIMIT 1;',
                 parameters: [],
             }
 
@@ -308,7 +350,7 @@ describe('DataApi', () => {
         it('With where', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users WHERE users.id = :id LIMIT 1;',
+                    'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" WHERE "users"."id" = :id LIMIT 1;',
                 parameters: [{ name: 'id', value: { longValue: 3 } }],
             }
 
@@ -323,7 +365,7 @@ describe('DataApi', () => {
 
         it('With fields', () => {
             const expected = {
-                sql: 'SELECT users.created, users.email FROM users LIMIT 1;',
+                sql: 'SELECT "users"."created", "users"."email" FROM "users" LIMIT 1;',
                 parameters: [],
             }
 
@@ -338,7 +380,7 @@ describe('DataApi', () => {
 
         it('With fields and where', () => {
             const expected = {
-                sql: 'SELECT users.created, users.email FROM users WHERE users.id = :id LIMIT 1;',
+                sql: 'SELECT "users"."created", "users"."email" FROM "users" WHERE "users"."id" = :id LIMIT 1;',
                 parameters: [{ name: 'id', value: { longValue: 3 } }],
             }
 

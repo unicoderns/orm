@@ -34,7 +34,7 @@ import { ORMModelQuery } from '..'
 let sessionsTable: sessions.Sessions
 let usersTwoTable: userstwo.UsersTwo
 
-beforeAll(done => {
+beforeAll((done) => {
     sessionsTable = new sessions.Sessions({
         debug: false,
         engine: Engines.MySQL,
@@ -53,7 +53,7 @@ describe('MYSQL', () => {
         it('Left join sessions with users without fields', () => {
             const expected = {
                 sql:
-                    'SELECT sessions.id, sessions.created, sessions.ip, sessions.user, ERROR; FROM sessions LEFT JOIN users ON sessions.user = users.id;',
+                    'SELECT `sessions`.`id`, `sessions`.`created`, `sessions`.`ip`, `sessions`.`user`, ERROR; FROM `sessions` LEFT JOIN `users` ON `sessions`.`user` = `users`.`id`;',
                 values: [],
             }
 
@@ -73,7 +73,7 @@ describe('MYSQL', () => {
         it('Left join sessions with users', () => {
             const expected = {
                 sql:
-                    'SELECT sessions.id, sessions.created, sessions.ip, sessions.user, users.username AS users__username, users.email AS users__email, users.firstName AS users__firstName, users.lastName AS users__lastName FROM sessions LEFT JOIN users ON sessions.user = users.id;',
+                    'SELECT `sessions`.`id`, `sessions`.`created`, `sessions`.`ip`, `sessions`.`user`, `users`.`username` AS `users__username`, `users`.`email` AS `users__email`, `users`.`firstName` AS `users__firstName`, `users`.`lastName` AS `users__lastName` FROM `sessions` LEFT JOIN `users` ON `sessions`.`user` = `users`.`id`;',
                 values: [],
             }
 
@@ -94,7 +94,7 @@ describe('MYSQL', () => {
         it('Right join sessions with users', () => {
             const expected = {
                 sql:
-                    'SELECT sessions.id, sessions.created, sessions.ip, sessions.user, users.username AS users__username, users.email AS users__email FROM sessions RIGHT JOIN users ON sessions.user = users.id;',
+                    'SELECT `sessions`.`id`, `sessions`.`created`, `sessions`.`ip`, `sessions`.`user`, `users`.`username` AS `users__username`, `users`.`email` AS `users__email` FROM `sessions` RIGHT JOIN `users` ON `sessions`.`user` = `users`.`id`;',
                 values: [],
             }
 
@@ -115,7 +115,7 @@ describe('MYSQL', () => {
         it('Left join sessions with where at users', () => {
             const expected = {
                 sql:
-                    'SELECT sessions.id, sessions.created, sessions.ip, sessions.user, users.username AS users__username, users.email AS users__email, users.firstName AS users__firstName, users.lastName AS users__lastName FROM sessions LEFT JOIN users ON sessions.user = users.id WHERE users.id = ?;',
+                    'SELECT `sessions`.`id`, `sessions`.`created`, `sessions`.`ip`, `sessions`.`user`, `users`.`username` AS `users__username`, `users`.`email` AS `users__email`, `users`.`firstName` AS `users__firstName`, `users`.`lastName` AS `users__lastName` FROM `sessions` LEFT JOIN `users` ON `sessions`.`user` = `users`.`id` WHERE `users`.`id` = ?;',
                 values: [3],
             }
 
@@ -140,7 +140,7 @@ describe('MYSQL', () => {
         it('Left join sessions with where at users and != operator', () => {
             const expected = {
                 sql:
-                    'SELECT sessions.id, sessions.created, sessions.ip, sessions.user, users.username AS users__username, users.email AS users__email, users.firstName AS users__firstName, users.lastName AS users__lastName FROM sessions LEFT JOIN users ON sessions.user = users.id WHERE users.id != ?;',
+                    'SELECT `sessions`.`id`, `sessions`.`created`, `sessions`.`ip`, `sessions`.`user`, `users`.`username` AS `users__username`, `users`.`email` AS `users__email`, `users`.`firstName` AS `users__firstName`, `users`.`lastName` AS `users__lastName` FROM `sessions` LEFT JOIN `users` ON `sessions`.`user` = `users`.`id` WHERE `users`.`id` != ?;',
                 values: [3],
             }
 
@@ -168,7 +168,7 @@ describe('MYSQL', () => {
         it('Inner join update with where at users', () => {
             const expected = {
                 sql:
-                    'UPDATE sessions INNER JOIN users ON sessions.user = users.id SET sessions.ip = ? WHERE users.id = ?;',
+                    'UPDATE `sessions` INNER JOIN `users` ON `sessions`.`user` = `users`.`id` SET `sessions`.`ip` = ? WHERE `users`.`id` = ?;',
                 values: ['121.0.0.1', 3],
             }
 
@@ -194,7 +194,8 @@ describe('MYSQL', () => {
 
         it('Inner join delete with where at users', () => {
             const expected = {
-                sql: 'DELETE FROM sessions INNER JOIN users ON sessions.user = users.id WHERE users.id = ?;',
+                sql:
+                    'DELETE FROM `sessions` INNER JOIN `users` ON `sessions`.`user` = `users`.`id` WHERE `users`.`id` = ?;',
                 values: [3],
             }
 
@@ -216,7 +217,7 @@ describe('MYSQL', () => {
         it('INNER join delete usersTwo with literal from users', () => {
             const expected = {
                 sql:
-                    'DELETE FROM usersTwo INNER JOIN users ON usersTwo.user = users.id WHERE usersTwo.username = users.username;',
+                    'DELETE FROM `usersTwo` INNER JOIN `users` ON `usersTwo`.`user` = `users`.`id` WHERE `usersTwo`.`username` = `users`.`username`;',
                 values: [],
             }
 
@@ -239,7 +240,7 @@ describe('MYSQL', () => {
         it('INNER join update usersTwo with literal from users', () => {
             const expected = {
                 sql:
-                    'UPDATE usersTwo INNER JOIN users ON usersTwo.user = users.id SET usersTwo.username = users.username;',
+                    'UPDATE `usersTwo` INNER JOIN `users` ON `usersTwo`.`user` = `users`.`id` SET `usersTwo`.`username` = `users`.`username`;',
                 values: [],
             }
 

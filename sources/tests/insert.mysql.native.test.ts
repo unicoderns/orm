@@ -32,7 +32,7 @@ let usersTable: users.Users
 import { Engines, Drivers } from '../interfaces/config'
 import { ORMModelQuery } from '..'
 
-beforeAll(done => {
+beforeAll((done) => {
     usersTable = new users.Users({
         debug: false,
         engine: Engines.MySQL,
@@ -45,7 +45,7 @@ describe('MYSQL', () => {
     describe('Insert', () => {
         it('1 value', () => {
             const expected = {
-                sql: 'INSERT INTO users (firstName) VALUES (?);',
+                sql: 'INSERT INTO `users` (`firstName`) VALUES (?);',
                 values: ['Chriss'],
             }
 
@@ -60,7 +60,7 @@ describe('MYSQL', () => {
 
         it('2 values', () => {
             const expected = {
-                sql: 'INSERT INTO users (firstName, username) VALUES (?, ?);',
+                sql: 'INSERT INTO `users` (`firstName`, `username`) VALUES (?, ?);',
                 values: ['Chriss', 'chriss'],
             }
 

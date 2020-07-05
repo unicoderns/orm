@@ -46,6 +46,7 @@ export class ORMModel {
     private unsafe = false
     private joins: ORMModelJoin[] = []
     private specialFunctions = ['now()']
+    private regularQuotes = '"'
     public readonly fields: ORMAllowedFields = {}
     public readonly secured: ORMAllowedFields = {}
     private currentParamPosition = 0
@@ -63,6 +64,16 @@ export class ORMModel {
 
         if (privacy == 'unsafe') {
             this.unsafe = true
+        }
+    }
+
+    /**
+     * Load Engine Configuration
+     * Please notice that PGSQL is the default config
+     */
+    private loadSpecificEngineSettings(): void {
+        if (this.config.engine === Engines.MySQL) {
+            this.regularQuotes = '`'
         }
     }
 
@@ -90,6 +101,7 @@ export class ORMModel {
                 consistentReturn: config.settings && !config.settings.consistentReturn ? false : true,
             },
         }
+        this.loadSpecificEngineSettings()
 
         return this
     }
@@ -133,11 +145,11 @@ export class ORMModel {
         const keys: string[] = []
 
         if (typeof target !== 'undefined') {
-            Object.keys(target).forEach(key => {
+            Object.keys(target).forEach((key) => {
                 const alias = target[key].alias
 
                 if (typeof alias !== 'undefined' && alias != key) {
-                    keys.push(`${key} AS ${alias}`)
+                    keys.push(`${key + this.regularQuotes} AS ${this.regularQuotes + alias}`)
                 } else {
                     keys.push(key)
                 }
@@ -155,7 +167,7 @@ export class ORMModel {
         const keys: string[] = []
 
         if (typeof scope !== 'undefined') {
-            target.forEach(item => {
+            target.forEach((item) => {
                 if (typeof scope[item] !== 'undefined') {
                     keys.push(item)
                 }
@@ -171,7 +183,7 @@ export class ORMModel {
      */
     private logMissingFields(target: string[], scope: ORMAllowedFields): void {
         if (typeof scope !== 'undefined') {
-            target.forEach(item => {
+            target.forEach((item) => {
                 // Validation for joined table not available yet.
                 const joinkeys = item.split('__')
 
@@ -212,14 +224,25 @@ export class ORMModel {
             }
         }
 
-        if (typeof prefix == 'undefined') {
-            fieldsSQL = `${this.tableName}.`
-            fieldsSQL = fieldsSQL + selectableFields.join(`, ${this.tableName}.`)
+        if (typeof prefix === 'undefined') {
+            fieldsSQL = `${this.regularQuotes + this.tableName + this.regularQuotes}.${this.regularQuotes}`
+            fieldsSQL =
+                fieldsSQL +
+                selectableFields.join(
+                    `${this.regularQuotes}, ${this.regularQuotes + this.tableName + this.regularQuotes}.${
+                    this.regularQuotes
+                    }`,
+                ) +
+                this.regularQuotes
         } else {
             const formatedFields: string[] = []
 
             selectableFields.forEach((field: string) => {
-                formatedFields.push(`${this.tableName}.${field} AS ${this.tableName}__${field}`)
+                formatedFields.push(
+                    `${this.regularQuotes + this.tableName + this.regularQuotes}.${
+                    this.regularQuotes + field + this.regularQuotes
+                    } AS ${this.regularQuotes + this.tableName}__${field + this.regularQuotes}`,
+                )
             })
             fieldsSQL = formatedFields.join(', ')
         }
@@ -267,9 +290,14 @@ export class ORMModel {
             joins.forEach((join: ORMModelJoin) => {
                 const linkedTableName = join.keyField.model.tableName
                 // eslint-disable-next-line prettier/prettier
-                const sql = ` ${join.type.toUpperCase()} JOIN ${linkedTableName} ON ${this.tableName}.${
+                // eslint-disable-next-line indent
+                const sql = ` ${join.type.toUpperCase()} JOIN ${this.regularQuotes}${linkedTableName}${
+                    this.regularQuotes
+                    } ON ${this.regularQuotes}${this.tableName}${this.regularQuotes}.${this.regularQuotes}${
                     join.keyField.localField
-                    } = ${linkedTableName}.${join.keyField.linkedField}`
+                    }${this.regularQuotes} = ${this.regularQuotes}${linkedTableName}${this.regularQuotes}.${
+                    this.regularQuotes
+                    }${join.keyField.linkedField}${this.regularQuotes}`
 
                 joinsStringArray.push(sql)
             })
@@ -398,20 +426,28 @@ export class ORMModel {
                     where[item] = where[item].value
                 }
                 if (String(where[item]).charAt(0) == '\\') {
-                    sql = `${sql + this.tableName}.${item} ${operator} ${String(where[item]).substring(1)}`
+                    sql = `${sql + this.regularQuotes + this.tableName + this.regularQuotes}.${
+                        this.regularQuotes + item + this.regularQuotes
+                        } ${operator} ${String(where[item]).substring(1)}`
                 } else {
                     let joinkeys = item.split('__')
                     // string literal
 
-                    if (joinkeys.length == 2) {
-                        sql = `${sql + joinkeys[0]}.${joinkeys[1]}`
+                    if (joinkeys.length === 2) {
+                        sql = `${sql + this.regularQuotes + joinkeys[0] + this.regularQuotes}.${
+                            this.regularQuotes + joinkeys[1] + this.regularQuotes
+                            }`
                     } else {
-                        sql = `${sql + this.tableName}.${item}`
+                        sql = `${sql + this.regularQuotes + this.tableName + this.regularQuotes}.${
+                            this.regularQuotes + item + this.regularQuotes
+                            }`
                     }
                     joinkeys = String(where[item]).split('__')
                     // joined column
                     if (joinkeys.length == 2) {
-                        sql = `${sql} ${operator} ${joinkeys[0]}.${joinkeys[1]}`
+                        sql = `${sql} ${operator} ${this.regularQuotes + joinkeys[0] + this.regularQuotes}.${
+                            this.regularQuotes + joinkeys[1] + this.regularQuotes
+                            }`
                     } else {
                         // special functiom
                         if (this.specialFunctions.indexOf(where[item]) >= 0) {
@@ -587,7 +623,9 @@ export class ORMModel {
         if (typeof limit !== 'undefined' && limit !== null) {
             extra += ` LIMIT ${limit}`
         }
-        const sql = `SELECT ${fieldsSQL}${joinFieldsSQL} FROM ${this.tableName}${joinCode}${whereCode.sql}${extra};`
+        const sql = `SELECT ${fieldsSQL + joinFieldsSQL} FROM ${
+            this.regularQuotes + this.tableName + this.regularQuotes + joinCode + whereCode.sql + extra
+            };`
 
         this.joins = []
 
@@ -599,10 +637,11 @@ export class ORMModel {
             query.values = whereCode.values
         }
 
-        const keyArray = String(fieldsSQL + joinFieldsSQL).split(', ')
+        // Consistent Return
+        const keyArray = String(fieldsSQL.replace(/"/g, '') + joinFieldsSQL.replace(/"/g, '')).split(', ')
         const keys: string[] = []
 
-        keyArray.forEach(key => {
+        keyArray.forEach((key) => {
             let temp = key.split(' AS ')
 
             if (temp.length === 2) {
@@ -760,7 +799,9 @@ export class ORMModel {
             }
         }
 
-        const query = `INSERT INTO ${this.tableName} (${fields.join(', ')}) VALUES (${wildcards.join(', ')});`
+        const query = `INSERT INTO ${this.regularQuotes + this.tableName + this.regularQuotes} (${
+            this.regularQuotes + fields.join(`${this.regularQuotes}, ${this.regularQuotes}`) + this.regularQuotes
+            }) VALUES (${wildcards.join(', ')});`
 
         if (this.config.driver === Drivers.DataAPI) {
             return this.query({ sql: query, parameters: valuesObj })
@@ -793,19 +834,31 @@ export class ORMModel {
             const joinkeys = String(data[key]).split('__')
 
             if (joinkeys.length === 2) {
-                fields.push(`${this.tableName}.${key} = ${joinkeys[0]}.${joinkeys[1]}`)
+                fields.push(
+                    `${this.regularQuotes}${this.tableName}${this.regularQuotes}.${this.regularQuotes}${key}${this.regularQuotes} = ${this.regularQuotes}${joinkeys[0]}${this.regularQuotes}.${this.regularQuotes}${joinkeys[1]}${this.regularQuotes}`,
+                )
             } else if (this.specialFunctions.indexOf(data[key]) >= 0) {
-                fields.push(`${this.tableName}.${key} = ${data[key]}`)
+                fields.push(
+                    `${this.regularQuotes}${this.tableName}${this.regularQuotes}.${this.regularQuotes}${key}${this.regularQuotes} = ${data[key]}`,
+                )
             } else {
                 valuesObj.push(this.validateAndTransform(key, data[key]))
                 values.push(data[key])
 
                 if (this.config.driver === Drivers.DataAPI) {
-                    fields.push(`${this.tableName}.${key} = :${key}`)
+                    fields.push(
+                        `${this.regularQuotes}${this.tableName}${this.regularQuotes}.${this.regularQuotes}${key}${this.regularQuotes} = :${key}`,
+                    )
                 } else if (this.config.engine === Engines.PostgreSQL) {
-                    fields.push(`${this.tableName}.${key} = $${++this.currentParamPosition}`)
+                    fields.push(
+                        `${this.regularQuotes}${this.tableName}${this.regularQuotes}.${this.regularQuotes}${key}${
+                        this.regularQuotes
+                        } = $${++this.currentParamPosition}`,
+                    )
                 } else if (this.config.engine === Engines.MySQL) {
-                    fields.push(`${this.tableName}.${key} = ?`)
+                    fields.push(
+                        `${this.regularQuotes}${this.tableName}${this.regularQuotes}.${this.regularQuotes}${key}${this.regularQuotes} = ?`,
+                    )
                 } else {
                     fields.push('ENGINE NOT SUPPORTED')
                 }
@@ -822,7 +875,9 @@ export class ORMModel {
             whereCode = this.generateWhereCode(where)
         }
 
-        const query = `UPDATE ${this.tableName}${joinCode} SET ${fields.join(', ')}${whereCode.sql};`
+        const query = `UPDATE ${this.regularQuotes}${this.tableName}${this.regularQuotes}${joinCode} SET ${fields.join(
+            ', ',
+        )}${whereCode.sql};`
 
         if (this.config.driver === Drivers.DataAPI) {
             return this.query({ sql: query, parameters: valuesObj.concat(whereCode.values) })
@@ -853,7 +908,9 @@ export class ORMModel {
         } else {
             whereCode = this.generateWhereCode(where)
         }
-        const query = `DELETE FROM ${this.tableName}${joinCode}${whereCode.sql};`
+        const query = `DELETE FROM ${
+            this.regularQuotes + this.tableName + this.regularQuotes + joinCode + whereCode.sql
+            };`
 
         if (this.config.driver === Drivers.DataAPI) {
             return this.query({ sql: query, parameters: whereCode.values })

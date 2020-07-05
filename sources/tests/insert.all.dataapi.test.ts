@@ -32,7 +32,7 @@ import { ORMModelQuery } from '..'
 
 let usersTable: users.Users
 
-beforeAll(done => {
+beforeAll((done) => {
     usersTable = new users.Users({
         debug: false,
         engine: Engines.PostgreSQL,
@@ -45,7 +45,7 @@ describe('DataAPI', () => {
     describe('Insert', () => {
         it('1 value', () => {
             const expected = {
-                sql: 'INSERT INTO users (firstName) VALUES (:firstName);',
+                sql: 'INSERT INTO "users" ("firstName") VALUES (:firstName);',
                 parameters: [{ name: 'firstName', value: { stringValue: 'Chriss' } }],
             }
 
@@ -56,7 +56,7 @@ describe('DataAPI', () => {
 
         it('2 parameters', () => {
             const expected = {
-                sql: 'INSERT INTO users (firstName, username) VALUES (:firstName, :username);',
+                sql: 'INSERT INTO "users" ("firstName", "username") VALUES (:firstName, :username);',
                 parameters: [
                     { name: 'firstName', value: { stringValue: 'Chriss' } },
                     { name: 'username', value: { stringValue: 'chriss' } },

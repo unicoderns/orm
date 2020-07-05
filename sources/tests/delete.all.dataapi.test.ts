@@ -32,7 +32,7 @@ import { ORMModelQuery } from '../interfaces'
 
 let usersTable: users.Users
 
-beforeAll(done => {
+beforeAll((done) => {
     usersTable = new users.Users({
         debug: false,
         engine: Engines.PostgreSQL,
@@ -45,7 +45,7 @@ describe('DataAPI', () => {
     describe('Delete', () => {
         it('Delete all', () => {
             const expected = {
-                sql: 'DELETE FROM users;',
+                sql: 'DELETE FROM "users";',
                 parameters: [],
             }
 
@@ -56,7 +56,7 @@ describe('DataAPI', () => {
 
         it('Delete with 1 condition', () => {
             const expected = {
-                sql: 'DELETE FROM users WHERE users.id = :id;',
+                sql: 'DELETE FROM "users" WHERE "users"."id" = :id;',
                 parameters: [{ name: 'id', value: { longValue: 1 } }],
             }
 
@@ -71,7 +71,7 @@ describe('DataAPI', () => {
                 { name: 'id', value: { longValue: 3 } },
             ]
             const expected = {
-                sql: 'DELETE FROM users WHERE users.username = :username AND users.id = :id;',
+                sql: 'DELETE FROM "users" WHERE "users"."username" = :username AND "users"."id" = :id;',
                 parameters,
             }
 
@@ -87,7 +87,7 @@ describe('DataAPI', () => {
 
         it('Delete with 2 conditions and different operator', () => {
             const expected = {
-                sql: 'DELETE FROM users WHERE users.username = :username AND users.id != :id;',
+                sql: 'DELETE FROM "users" WHERE "users"."username" = :username AND "users"."id" != :id;',
                 parameters: [
                     { name: 'username', value: { stringValue: 'chriss' } },
                     { name: 'id', value: { longValue: 3 } },

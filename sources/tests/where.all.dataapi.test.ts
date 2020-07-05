@@ -32,7 +32,7 @@ import { ORMModelQuery } from '..'
 
 let usersTable: users.Users
 
-beforeAll(done => {
+beforeAll((done) => {
     usersTable = new users.Users({
         debug: false,
         engine: Engines.PostgreSQL,
@@ -46,7 +46,7 @@ describe('DataApi', () => {
         it('Simple with empty where array should fail', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM usersERROR;',
+                    'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users"ERROR;',
                 parameters: [],
             }
 
@@ -61,7 +61,7 @@ describe('DataApi', () => {
 
         it('Simple update with empty where object should fail', () => {
             const expected = {
-                sql: 'UPDATE users SET users.username = :usernameERROR;',
+                sql: 'UPDATE "users" SET "users"."username" = :usernameERROR;',
                 parameters: [{ name: 'username', value: { stringValue: 'chriss' } }],
             }
 
@@ -79,7 +79,7 @@ describe('DataApi', () => {
 
         it('Simple delete with empty where object should fail', () => {
             const expected = {
-                sql: 'DELETE FROM usersERROR;',
+                sql: 'DELETE FROM "users"ERROR;',
                 parameters: [],
             }
 
@@ -91,7 +91,7 @@ describe('DataApi', () => {
         it('Simple with where string different than "*" should fail', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM usersERROR;',
+                    'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users"ERROR;',
                 parameters: [],
             }
 
@@ -107,7 +107,7 @@ describe('DataApi', () => {
         it('Simple with Boolean', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users WHERE users.active = :active;',
+                    'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" WHERE "users"."active" = :active;',
                 parameters: [
                     {
                         name: 'active',
@@ -128,7 +128,7 @@ describe('DataApi', () => {
         it('Simple with OR', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users WHERE users.active = :active;',
+                    'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" WHERE "users"."active" = :active;',
                 parameters: [
                     {
                         name: 'active',
@@ -149,7 +149,7 @@ describe('DataApi', () => {
         it('Simple with string literal', () => {
             const expected = {
                 sql:
-                    "SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users WHERE (users.id = :id) OR (users.username = 'chriss');",
+                    'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" WHERE ("users"."id" = :id) OR ("users"."username" = \'chriss\');',
                 parameters: [{ name: 'id', value: { longValue: 3 } }],
             }
 
@@ -165,7 +165,7 @@ describe('DataApi', () => {
         it('Multiple fields with OR', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users WHERE (users.id = :id AND users.email = :email) OR (users.username = :username);',
+                    'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" WHERE ("users"."id" = :id AND "users"."email" = :email) OR ("users"."username" = :username);',
                 parameters: [
                     { name: 'id', value: { longValue: 3 } },
                     { name: 'email', value: { stringValue: 'chriss@unicoderns.com' } },
@@ -185,7 +185,7 @@ describe('DataApi', () => {
         it('Simple with multiple AND', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users WHERE users.id = :id AND users.username = :username AND users.email = :email;',
+                    'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" WHERE "users"."id" = :id AND "users"."username" = :username AND "users"."email" = :email;',
                 parameters: [
                     { name: 'id', value: { longValue: 3 } },
                     { name: 'username', value: { stringValue: 'chriss' } },
@@ -205,7 +205,7 @@ describe('DataApi', () => {
         it('Simple with multiple AND and != operator', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users WHERE users.id != :id AND users.username = :username AND users.email = :email;',
+                    'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" WHERE "users"."id" != :id AND "users"."username" = :username AND "users"."email" = :email;',
                 parameters: [
                     { name: 'id', value: { longValue: 3 } },
                     { name: 'username', value: { stringValue: 'chriss' } },
@@ -225,7 +225,7 @@ describe('DataApi', () => {
         it('Simple with multiple OR', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users WHERE (users.id = :id) OR (users.username = :username) OR (users.email = :email);',
+                    'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" WHERE ("users"."id" = :id) OR ("users"."username" = :username) OR ("users"."email" = :email);',
                 parameters: [
                     { name: 'id', value: { longValue: 3 } },
                     { name: 'username', value: { stringValue: 'chriss' } },
@@ -245,7 +245,7 @@ describe('DataApi', () => {
         it('Simple with groupBy', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users GROUP BY username, active;',
+                    'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" GROUP BY username, active;',
                 parameters: [],
             }
 
@@ -261,7 +261,7 @@ describe('DataApi', () => {
         it('Simple with orderBy', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users ORDER BY id ASC;',
+                    'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" ORDER BY id ASC;',
                 parameters: [],
             }
 
@@ -277,7 +277,7 @@ describe('DataApi', () => {
         it('Simple with orderBy and groupBy', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users GROUP BY username, active ORDER BY id ASC;',
+                    'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" GROUP BY username, active ORDER BY id ASC;',
                 parameters: [],
             }
 
@@ -294,7 +294,7 @@ describe('DataApi', () => {
         it('Simple with <= operator', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users WHERE (users.id <= :id);',
+                    'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" WHERE ("users"."id" <= :id);',
                 parameters: [{ name: 'id', value: { longValue: 3 } }],
             }
 
@@ -317,7 +317,7 @@ describe('DataApi', () => {
         it('Simple with string literal', () => {
             const expected = {
                 sql:
-                    "SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users WHERE (users.id = :id) OR (users.username != 'chriss');",
+                    'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" WHERE ("users"."id" = :id) OR ("users"."username" != \'chriss\');',
                 parameters: [{ name: 'id', value: { longValue: 3 } }],
             }
 
@@ -342,7 +342,7 @@ describe('DataApi', () => {
         it('Simple with now() function', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users WHERE (users.id = :id) OR (users.created = now());',
+                    'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" WHERE ("users"."id" = :id) OR ("users"."created" = now());',
                 parameters: [{ name: 'id', value: { longValue: 3 } }],
             }
 
@@ -358,7 +358,7 @@ describe('DataApi', () => {
         it('Simple with now() function and != operator', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users WHERE (users.id = :id) OR (users.created >= now());',
+                    'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" WHERE ("users"."id" = :id) OR ("users"."created" >= now());',
                 parameters: [{ name: 'id', value: { longValue: 3 } }],
             }
 

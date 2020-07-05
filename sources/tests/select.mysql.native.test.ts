@@ -33,7 +33,7 @@ import { ORMModelQuery } from '..'
 let usersTable: users.Users
 let usersUnsafeTable: users.Users
 
-beforeAll(done => {
+beforeAll((done) => {
     usersTable = new users.Users({
         debug: false,
         engine: Engines.MySQL,
@@ -54,7 +54,7 @@ describe('MYSQL', () => {
     describe('Get general', () => {
         it('Simple with plain text', () => {
             const expected = {
-                sql: 'SELECT username AS user FROM users;',
+                sql: 'SELECT username AS user FROM `users`;',
                 values: [],
             }
 
@@ -69,7 +69,7 @@ describe('MYSQL', () => {
         it('Simple with empty fields array', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users;',
+                    'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users`;',
                 values: [],
             }
 
@@ -85,7 +85,7 @@ describe('MYSQL', () => {
         it('Simple unsafe', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active, users.password FROM users;',
+                    'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active`, `users`.`password` FROM `users`;',
                 values: [],
             }
 
@@ -103,7 +103,7 @@ describe('MYSQL', () => {
         it('Simple', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users;',
+                    'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users`;',
                 values: [],
             }
 
@@ -115,7 +115,7 @@ describe('MYSQL', () => {
         it('Simple with boolean', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users WHERE users.active = ?;',
+                    'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE `users`.`active` = ?;',
                 values: [1],
             }
 
@@ -131,7 +131,7 @@ describe('MYSQL', () => {
         it('With where', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users WHERE users.id = ?;',
+                    'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE `users`.`id` = ?;',
                 values: [3],
             }
 
@@ -148,7 +148,7 @@ describe('MYSQL', () => {
 
         it('With fields', () => {
             const expected = {
-                sql: 'SELECT users.created, users.email FROM users;',
+                sql: 'SELECT `users`.`created`, `users`.`email` FROM `users`;',
                 values: [],
             }
 
@@ -163,7 +163,7 @@ describe('MYSQL', () => {
 
         it('With fields and where', () => {
             const expected = {
-                sql: 'SELECT users.created, users.email FROM users WHERE users.id = ?;',
+                sql: 'SELECT `users`.`created`, `users`.`email` FROM `users` WHERE `users`.`id` = ?;',
                 values: [3],
             }
 
@@ -184,7 +184,7 @@ describe('MYSQL', () => {
         it('Simple', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users LIMIT 3;',
+                    'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` LIMIT 3;',
                 values: [],
             }
 
@@ -200,7 +200,7 @@ describe('MYSQL', () => {
         it('Simple without limit', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users;',
+                    'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users`;',
                 values: [],
             }
 
@@ -212,7 +212,7 @@ describe('MYSQL', () => {
         it('With where', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users WHERE users.id = ? LIMIT 3;',
+                    'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE `users`.`id` = ? LIMIT 3;',
                 values: [3],
             }
 
@@ -230,7 +230,7 @@ describe('MYSQL', () => {
 
         it('With fields', () => {
             const expected = {
-                sql: 'SELECT users.created, users.email FROM users LIMIT 3;',
+                sql: 'SELECT `users`.`created`, `users`.`email` FROM `users` LIMIT 3;',
                 values: [],
             }
 
@@ -246,7 +246,7 @@ describe('MYSQL', () => {
 
         it('With fields and where', () => {
             const expected = {
-                sql: 'SELECT users.created, users.email FROM users WHERE users.id = ? LIMIT 3;',
+                sql: 'SELECT `users`.`created`, `users`.`email` FROM `users` WHERE `users`.`id` = ? LIMIT 3;',
                 values: [3],
             }
 
@@ -268,7 +268,7 @@ describe('MYSQL', () => {
         it('Simple', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users LIMIT 1;',
+                    'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` LIMIT 1;',
                 values: [],
             }
 
@@ -280,7 +280,7 @@ describe('MYSQL', () => {
         it('With where', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users WHERE users.id = ? LIMIT 1;',
+                    'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE `users`.`id` = ? LIMIT 1;',
                 values: [3],
             }
 
@@ -297,7 +297,7 @@ describe('MYSQL', () => {
 
         it('With fields', () => {
             const expected = {
-                sql: 'SELECT users.created, users.email FROM users LIMIT 1;',
+                sql: 'SELECT `users`.`created`, `users`.`email` FROM `users` LIMIT 1;',
                 values: [],
             }
 
@@ -312,7 +312,7 @@ describe('MYSQL', () => {
 
         it('With fields and where', () => {
             const expected = {
-                sql: 'SELECT users.created, users.email FROM users WHERE users.id = ? LIMIT 1;',
+                sql: 'SELECT `users`.`created`, `users`.`email` FROM `users` WHERE `users`.`id` = ? LIMIT 1;',
                 values: [3],
             }
 

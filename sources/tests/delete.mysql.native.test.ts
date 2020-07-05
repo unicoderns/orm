@@ -32,7 +32,7 @@ import { ORMModelQuery } from '..'
 
 let usersTable: users.Users
 
-beforeAll(done => {
+beforeAll((done) => {
     usersTable = new users.Users({
         debug: false,
         engine: Engines.MySQL,
@@ -45,7 +45,7 @@ describe('MYSQL', () => {
     describe('Delete', () => {
         it('Delete all', () => {
             const expected = {
-                sql: 'DELETE FROM users;',
+                sql: 'DELETE FROM `users`;',
                 values: [],
             }
 
@@ -56,7 +56,7 @@ describe('MYSQL', () => {
 
         it('Delete with 1 condition', () => {
             const expected = {
-                sql: 'DELETE FROM users WHERE users.id = ?;',
+                sql: 'DELETE FROM `users` WHERE `users`.`id` = ?;',
                 values: [1],
             }
 
@@ -67,7 +67,7 @@ describe('MYSQL', () => {
 
         it('Delete with 2 conditions', () => {
             const expected = {
-                sql: 'DELETE FROM users WHERE users.username = ? AND users.id = ?;',
+                sql: 'DELETE FROM `users` WHERE `users`.`username` = ? AND `users`.`id` = ?;',
                 values: ['chriss', 3],
             }
 
@@ -78,7 +78,7 @@ describe('MYSQL', () => {
 
         it('Delete with 2 conditions and different operator', () => {
             const expected = {
-                sql: 'DELETE FROM users WHERE users.username = ? AND users.id != ?;',
+                sql: 'DELETE FROM `users` WHERE `users`.`username` = ? AND `users`.`id` != ?;',
                 values: ['chriss', 3],
             }
 

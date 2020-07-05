@@ -32,7 +32,7 @@ import { Engines, Drivers } from '../interfaces/config'
 let usersTable: users.Users
 let usersUnsafeTable: users.Users
 
-beforeAll(done => {
+beforeAll((done) => {
     usersTable = new users.Users({
         debug: false,
         engine: Engines.MySQL,

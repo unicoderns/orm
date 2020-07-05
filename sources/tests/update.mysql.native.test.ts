@@ -32,7 +32,7 @@ import { ORMModelQuery } from '..'
 
 let usersTable: users.Users
 
-beforeAll(done => {
+beforeAll((done) => {
     usersTable = new users.Users({
         debug: false,
         engine: Engines.MySQL,
@@ -45,7 +45,7 @@ describe('MYSQL', () => {
     describe('Update', () => {
         it('Fails if where is an object', () => {
             const expected = {
-                sql: 'UPDATE users SET users.firstName = ?ERROR;',
+                sql: 'UPDATE `users` SET `users`.`firstName` = ?ERROR;',
                 values: ['Chriss'],
             }
 
@@ -63,7 +63,7 @@ describe('MYSQL', () => {
 
         it('Fails if where is an array', () => {
             const expected = {
-                sql: 'UPDATE users SET users.firstName = ?ERROR;',
+                sql: 'UPDATE `users` SET `users`.`firstName` = ?ERROR;',
                 values: ['Chriss'],
             }
 
@@ -81,7 +81,7 @@ describe('MYSQL', () => {
 
         it('Fails if data is empty', () => {
             const expected = {
-                sql: 'UPDATE users SET ;',
+                sql: 'UPDATE `users` SET ;',
                 values: [],
             }
 
@@ -97,7 +97,7 @@ describe('MYSQL', () => {
 
         it('1 field 1 where', () => {
             const expected = {
-                sql: 'UPDATE users SET users.firstName = ? WHERE users.id = ?;',
+                sql: 'UPDATE `users` SET `users`.`firstName` = ? WHERE `users`.`id` = ?;',
                 values: ['Chriss', 3],
             }
 
@@ -117,7 +117,7 @@ describe('MYSQL', () => {
 
         it('1 field 1 where spacial now() function', () => {
             const expected = {
-                sql: 'UPDATE users SET users.created = now() WHERE users.id = ?;',
+                sql: 'UPDATE `users` SET `users`.`created` = now() WHERE `users`.`id` = ?;',
                 values: [3],
             }
 

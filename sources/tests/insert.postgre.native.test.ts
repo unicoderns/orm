@@ -32,7 +32,7 @@ let usersTable: users.Users
 import { Engines, Drivers } from '../interfaces/config'
 import { ORMModelQuery } from '..'
 
-beforeAll(done => {
+beforeAll((done) => {
     usersTable = new users.Users({
         debug: false,
         engine: Engines.PostgreSQL,
@@ -45,7 +45,7 @@ describe('PostgreSQL', () => {
     describe('Insert', () => {
         it('1 value', () => {
             const expected = {
-                sql: 'INSERT INTO users (firstName) VALUES ($1);',
+                sql: 'INSERT INTO "users" ("firstName") VALUES ($1);',
                 values: ['Chriss'],
             }
 
@@ -60,7 +60,7 @@ describe('PostgreSQL', () => {
 
         it('2 values', () => {
             const expected = {
-                sql: 'INSERT INTO users (firstName, username) VALUES ($1, $2);',
+                sql: 'INSERT INTO "users" ("firstName", "username") VALUES ($1, $2);',
                 values: ['Chriss', 'chriss'],
             }
 

@@ -32,7 +32,7 @@ import { ORMModelQuery } from '..'
 
 let usersTable: users.Users
 
-beforeAll(done => {
+beforeAll((done) => {
     usersTable = new users.Users({
         debug: false,
         engine: Engines.PostgreSQL,
@@ -45,7 +45,7 @@ describe('PostgreSQL', () => {
     describe('Delete', () => {
         it('Delete all', () => {
             const expected = {
-                sql: 'DELETE FROM users;',
+                sql: 'DELETE FROM "users";',
                 values: [],
             }
 
@@ -56,7 +56,7 @@ describe('PostgreSQL', () => {
 
         it('Delete with 1 condition', () => {
             const expected = {
-                sql: 'DELETE FROM users WHERE users.id = $1;',
+                sql: 'DELETE FROM "users" WHERE "users"."id" = $1;',
                 values: [1],
             }
 
@@ -67,7 +67,7 @@ describe('PostgreSQL', () => {
 
         it('Delete with 2 conditions', () => {
             const expected = {
-                sql: 'DELETE FROM users WHERE users.username = $1 AND users.id = $2;',
+                sql: 'DELETE FROM "users" WHERE "users"."username" = $1 AND "users"."id" = $2;',
                 values: ['chriss', 3],
             }
 
@@ -78,7 +78,7 @@ describe('PostgreSQL', () => {
 
         it('Delete with 2 conditions and different operator', () => {
             const expected = {
-                sql: 'DELETE FROM users WHERE users.username = $1 AND users.id != $2;',
+                sql: 'DELETE FROM "users" WHERE "users"."username" = $1 AND "users"."id" != $2;',
                 values: ['chriss', 3],
             }
 

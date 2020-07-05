@@ -32,7 +32,7 @@ import { ORMModelQuery } from '..'
 
 let usersTable: users.Users
 
-beforeAll(done => {
+beforeAll((done) => {
     usersTable = new users.Users({
         debug: false,
         engine: Engines.MySQL,
@@ -46,7 +46,7 @@ describe('MYSQL', () => {
         it('Simple with empty where array should fail', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM usersERROR;',
+                    'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users`ERROR;',
                 values: [],
             }
 
@@ -61,7 +61,7 @@ describe('MYSQL', () => {
 
         it('Simple update with empty where object should fail', () => {
             const expected = {
-                sql: 'UPDATE users SET users.username = ?ERROR;',
+                sql: 'UPDATE `users` SET `users`.`username` = ?ERROR;',
                 values: ['chriss'],
             }
 
@@ -79,7 +79,7 @@ describe('MYSQL', () => {
 
         it('Simple delete with empty where object should fail', () => {
             const expected = {
-                sql: 'DELETE FROM usersERROR;',
+                sql: 'DELETE FROM `users`ERROR;',
                 values: [],
             }
 
@@ -91,7 +91,7 @@ describe('MYSQL', () => {
         it('Simple with where string different than "*" should fail', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM usersERROR;',
+                    'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users`ERROR;',
                 values: [],
             }
 
@@ -107,7 +107,7 @@ describe('MYSQL', () => {
         it('Simple with Boolean', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users WHERE users.active = ?;',
+                    'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE `users`.`active` = ?;',
                 values: [1],
             }
 
@@ -123,7 +123,7 @@ describe('MYSQL', () => {
         it('Simple with OR', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users WHERE (users.id = ?) OR (users.username = ?);',
+                    'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE (`users`.`id` = ?) OR (`users`.`username` = ?);',
                 values: [3, 'chriss'],
             }
 
@@ -139,7 +139,7 @@ describe('MYSQL', () => {
         it('Simple with string literal', () => {
             const expected = {
                 sql:
-                    "SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users WHERE (users.id = ?) OR (users.username = 'chriss');",
+                    "SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE (`users`.`id` = ?) OR (`users`.`username` = 'chriss');",
                 values: [3],
             }
 
@@ -155,7 +155,7 @@ describe('MYSQL', () => {
         it('Multiple fields with OR', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users WHERE (users.id = ? AND users.email = ?) OR (users.username = ?);',
+                    'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE (`users`.`id` = ? AND `users`.`email` = ?) OR (`users`.`username` = ?);',
                 values: [3, 'chriss@unicoderns.com', 'chriss'],
             }
 
@@ -171,7 +171,7 @@ describe('MYSQL', () => {
         it('Simple with multiple AND', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users WHERE users.id = ? AND users.username = ? AND users.email = ?;',
+                    'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE `users`.`id` = ? AND `users`.`username` = ? AND `users`.`email` = ?;',
                 values: [3, 'chriss', 'chriss@unicoderns.com'],
             }
 
@@ -187,7 +187,7 @@ describe('MYSQL', () => {
         it('Simple with multiple AND and != operator', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users WHERE users.id != ? AND users.username = ? AND users.email = ?;',
+                    'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE `users`.`id` != ? AND `users`.`username` = ? AND `users`.`email` = ?;',
                 values: [3, 'chriss', 'chriss@unicoderns.com'],
             }
 
@@ -203,7 +203,7 @@ describe('MYSQL', () => {
         it('Simple with multiple OR', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users WHERE (users.id = ?) OR (users.username = ?) OR (users.email = ?);',
+                    'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE (`users`.`id` = ?) OR (`users`.`username` = ?) OR (`users`.`email` = ?);',
                 values: [3, 'chriss', 'chriss@unicoderns.com'],
             }
 
@@ -219,7 +219,7 @@ describe('MYSQL', () => {
         it('Simple with groupBy', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users GROUP BY username, active;',
+                    'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` GROUP BY username, active;',
                 values: [],
             }
 
@@ -235,7 +235,7 @@ describe('MYSQL', () => {
         it('Simple with orderBy', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users ORDER BY id ASC;',
+                    'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` ORDER BY id ASC;',
                 values: [],
             }
 
@@ -251,7 +251,7 @@ describe('MYSQL', () => {
         it('Simple with orderBy and groupBy', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users GROUP BY username, active ORDER BY id ASC;',
+                    'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` GROUP BY username, active ORDER BY id ASC;',
                 values: [],
             }
 
@@ -268,7 +268,7 @@ describe('MYSQL', () => {
         it('Simple with <= operator', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users WHERE (users.id <= ?);',
+                    'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE (`users`.`id` <= ?);',
                 values: [3],
             }
 
@@ -291,7 +291,7 @@ describe('MYSQL', () => {
         it('Simple with string literal', () => {
             const expected = {
                 sql:
-                    "SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users WHERE (users.id = ?) OR (users.username != 'chriss');",
+                    "SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE (`users`.`id` = ?) OR (`users`.`username` != 'chriss');",
                 values: [3],
             }
 
@@ -316,7 +316,7 @@ describe('MYSQL', () => {
         it('Simple with now() function', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users WHERE (users.id = ?) OR (users.created = now());',
+                    'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE (`users`.`id` = ?) OR (`users`.`created` = now());',
                 values: [3],
             }
 
@@ -332,7 +332,7 @@ describe('MYSQL', () => {
         it('Simple with now() function and != operator', () => {
             const expected = {
                 sql:
-                    'SELECT users.id, users.created, users.username, users.email, users.firstName AS first_name, users.lastName AS last_name, users.admin, users.verified, users.active FROM users WHERE (users.id = ?) OR (users.created >= now());',
+                    'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE (`users`.`id` = ?) OR (`users`.`created` >= now());',
                 values: [3],
             }
 
