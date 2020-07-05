@@ -43,6 +43,17 @@ beforeAll((done) => {
 
 describe('DataAPI', () => {
     describe('Insert', () => {
+        it('undefined value should fail', () => {
+            const expected = {
+                sql: 'INSERT INTO "users" ("firstName") VALUES (:firstName);',
+                parameters: [{ name: 'firstName', value: { stringValue: 'ERROR;' } }],
+            }
+
+            usersTable.insert({ firstName: undefined }).then((query: ORMModelQuery) => {
+                expect(query).toEqual(expected)
+            })
+        })
+
         it('1 value', () => {
             const expected = {
                 sql: 'INSERT INTO "users" ("firstName") VALUES (:firstName);',

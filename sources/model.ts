@@ -782,7 +782,7 @@ export class ORMModel {
         const valuesObj: any = []
 
         for (const key in data) {
-            const value = data[key]
+            const value = data[key] || 'ERROR;'
 
             fields.push(key)
             values.push(value)
