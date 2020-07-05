@@ -313,7 +313,7 @@ export class ORMModel {
     /////////////////////////////////////////////////////////////////////
     private validateAndTransform(key: string, value: string | number): {} {
         const joinkeys = key.split('__')
-        // Join is always INT
+        const fields = this.getFields()
 
         if (joinkeys.length == 2) {
             return {
@@ -322,13 +322,13 @@ export class ORMModel {
             }
         }
 
-        if (this.fields[key]) {
-            const type = this.fields[key].type
+        if (fields[key]) {
+            const type = fields[key].type
 
             if (type === ORMSupportedFields.BOOL) {
                 return {
                     name: key,
-                    value: { booleanValue: value ? true : false },
+                    value: { booleanValue: value },
                 }
             } else if (
                 type === ORMSupportedFields.INT ||
@@ -367,7 +367,7 @@ export class ORMModel {
             }
         }
 
-        return { [key]: value }
+        return 'ERROR;'
     }
 
     /////////////////////////////////////////////////////////////////////
@@ -782,7 +782,7 @@ export class ORMModel {
         const valuesObj: any = []
 
         for (const key in data) {
-            const value = data[key] || 'ERROR;'
+            const value = typeof data[key] === 'undefined' ? '' : data[key]
 
             fields.push(key)
             values.push(value)

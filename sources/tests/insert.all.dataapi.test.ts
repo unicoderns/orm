@@ -31,6 +31,7 @@ import { Engines, Drivers } from '../interfaces/config'
 import { ORMModelQuery } from '..'
 
 let usersTable: users.Users
+let usersUnsafeTable: users.Users
 
 beforeAll((done) => {
     usersTable = new users.Users({
@@ -38,18 +39,37 @@ beforeAll((done) => {
         engine: Engines.PostgreSQL,
         driver: Drivers.DataAPI,
     })
+    usersUnsafeTable = new users.Users(
+        {
+            debug: false,
+            engine: Engines.PostgreSQL,
+            driver: Drivers.DataAPI,
+        },
+        'unsafe',
+    )
     done()
 })
 
 describe('DataAPI', () => {
     describe('Insert', () => {
-        it('undefined value should fail', () => {
+        it('undefined value should be escaped', () => {
             const expected = {
                 sql: 'INSERT INTO "users" ("firstName") VALUES (:firstName);',
-                parameters: [{ name: 'firstName', value: { stringValue: 'ERROR;' } }],
+                parameters: [{ name: 'firstName', value: { stringValue: '' } }],
             }
 
             usersTable.insert({ firstName: undefined }).then((query: ORMModelQuery) => {
+                expect(query).toEqual(expected)
+            })
+        })
+
+        it('undefined field should fail', () => {
+            const expected = {
+                sql: 'INSERT INTO "users" ("first_name") VALUES (:first_name);',
+                parameters: ['ERROR;'],
+            }
+
+            usersTable.insert({ first_name: '' }).then((query: ORMModelQuery) => {
                 expect(query).toEqual(expected)
             })
         })
@@ -78,6 +98,38 @@ describe('DataAPI', () => {
                 .insert({
                     firstName: 'Chriss',
                     username: 'chriss',
+                })
+                .then((query: ORMModelQuery) => {
+                    expect(query).toEqual(expected)
+                })
+        })
+
+        it('full unsafe parameters', () => {
+            const expected = {
+                sql:
+                    'INSERT INTO "users" ("username", "email", "password", "firstName", "lastName", "admin", "verified", "active") VALUES (:username, :email, :password, :firstName, :lastName, :admin, :verified, :active);',
+                parameters: [
+                    { name: 'username', value: { stringValue: 'username' } },
+                    { name: 'email', value: { stringValue: 'test@unicoderns.com' } },
+                    { name: 'password', value: { stringValue: 'hash' } },
+                    { name: 'firstName', value: { stringValue: 'Chriss' } },
+                    { name: 'lastName', value: { stringValue: 'Mejia' } },
+                    { name: 'admin', value: { booleanValue: false } },
+                    { name: 'verified', value: { booleanValue: true } },
+                    { name: 'active', value: { booleanValue: true } },
+                ],
+            }
+
+            usersUnsafeTable
+                .insert({
+                    username: 'username',
+                    email: 'test@unicoderns.com',
+                    password: 'hash',
+                    firstName: 'Chriss',
+                    lastName: 'Mejia',
+                    admin: false,
+                    verified: true,
+                    active: true,
                 })
                 .then((query: ORMModelQuery) => {
                     expect(query).toEqual(expected)

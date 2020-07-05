@@ -199,7 +199,7 @@ describe('DataApi', () => {
 
             usersTable
                 .getAll({
-                    where: { active: 1 },
+                    where: { active: true },
                 })
                 .then((query: ORMModelQuery) => {
                     expect(query).toEqual(expected)

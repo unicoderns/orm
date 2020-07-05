@@ -43,6 +43,17 @@ beforeAll((done) => {
 
 describe('PostgreSQL', () => {
     describe('Insert', () => {
+        it('undefined value should be escaped', () => {
+            const expected = {
+                sql: 'INSERT INTO "users" ("first_name") VALUES ($1);',
+                values: [''],
+            }
+
+            usersTable.insert({ first_name: undefined }).then((query: ORMModelQuery) => {
+                expect(query).toEqual(expected)
+            })
+        })
+
         it('1 value', () => {
             const expected = {
                 sql: 'INSERT INTO "users" ("firstName") VALUES ($1);',

@@ -116,12 +116,12 @@ describe('PostgreSQL', () => {
             const expected = {
                 sql:
                     'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" WHERE "users"."active" = $1;',
-                values: [1],
+                values: [true],
             }
 
             usersTable
                 .getAll({
-                    where: { active: 1 },
+                    where: { active: true },
                 })
                 .then((query: ORMModelQuery) => {
                     expect(query).toEqual(expected)
