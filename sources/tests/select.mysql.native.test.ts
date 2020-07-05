@@ -26,6 +26,7 @@
 import 'jasmine'
 
 import * as users from './dummy/usersModel'
+import * as test from './dummy/testModel'
 
 import { Engines, Drivers } from '../interfaces/config'
 import { ORMModelQuery } from '..'
@@ -51,6 +52,26 @@ beforeAll((done) => {
 })
 
 describe('MYSQL', () => {
+    describe('Test fields', () => {
+        it('Simple with full model', () => {
+            const expected = {
+                sql:
+                    'SELECT `test`.`tinyint`, `test`.`smallint`, `test`.`int`, `test`.`id`, `test`.`foreignkey`, `test`.`statickey`, `test`.`float`, `test`.`double`, `test`.`decimal`, `test`.`char`, `test`.`varchar`, `test`.`tinytext`, `test`.`text`, `test`.`longtext`, `test`.`bool`, `test`.`year`, `test`.`date`, `test`.`time`, `test`.`datetime`, `test`.`timestamp` FROM `test`;',
+                values: [],
+            }
+
+            const testTable: test.Test = new test.Test({
+                debug: false,
+                engine: Engines.MySQL,
+                driver: Drivers.Native,
+            })
+
+            testTable.getAll({}).then((query: ORMModelQuery) => {
+                expect(query).toEqual(expected)
+            })
+        })
+    })
+
     describe('Get general', () => {
         it('Simple with plain text', () => {
             const expected = {

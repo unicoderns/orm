@@ -23,44 +23,63 @@
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 import * as usersModel from './usersModel'
+
 import { ORMModel } from '../..'
 import { ORMDatatypes } from '../../datatypes'
-import { ORMTimestampDefault } from '../../enums'
 
 export interface Row {
-    id?: number
-    created?: number
-    username: string
-    email: string
-    password: string
-    salt: string
-    firstName?: string
-    lastName?: string
-    admin?: boolean
-    verified?: boolean
-    active?: boolean
+    tinyint: number
+    smallint: number
+    int: number
+    id: number
+    foreignkey: number
+    statickey: number
+    float: number
+    double: number
+    decimal: number
+    char: string
+    varchar: string
+    tinytext: string
+    text: string
+    longtext: string
+    bool: boolean
+    year: number
+    date: number
+    time: number
+    datetime: number
+    timestamp: number
 }
 
 /**
- * User Model
+ * Test Model
  */
-export class UsersTwo extends ORMModel {
-    protected tableName = 'usersTwo'
+export class Test extends ORMModel {
+    protected tableName = 'test'
 
     public readonly fields = {
+        tinyint: new ORMDatatypes().TINYINT(),
+        smallint: new ORMDatatypes().SMALLINT(),
+        int: new ORMDatatypes().INT(),
         id: new ORMDatatypes().ID(),
-        created: new ORMDatatypes().TIMESTAMP({
-            notNull: true,
-            default: ORMTimestampDefault.CURRENT_TIMESTAMP,
-        }),
-        username: new ORMDatatypes().VARCHAR({
-            size: 45,
-            unique: true,
-        }),
         // ToDo: Specify the localField looks redundant
-        user: new ORMDatatypes().FOREIGNKEY('user', 'id', new usersModel.Users(), {
+        foreignkey: new ORMDatatypes().FOREIGNKEY('user', 'id', new usersModel.Users(), {
             notNull: true,
             unique: true,
         }),
+        statickey: new ORMDatatypes().STATICKEY({}),
+        float: new ORMDatatypes().FLOAT(),
+        double: new ORMDatatypes().DOUBLE(),
+        decimal: new ORMDatatypes().DECIMAL(),
+        char: new ORMDatatypes().CHAR(),
+        varchar: new ORMDatatypes().VARCHAR(),
+        tinytext: new ORMDatatypes().TINYTEXT(),
+        text: new ORMDatatypes().TEXT(),
+        longtext: new ORMDatatypes().LONGTEXT(),
+        bool: new ORMDatatypes().BOOL(),
+        year: new ORMDatatypes().YEAR(),
+        date: new ORMDatatypes().DATE(),
+        time: new ORMDatatypes().TIME(),
+        datetime: new ORMDatatypes().DATETIME(),
+        timestamp: new ORMDatatypes().TIMESTAMP(),
     }
 }
