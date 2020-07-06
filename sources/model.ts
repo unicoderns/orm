@@ -130,8 +130,8 @@ export class ORMModel {
      * @param target Db table name.
      * @return Field map.
      */
-    public getFields = (): ORMAllowedFields => {
-        if (this.unsafe) {
+    public getFields = ({ all }: { all: boolean }): ORMAllowedFields => {
+        if (this.unsafe || all) {
             return { ...this.fields, ...this.secured }
         }
 
@@ -207,7 +207,7 @@ export class ORMModel {
     private getSelectFieldsSQL(fields: string | string[] | undefined, prefix?: boolean): string {
         let fieldsSQL = ''
         let selectableFields: string[] = []
-        const modelFields = this.getFields()
+        const modelFields = this.getFields({ all: false })
         const config: Config = this.config
 
         if (typeof fields === 'string') {
@@ -313,7 +313,7 @@ export class ORMModel {
     /////////////////////////////////////////////////////////////////////
     private validateAndTransform(key: string, value: string | number): {} {
         const joinkeys = key.split('__')
-        const fields = this.getFields()
+        const fields = this.getFields({ all: true })
 
         if (joinkeys.length == 2) {
             return {

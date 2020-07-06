@@ -31,7 +31,6 @@ import { Engines, Drivers } from '../interfaces/config'
 import { ORMModelQuery } from '..'
 
 let usersTable: users.Users
-let usersUnsafeTable: users.Users
 
 beforeAll((done) => {
     usersTable = new users.Users({
@@ -39,14 +38,6 @@ beforeAll((done) => {
         engine: Engines.PostgreSQL,
         driver: Drivers.DataAPI,
     })
-    usersUnsafeTable = new users.Users(
-        {
-            debug: false,
-            engine: Engines.PostgreSQL,
-            driver: Drivers.DataAPI,
-        },
-        'unsafe',
-    )
     done()
 })
 
@@ -120,7 +111,7 @@ describe('DataAPI', () => {
                 ],
             }
 
-            usersUnsafeTable
+            usersTable
                 .insert({
                     username: 'username',
                     email: 'test@unicoderns.com',

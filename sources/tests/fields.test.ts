@@ -53,7 +53,7 @@ beforeAll((done) => {
 
 describe('Fields', () => {
     it('Model to have fields', () => {
-        expect(usersTable.getFields()).not.toBeNull()
+        expect(usersTable.getFields({ all: false })).not.toBeNull()
     })
 
     it('Model returns correct fields', () => {
@@ -85,7 +85,7 @@ describe('Fields', () => {
             active: new ORMDatatypes().BOOL(),
         }
 
-        expect(usersTable.getFields()).toEqual(fields)
+        expect(usersTable.getFields({ all: false })).toEqual(fields)
     })
 
     it('Unsafe Model returns correct fields', () => {
@@ -122,6 +122,43 @@ describe('Fields', () => {
             }),
         }
 
-        expect(usersUnsafeTable.getFields()).toEqual(fields)
+        expect(usersUnsafeTable.getFields({ all: false })).toEqual(fields)
+    })
+
+    it('Safe Model returns all with correct fields', () => {
+        const fields: ORMAllowedFields = {
+            id: new ORMDatatypes().ID(),
+            created: new ORMDatatypes().TIMESTAMP({
+                notNull: true,
+                default: ORMTimestampDefault.CURRENT_TIMESTAMP,
+            }),
+            username: new ORMDatatypes().VARCHAR({
+                size: 45,
+                unique: true,
+            }),
+            email: new ORMDatatypes().VARCHAR({
+                notNull: true,
+                size: 45,
+                unique: true,
+            }),
+            firstName: new ORMDatatypes().VARCHAR({
+                alias: 'first_name',
+                size: 45,
+            }),
+            lastName: new ORMDatatypes().VARCHAR({
+                alias: 'last_name',
+                size: 45,
+            }),
+            admin: new ORMDatatypes().BOOL(),
+            verified: new ORMDatatypes().BOOL(),
+            active: new ORMDatatypes().BOOL(),
+            password: new ORMDatatypes().VARCHAR({
+                notNull: true,
+                protected: true,
+                size: 60,
+            }),
+        }
+
+        expect(usersTable.getFields({ all: true })).toEqual(fields)
     })
 })
