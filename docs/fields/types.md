@@ -2,7 +2,7 @@
 
 Internal field types.
 
-All types inherit from `CommonTypes` and cointain the following properties diretly related with the table:
+All types inherit from `CommonTypes` and cointains the following properties directly related with the table:
 
 ```typescript
 primaryKey?: boolean;
@@ -44,7 +44,7 @@ precision?: number;
 default: Defaults.Binary;
 ```
 
-See defaults for more.
+See [defaults](https://github.com/unicoderns/orm/blob/master/docs/fields/defaults.md) for more.
 
 ### DataTimestampType
 
@@ -52,8 +52,7 @@ See defaults for more.
 default: Defaults.Timestamp;
 ```
 
-See defaults for more.
-
+See [defaults](https://github.com/unicoderns/orm/blob/master/docs/fields/defaults.md) for more.
 
 ### ForeignKey
 
@@ -63,15 +62,15 @@ linkedField: string;
 model: Model;
 ```
 
-#### localField ####
+#### localField
 
 Name of the current field
 
-#### linkedField ####
+#### linkedField
 
 Name of the field linked in the other table
 
-#### model ####
+#### model
 
 Model owner of the linked field
 
