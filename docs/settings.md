@@ -39,7 +39,7 @@ export interface Config {
 
 ### debug
 
-Depends on this value you would get as many information from the debug process as you want. This is an optional parameter | `boolean`
+Depends on this value you would get as many information from the debug process as you want. This parameter would be `boolean: true | false`. This is an optional parameter
 
 ### engine
 

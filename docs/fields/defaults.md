@@ -1,4 +1,4 @@
-# Field Defaults
+# Default Fields
 
 Available default values
 
@@ -7,11 +7,20 @@ Available default values
 ### Timestamp
 
 ```typescript
-export enum Timestamp { "NULL", "ZERO", "CURRENT_TIMESTAMP", "NULL ON UPDATE CURRENT_TIMESTAMP", "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP" };
+export enum Timestamp {
+  'NULL',
+  'ZERO',
+  'CURRENT_TIMESTAMP',
+  'NULL ON UPDATE CURRENT_TIMESTAMP',
+  'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+}
 ```
 
 ### Binary
 
 ```typescript
-export enum Binary { "FALSE", "TRUE" };
+export enum Binary {
+  'FALSE',
+  'TRUE',
+}
 ```
