@@ -29,7 +29,9 @@ This is a typescript light layer package that allows you to manage and do querie
 1. Install the library:
    `npm install -s @unicoderns/orm`
 
-2. Create a connection model as in the following example:
+2. Create a [model](https://github.com/unicoderns/orm/blob/master/docs/models.md).
+
+3. Create a connection as the following example:
 
 ```typescript
 import * as users from './dummy/usersModel';
@@ -43,7 +45,7 @@ usersTable = new users.Users({
 });
 ```
 
-3. Use the available [queries](https://github.com/unicoderns/orm/blob/master/docs/functions.md).
+4. Use the available [queries](https://github.com/unicoderns/orm/blob/master/docs/functions.md).
 
 ## Bugs and Features
 

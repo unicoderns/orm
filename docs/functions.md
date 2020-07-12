@@ -10,7 +10,6 @@ These are the available functions to query
 - [Joins](#joins)
 - [Special Values](#special-values)
 - [Advanced queries](#advanced)
-- [Literal Strings](#literal-strings)
 
 ## Queries Available
 
@@ -553,13 +552,13 @@ DELETE FROM `usersTwo` INNER JOIN `users` ON `usersTwo`.`user` = `users`.`id` WH
 
 `type` Type of Join to apply E.g.: INNER, LEFT.
 
-### Special values
+### 7. Special values
 
 Supported out the box mysql functions as where and set values.
 
 - `now()` Insert a SQL now() function.
 
-### Advanced
+### 8. Advanced
 
 #### Literal strings
 

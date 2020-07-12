@@ -53,6 +53,7 @@ export interface Row {
 }
 
 /**
+ * User´s model example
  * Creates the User Class Model and extends from the
  * ORMModel to inherit all its functions
  */
