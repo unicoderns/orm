@@ -99,7 +99,7 @@ export class Users extends ORMModel {
 
 ### Unsafe mode
 
-[Secret fields](https://github.com/unicoderns/orm/blob/master/docs/fields/index.md#Secret) are protected system wide, they will be returned **ONLY** if the model you query is on _unsafe mode_, this will prevent leak of sensitive information by mistake even if that field is added later on the development process.
+[Secured fields](https://github.com/unicoderns/orm/blob/master/docs/fields/index.md#Secured) are protected system wide, they will be returned **ONLY** if the model you query is on _unsafe mode_, this will prevent leak of sensitive information by mistake even if that field is added later on the development process.
 
 ```typescript
 import * as users from './dummy/usersModel';

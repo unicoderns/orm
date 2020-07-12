@@ -18,7 +18,7 @@ This is a typescript light layer package that allows you to manage and do querie
 1. Install by running the following command:
    `npm install -s @unicoderns/orm`
 
-2. Create a connection model as in the following example:
+2. Create a connection [model](https://github.com/unicoderns/orm/blob/master/docs/models.md) as in the following example.
 
 ```typescript
 import * as users from './dummy/usersModel';

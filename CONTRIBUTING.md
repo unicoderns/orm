@@ -32,7 +32,7 @@ If you want to contributte please follow the instructions below:
 
 `git checkout -b <topic-branch-name>`
 
-4. If you added something you think should be included in project´s doumentation or in readme, please go and add it. This helps the team to keep the project updated.
+4. If you added something you think should be included in project´s documentation or in readme, please go and add it. This helps the team to keep the project updated.
 
 5. Commit your changes. Please add a description for your commit (About 50 characters about what you did on your code). Use Git's [interactive rebase feature](https://help.github.com/en/github/using-git/about-git-rebase) to clean your commits before send a pull request.
 

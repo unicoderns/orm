@@ -1,6 +1,6 @@
 # Fields
 
-In unicoderns, fields are define as interfaces sometimes extending from other interfaces.
+In Unicoderns ORM, fields are define as interfaces sometimes extending from other interfaces.
 
 ```typescript
 export interface ORMVarCharField extends ORMCommonFields {
@@ -45,9 +45,9 @@ export enum ORMSupportedFields {
 }
 ```
 
-### Secret
+### Secured
 
-Secret field, will be returned **ONLY** if the model you query is on unsafe mode, this will prevent leak of sensitive information by mistake even if that field is added later on the development process.
+Secured field, will be returned **ONLY** if the model you query is on unsafe mode, this will prevent leak of sensitive information by mistake even if that field is added later on the development process.
 
 ## Property
 

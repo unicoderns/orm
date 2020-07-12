@@ -43,7 +43,7 @@ usersTable = new users.Users({
 });
 ```
 
-3. Use the available queries.
+3. Use the available [queries](https://github.com/unicoderns/orm/blob/master/docs/functions.md).
 
 ## Bugs and Features
 

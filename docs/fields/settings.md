@@ -174,7 +174,7 @@ type: "BOOL",
 default: settings.default || 0
 ```
 
-See Defaults for details
+See [defaults](https://github.com/unicoderns/orm/blob/master/docs/fields/defaults.md) for details
 
 ## Dates
 
@@ -229,4 +229,4 @@ type: "TIMESTAMP",
 default: settings.default || Defaults.Timestamp["CURRENT_TIMESTAMP"]
 ```
 
-See Defaults for details
+See [defaults](https://github.com/unicoderns/orm/blob/master/docs/fields/defaults.md) for details

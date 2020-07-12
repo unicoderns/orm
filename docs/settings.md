@@ -20,10 +20,9 @@ You should create the model you need, in the example above we created the model 
 
 Then, once you instance the model you should pass the required parameters to create the connection:
 
-`debug: boolean`
-`engine: Engines | .MySQL | .PostgreSQL`
-`driver: Drivers | .Native | DataAPI`
-`engine`
+`debug: [true | false]`
+`engine: [.MySQL | .PostgreSQL]`
+`driver: [.Native | .DataAPI]`
 `settings`
 `connection`
 
@@ -39,19 +38,19 @@ export interface Config {
 
 ### debug
 
-Depends on this value you would get as many information from the debug process as you want. This parameter would be `boolean: true | false`. This is an optional parameter
+Depends on this value you would get as many information from the debug process as you want. This parameter would be `[true | false]`. This is an optional parameter
 
 ### engine
 
-The engines would be `MySQL | PostgreSQL`. This is optional parameter.
+The engines would be `[MySQL | PostgreSQL]`. This is optional parameter.
 
 ### driver
 
-The drivers would be `Native | DataAPI`. This is optional parameter.
+The drivers would be `[Native | DataAPI]`. This is optional parameter.
 
 ### settings
 
-By now, our `settings` parameter allows you to get a `consistentReturn`. This parameter is optional.
+By now, our `settings` parameter allows you to get a `consistentReturn`. This parameter is optional and works currently only for DataAPI.
 
 ```typescript
 export interface Settings {
