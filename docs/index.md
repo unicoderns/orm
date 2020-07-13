@@ -1,7 +1,5 @@
 # Unicoderns ORM
 
-[![](https://unicoderns.com/img/logoorm.e1a28eb9.svg)](https://unicoderns.com/en/orm/)
-
 ### Unicoderns Object/Relational Mapping
 
 [![npm version](https://badge.fury.io/js/%40unicoderns%2Form.svg)](https://badge.fury.io/js/%40unicoderns%2Form)[![Travis](https://travis-ci.org/unicoderns/ORM.svg?branch=master)](https://travis-ci.org/unicoderns/ORM)
@@ -15,23 +13,14 @@ Docs available at [unicoderns.com](http://unicoderns.com/docs/ORM/) `Work in pro
 
 This is a typescript light layer package that allows you to manage and do queries to the DB in an easier way, even without SQL knowledge.
 
-## Table of Contents
+## First Steps
 
-- [Quick Start](#quick-start)
-- [Bugs and features](#bugs-and-features)
-- [Do you want to contribute?](#do-you-want-to-contribute)
-- [Creators](#creators)
-- [Community](#community)
-- [Copyright and license](#copyright-and-license)
-
-## Quick Start
-
-1. Install the library:
+1. Install by running the following command:
    `npm install -s @unicoderns/orm`
 
 2. Create a [model](https://github.com/unicoderns/orm/blob/master/docs/models.md).
 
-3. Create a connection as the following example:
+3. Create a connection as in the following example:
 
 ```typescript
 import * as users from './dummy/usersModel';
@@ -45,20 +34,14 @@ usersTable = new users.Users({
 });
 ```
 
-4. Use the available [queries](https://github.com/unicoderns/orm/blob/master/docs/functions.md).
+4. Once you have the connection model you can start quering, as in the following example:
 
-## Bugs and Features
-
-Do you have a bug or a feature request? Please first check if the issue you found hasn´t been solved yet [here](https://github.com/unicoderns/orm/issues). If you want to open a bug or request a new feature, please refer to our [contributing guidelines](https://github.com/unicoderns/orm/blob/master/CONTRIBUTING.md) and open your request [here](https://github.com/unicoderns/orm/issues).
-
-## Do you want to contribute?
-
-If you want to be part of this amazing project, please read through our [contributing guidelines](https://github.com/unicoderns/orm/blob/master/CONTRIBUTING.md) to know the process you should follow. The community will be glad to receive your contribution.
-
-## Community
-
-Stay in touch with all members of the community and get updates about ORM's development. Follow us [on twitter](https://twitter.com/unicoderns).
-
-## Copyright and license
-
-Code and documentation Copyright 2018–2020 to Contributors and Unicoderns S.A. Code released under the MIT License.
+```typescript
+usersTable
+  .getAll({
+    fields: [],
+  })
+  .then((query: ORMModelQuery) => {
+    expect(query).toEqual(expected);
+  });
+```
