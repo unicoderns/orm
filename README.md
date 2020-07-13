@@ -49,7 +49,7 @@ usersTable = new users.Users({
 
 ## Bugs and Features
 
-Do you have a bug or a feature request? Please first check if the issue you found hasn´t been solved yet [here](https://github.com/unicoderns/orm/issues). If you want to open a bug or request a new feature, please refer to our [contributing guidelines](https://github.com/isaZuGo/orm/blob/update-documentation/CONTRIBUTING.md) and open your request [here](https://github.com/unicoderns/orm/issues).
+Do you have a bug or a feature request? Please first check if the issue you found hasn´t been solved yet [here](https://github.com/unicoderns/orm/issues). If you want to open a bug or request a new feature, please refer to our [contributing guidelines](https://github.com/unicoderns/orm/blob/master/CONTRIBUTING.md) and open your request [here](https://github.com/unicoderns/orm/issues).
 
 ## Do you want to contribute?
 

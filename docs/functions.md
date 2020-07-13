@@ -554,7 +554,7 @@ DELETE FROM `usersTwo` INNER JOIN `users` ON `usersTwo`.`user` = `users`.`id` WH
 
 ### 7. Special values
 
-Supported out the box mysql functions as where and set values.
+Supported out the box SQL functions as where and set values.
 
 - `now()` Insert a SQL now() function.
 
