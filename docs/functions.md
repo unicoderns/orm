@@ -13,7 +13,7 @@ These are the available functions to query
 
 ## Queries Available
 
-### 1. Select
+### Select
 
 #### Get
 
@@ -23,11 +23,11 @@ When you use this funtion you will get 1 matching row
 usersTable
   .get({})
   .then((data: any) => {
-    console.log(data);
+    console.log(data)
   })
   .catch((err: any) => {
-    console.error(err);
-  });
+    console.error(err)
+  })
 ```
 
 Query executed:
@@ -48,11 +48,11 @@ Query executed:
 usersTable
   .get({ fields: ['created', 'email'] })
   .then((data: any) => {
-    console.log(data);
+    console.log(data)
   })
   .catch((err: any) => {
-    console.error(err);
-  });
+    console.error(err)
+  })
 ```
 
 `where`
@@ -69,8 +69,8 @@ usersTable
     where: { id: 3 },
   })
   .then((query: ORMModelQuery) => {
-    expect(query).toEqual(expected);
-  });
+    expect(query).toEqual(expected)
+  })
 ```
 
 `orderBy` String with column names and direction E.g.: "id, name ASC"
@@ -87,11 +87,11 @@ usersTable
     limit: 3,
   })
   .then((data: any) => {
-    console.log(data);
+    console.log(data)
   })
   .catch((err: any) => {
-    console.error(err);
-  });
+    console.error(err)
+  })
 ```
 
 Query executed:
@@ -115,8 +115,8 @@ usersTable
     limit: 3,
   })
   .then((query: ORMModelQuery) => {
-    expect(query).toEqual(expected);
-  });
+    expect(query).toEqual(expected)
+  })
 ```
 
 `where`
@@ -136,8 +136,8 @@ usersTable
     limit: 3,
   })
   .then((query: ORMModelQuery) => {
-    expect(query).toEqual(expected);
-  });
+    expect(query).toEqual(expected)
+  })
 ```
 
 `orderBy` String with column names and direction E.g.: "id, name ASC"
@@ -158,11 +158,11 @@ usersTable
     },
   })
   .then((data: any) => {
-    console.log(data);
+    console.log(data)
   })
   .catch((err: any) => {
-    console.error(err);
-  });
+    console.error(err)
+  })
 ```
 
 Query executed:
@@ -185,8 +185,8 @@ usersTable
     fields: ['created', 'email'],
   })
   .then((query: ORMModelQuery) => {
-    expect(query).toEqual(expected);
-  });
+    expect(query).toEqual(expected)
+  })
 ```
 
 `where`
@@ -205,15 +205,15 @@ usersTable
     },
   })
   .then((query: ORMModelQuery) => {
-    expect(query).toEqual(expected);
-  });
+    expect(query).toEqual(expected)
+  })
 ```
 
 `orderBy` String with column names and direction E.g.: "id, name ASC"
 
 `groupBy` String with column names E.g.: "id, name"
 
-### 2. Insert
+### Insert
 
 This function will let you insert information into the database
 
@@ -223,11 +223,11 @@ usersTable
     firstName: 'Chriss',
   })
   .then((data: any) => {
-    console.log(data);
+    console.log(data)
   })
   .catch((err: any) => {
-    console.error(err);
-  });
+    console.error(err)
+  })
 ```
 
 Query executed:
@@ -240,7 +240,7 @@ Query executed:
 
 Expecting object to be inserted into the table
 
-### 3. Update
+### Update
 
 ```typescript
 usersTable
@@ -251,11 +251,11 @@ usersTable
     where: { id: 3 },
   })
   .then((data: any) => {
-    console.log(data);
+    console.log(data)
   })
   .catch((err: any) => {
-    console.error(err);
-  });
+    console.error(err)
+  })
 ```
 
 Query executed:
@@ -276,7 +276,7 @@ Query executed:
 - Array of [Key/Operator/Value](#operators) objects will generate a multiple filters separated by an "OR".
 - Mixed Array of Key/Value and Key/Operator/Value objects will generate a multiple filters separated by an "OR".
 
-### 4. Delete
+### Delete
 
 This function will let you delete information from the database
 
@@ -286,11 +286,11 @@ usersTable
     id: 1,
   })
   .then((data: any) => {
-    console.log(data);
+    console.log(data)
   })
   .catch((err: any) => {
-    console.error(err);
-  });
+    console.error(err)
+  })
 ```
 
 Query executed:
@@ -315,8 +315,8 @@ Expecting:
 usersTable
   .delete({ username: 'chriss', id: 3 })
   .then((query: ORMModelQuery) => {
-    expect(query).toEqual(expected);
-  });
+    expect(query).toEqual(expected)
+  })
 ```
 
 ```typescript
@@ -329,11 +329,11 @@ usersTable
     },
   })
   .then((query: ORMModelQuery) => {
-    expect(query).toEqual(expected);
-  });
+    expect(query).toEqual(expected)
+  })
 ```
 
-### 5. Operators
+### Operators
 
 You can change your where condition operator from the default `=` to any operator that you want, as `!=` or `<` following this format:
 
@@ -352,11 +352,11 @@ usersTable
     ],
   })
   .then((data: any) => {
-    console.log(data);
+    console.log(data)
   })
   .catch((err: any) => {
-    console.error(err);
-  });
+    console.error(err)
+  })
 ```
 
 Query executed:
@@ -365,7 +365,7 @@ Query executed:
 'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE (`users`.`id` = ?) OR (`users`.`created` >= now());'
 ```
 
-### 6. Join
+### Join
 
 Please notice:
 
@@ -389,11 +389,11 @@ sessionsTable
     },
   })
   .then((data: any) => {
-    console.log(data);
+    console.log(data)
   })
   .catch((err: any) => {
-    console.error(err);
-  });
+    console.error(err)
+  })
 ```
 
 Query executed:
@@ -429,11 +429,11 @@ sessionsTable
     },
   })
   .then((data: any) => {
-    console.log(data);
+    console.log(data)
   })
   .catch((err: any) => {
-    console.error(err);
-  });
+    console.error(err)
+  })
 ```
 
 Query executed:
@@ -466,11 +466,11 @@ sessionsTable
     where: '*',
   })
   .then((data: any) => {
-    console.log(data);
+    console.log(data)
   })
   .catch((err: any) => {
-    console.error(err);
-  });
+    console.error(err)
+  })
 ```
 
 Query executed:
@@ -499,11 +499,11 @@ sessionsTable
     users__id: 3,
   })
   .then((data: any) => {
-    console.log(data);
+    console.log(data)
   })
   .catch((err: any) => {
-    console.error(err);
-  });
+    console.error(err)
+  })
 ```
 
 Query executed:
@@ -533,11 +533,11 @@ sessionsTable
     username: 'users__username',
   })
   .then((data: any) => {
-    console.log(data);
+    console.log(data)
   })
   .catch((err: any) => {
-    console.error(err);
-  });
+    console.error(err)
+  })
 ```
 
 Query executed:
@@ -558,7 +558,7 @@ Supported out the box SQL functions as where and set values.
 
 - `now()` Insert a SQL now() function.
 
-### 8. Advanced
+### Advanced
 
 #### Literal strings
 
@@ -570,11 +570,11 @@ sessionsTable
     where: [{ id: 3 }, { username: "\\'chriss'" }],
   })
   .then((data: any) => {
-    console.log(data);
+    console.log(data)
   })
   .catch((err: any) => {
-    console.error(err);
-  });
+    console.error(err)
+  })
 ```
 
 Query _prepared_:
