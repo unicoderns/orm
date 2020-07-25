@@ -10,17 +10,17 @@ Used by typescript to know what parameters and types expect from a row object, [
 
 ```typescript
 export interface Row {
-  id?: number;
-  created?: number;
-  username: string;
-  email: string;
-  password: string;
-  salt: string;
-  firstName?: string;
-  lastName?: string;
-  admin?: boolean;
-  verified?: boolean;
-  active?: boolean;
+  id?: number
+  created?: number
+  username: string
+  email: string
+  password: string
+  salt: string
+  firstName?: string
+  lastName?: string
+  admin?: boolean
+  verified?: boolean
+  active?: boolean
 }
 ```
 
@@ -32,24 +32,24 @@ Inherits [functions](https://github.com/unicoderns/orm/blob/master/docs/function
 ### Examples
 
 ```typescript
-import { ORMModel } from '../..';
-import { ORMDatatypes } from '../../datatypes';
-import { ORMTimestampDefault } from '../../enums';
+import { ORMModel } from '../..'
+import { ORMDatatypes } from '../../datatypes'
+import { ORMTimestampDefault } from '../../enums'
 
 // Set the types for each field
 
 export interface Row {
-  id?: number;
-  created?: number;
-  username: string;
-  email: string;
-  password: string;
-  salt: string;
-  firstName?: string;
-  lastName?: string;
-  admin?: boolean;
-  verified?: boolean;
-  active?: boolean;
+  id?: number
+  created?: number
+  username: string
+  email: string
+  password: string
+  salt: string
+  firstName?: string
+  lastName?: string
+  admin?: boolean
+  verified?: boolean
+  active?: boolean
 }
 
 /**
@@ -58,7 +58,7 @@ export interface Row {
  * ORMModel to inherit all its functions
  */
 export class Users extends ORMModel {
-  protected tableName = 'users';
+  protected tableName = 'users'
 
   public readonly fields = {
     id: new ORMDatatypes().ID(),
@@ -86,7 +86,7 @@ export class Users extends ORMModel {
     admin: new ORMDatatypes().BOOL(),
     verified: new ORMDatatypes().BOOL(),
     active: new ORMDatatypes().BOOL(),
-  };
+  }
 
   public readonly secured = {
     password: new ORMDatatypes().VARCHAR({
@@ -94,7 +94,7 @@ export class Users extends ORMModel {
       protected: true,
       size: 60,
     }),
-  };
+  }
 }
 ```
 
@@ -103,12 +103,12 @@ export class Users extends ORMModel {
 [Secured fields](https://github.com/unicoderns/orm/blob/master/docs/fields/index.md#Secured) are protected system wide, they will be returned **ONLY** if the model you query is on _unsafe mode_, this will prevent leak of sensitive information by mistake even if that field is added later on the development process.
 
 ```typescript
-import * as users from './dummy/usersModel';
+import * as users from './dummy/usersModel'
 
-import { Engines, Drivers } from '../interfaces/config';
-import { ORMModelQuery } from '..';
+import { Engines, Drivers } from '../interfaces/config'
+import { ORMModelQuery } from '..'
 
-let usersUnsafeTable: users.Users;
+let usersUnsafeTable: users.Users
 
 usersUnsafeTable = new users.Users(
   {
@@ -117,13 +117,16 @@ usersUnsafeTable = new users.Users(
     driver: Drivers.DataAPI,
   },
   'unsafe'
-);
+)
 
 usersUnsafeTable
   .getAll({
     fields: [],
   })
-  .then((query: ORMModelQuery) => {
-    expect(query).toEqual(expected);
-  });
+  .then((data: any) => {
+    console.log(data)
+  })
+  .catch((err: any) => {
+    console.error(err)
+  })
 ```

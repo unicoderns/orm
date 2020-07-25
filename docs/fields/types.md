@@ -5,23 +5,23 @@ Internal field types.
 All types inherit from `CommonTypes` and cointains the following properties directly related with the table:
 
 ```typescript
-primaryKey?: boolean;
-notNull?: boolean;
-unique?: boolean;
-unsigned?: boolean;
-zeroFill?: boolean;
-autoincrement?: boolean;
-generated?: boolean;
-size?: number;
+primaryKey?: boolean
+notNull?: boolean
+unique?: boolean
+unsigned?: boolean
+zeroFill?: boolean
+autoincrement?: boolean
+generated?: boolean
+size?: number
 ```
 
 Also includes system specific properties:
 
 ```typescript
-type?: string;
-alias?: string;
-protected?: boolean;
-private?: boolean;
+type?: string
+alias?: string
+protected?: boolean
+private?: boolean
 ```
 
 ## List
@@ -29,19 +29,19 @@ private?: boolean;
 ### VarCharType
 
 ```typescript
-size: number;
+size: number
 ```
 
 ### FloatType
 
 ```typescript
-precision?: number;
+precision?: number
 ```
 
 ### BoolType
 
 ```typescript
-default: Defaults.Binary;
+default: Defaults.Binary
 ```
 
 See [defaults](https://github.com/unicoderns/orm/blob/master/docs/fields/defaults.md) for more.
@@ -49,7 +49,7 @@ See [defaults](https://github.com/unicoderns/orm/blob/master/docs/fields/default
 ### DataTimestampType
 
 ```typescript
-default: Defaults.Timestamp;
+default: Defaults.Timestamp
 ```
 
 See [defaults](https://github.com/unicoderns/orm/blob/master/docs/fields/defaults.md) for more.
@@ -57,9 +57,9 @@ See [defaults](https://github.com/unicoderns/orm/blob/master/docs/fields/default
 ### ForeignKey
 
 ```typescript
-localField: string;
-linkedField: string;
-model: Model;
+localField: string
+linkedField: string
+model: Model
 ```
 
 #### localField
@@ -77,5 +77,5 @@ Model owner of the linked field
 ### StaticKey
 
 ```typescript
-keys: any;
+keys: any
 ```

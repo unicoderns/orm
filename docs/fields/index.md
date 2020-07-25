@@ -9,6 +9,7 @@ export interface ORMVarCharField extends ORMCommonFields {
 
 export interface ORMFloatField extends ORMCommonFields {
     precision?: number
+}
 ```
 
 ### Field

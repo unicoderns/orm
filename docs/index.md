@@ -23,15 +23,15 @@ This is a typescript light layer package that allows you to manage and do querie
 3. Create a connection as in the following example:
 
 ```typescript
-import * as users from './dummy/usersModel';
-import { Engines, Drivers } from '@unicoderns/orm';
+import * as users from './dummy/usersModel'
+import { Engines, Drivers } from '@unicoderns/orm'
 
-let usersTable: users.Users;
+let usersTable: users.Users
 usersTable = new users.Users({
   debug: false,
   engine: Engines.MySQL,
   driver: Drivers.Native,
-});
+})
 ```
 
 4. Once you have the connection model you can start quering, as in the following example:
@@ -41,7 +41,10 @@ usersTable
   .getAll({
     fields: [],
   })
-  .then((query: ORMModelQuery) => {
-    expect(query).toEqual(expected);
-  });
+  .then((data: any) => {
+    console.log(data)
+  })
+  .catch((err: any) => {
+    console.error(err)
+  })
 ```
