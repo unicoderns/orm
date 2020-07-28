@@ -11,7 +11,7 @@ Return [Fields.CommonTypes](https://github.com/unicoderns/orm/blob/master/docs/f
 #### Custom settings
 
 ```typescript
-type: 'TINYINT';
+type: 'TINYINT'
 ```
 
 ### SMALLINT
@@ -21,7 +21,7 @@ Return [Fields.CommonTypes](https://github.com/unicoderns/orm/blob/master/docs/f
 #### Custom settings
 
 ```typescript
-type: 'SMALLINT';
+type: 'SMALLINT'
 ```
 
 ### INT
@@ -31,7 +31,7 @@ Return [Fields.CommonTypes](https://github.com/unicoderns/orm/blob/master/docs/f
 #### Custom settings
 
 ```typescript
-type: 'INT';
+type: 'INT'
 ```
 
 ### ID
@@ -41,12 +41,12 @@ Return [Fields.CommonTypes](https://github.com/unicoderns/orm/blob/master/docs/f
 #### Custom settings
 
 ```typescript
-type: "INT",
-size: settings.size || 0,
-primaryKey: true,
-notNull: true,
-unique: true,
-unsigned: true,
+type: "INT"
+size: settings.size || 0
+primaryKey: true
+notNull: true
+unique: true
+unsigned: true
 autoincrement: true
 ```
 
@@ -57,10 +57,10 @@ Return [Fields.ForeignKey](https://github.com/unicoderns/orm/blob/master/docs/fi
 #### Custom settings
 
 ```typescript
-type: "INT",
-size: settings.size || 0,
-model: model,
-localField: localField,
+type: "INT"
+size: settings.size || 0
+model: model
+localField: localField
 linkedField: linkedField
 ```
 
@@ -71,8 +71,8 @@ Return [Fields.StaticKey](https://github.com/unicoderns/orm/blob/master/docs/fie
 #### Custom settings
 
 ```typescript
-type: "INT",
-size: settings.size || 0,
+type: "INT"
+size: settings.size || 0
 keys: keys
 ```
 
@@ -83,7 +83,7 @@ Return [Fields.FloatType](https://github.com/unicoderns/orm/blob/master/docs/fie
 #### Custom settings
 
 ```typescript
-type: 'FLOAT';
+type: 'FLOAT'
 ```
 
 ### DOUBLE
@@ -93,7 +93,7 @@ Return [Fields.FloatType](https://github.com/unicoderns/orm/blob/master/docs/fie
 #### Custom settings
 
 ```typescript
-type: 'DOUBLE';
+type: 'DOUBLE'
 ```
 
 ### DECIMAL
@@ -103,7 +103,7 @@ Return [Fields.FloatType](https://github.com/unicoderns/orm/blob/master/docs/fie
 #### Custom settings
 
 ```typescript
-type: 'DECIMAL';
+type: 'DECIMAL'
 ```
 
 ## Strings
@@ -115,7 +115,7 @@ Return [Fields.VarCharType](https://github.com/unicoderns/orm/blob/master/docs/f
 #### Custom settings
 
 ```typescript
-type: "CHAR",
+type: "CHAR"
 size: settings.size || 0
 ```
 
@@ -126,7 +126,7 @@ Return [Fields.VarCharType](https://github.com/unicoderns/orm/blob/master/docs/f
 #### Custom settings
 
 ```typescript
-type: "VARCHAR",
+type: "VARCHAR"
 size: settings.size || 0
 ```
 
@@ -137,7 +137,7 @@ Return [Fields.VarCharType](https://github.com/unicoderns/orm/blob/master/docs/f
 #### Custom settings
 
 ```typescript
-type: "TINYTEXT",
+type: "TINYTEXT"
 size: settings.size || 0
 ```
 
@@ -148,7 +148,7 @@ Return [Fields.CommonTypes](https://github.com/unicoderns/orm/blob/master/docs/f
 #### Custom settings
 
 ```typescript
-type: 'TEXT';
+type: 'TEXT'
 ```
 
 ### LONGTEXT
@@ -158,7 +158,7 @@ Return [Fields.CommonTypes](https://github.com/unicoderns/orm/blob/master/docs/f
 #### Custom settings
 
 ```typescript
-type: 'LONGTEXT';
+type: 'LONGTEXT'
 ```
 
 ## Binary
@@ -170,7 +170,7 @@ Return [Fields.BoolType](https://github.com/unicoderns/orm/blob/master/docs/fiel
 #### Custom settings
 
 ```typescript
-type: "BOOL",
+type: "BOOL"
 default: settings.default || 0
 ```
 
@@ -185,7 +185,7 @@ Return [Fields.DataTimestampType](https://github.com/unicoderns/orm/blob/master/
 #### Custom settings
 
 ```typescript
-type: 'YEAR';
+type: 'YEAR'
 ```
 
 ### DATE
@@ -195,7 +195,7 @@ Return [Fields.DataTimestampType](https://github.com/unicoderns/orm/blob/master/
 #### Custom settings
 
 ```typescript
-type: 'DATE';
+type: 'DATE'
 ```
 
 ### TIME
@@ -205,7 +205,7 @@ Return [Fields.DataTimestampType](https://github.com/unicoderns/orm/blob/master/
 #### Custom settings
 
 ```typescript
-type: 'TIME';
+type: 'TIME'
 ```
 
 ### DATETIME
@@ -215,7 +215,7 @@ Return [Fields.DataTimestampType](https://github.com/unicoderns/orm/blob/master/
 #### Custom settings
 
 ```typescript
-type: 'DATETIME';
+type: 'DATETIME'
 ```
 
 ### TIMESTAMP
@@ -225,7 +225,7 @@ Return [Fields.DataTimestampType](https://github.com/unicoderns/orm/blob/master/
 #### Custom settings
 
 ```typescript
-type: "TIMESTAMP",
+type: "TIMESTAMP"
 default: settings.default || Defaults.Timestamp["CURRENT_TIMESTAMP"]
 ```
 

@@ -33,7 +33,7 @@ usersTable
 Query executed:
 
 ```sql
-'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`first_name`, `users`.`last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` LIMIT 1;'
+SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`first_name`, `users`.`last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` LIMIT 1;
 ```
 
 ##### Params
@@ -68,8 +68,11 @@ usersTable
     fields: ['created', 'email'],
     where: { id: 3 },
   })
-  .then((query: ORMModelQuery) => {
-    expect(query).toEqual(expected)
+  .then((data: any) => {
+    console.log(data)
+  })
+  .catch((err: any) => {
+    console.error(err)
   })
 ```
 
@@ -97,7 +100,7 @@ usersTable
 Query executed:
 
 ```sql
-'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`first_name`, `users`.`last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` LIMIT 3;'
+SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`first_name`, `users`.`last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` LIMIT 3;
 ```
 
 ##### Params
@@ -114,8 +117,11 @@ usersTable
     fields: ['created', 'email'],
     limit: 3,
   })
-  .then((query: ORMModelQuery) => {
-    expect(query).toEqual(expected)
+  .then((data: any) => {
+    console.log(data)
+  })
+  .catch((err: any) => {
+    console.error(err)
   })
 ```
 
@@ -135,8 +141,11 @@ usersTable
     },
     limit: 3,
   })
-  .then((query: ORMModelQuery) => {
-    expect(query).toEqual(expected)
+  .then((data: any) => {
+    console.log(data)
+  })
+  .catch((err: any) => {
+    console.error(err)
   })
 ```
 
@@ -168,7 +177,7 @@ usersTable
 Query executed:
 
 ```sql
-'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`first_name`, `users`.`last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE `users`.`id` = 3;'
+SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`first_name`, `users`.`last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE `users`.`id` = 3;
 ```
 
 #### Params
@@ -184,8 +193,11 @@ usersTable
   .getAll({
     fields: ['created', 'email'],
   })
-  .then((query: ORMModelQuery) => {
-    expect(query).toEqual(expected)
+  .then((data: any) => {
+    console.log(data)
+  })
+  .catch((err: any) => {
+    console.error(err)
   })
 ```
 
@@ -204,8 +216,11 @@ usersTable
       id: 3,
     },
   })
-  .then((query: ORMModelQuery) => {
-    expect(query).toEqual(expected)
+  .then((data: any) => {
+    console.log(data)
+  })
+  .catch((err: any) => {
+    console.error(err)
   })
 ```
 
@@ -233,7 +248,7 @@ usersTable
 Query executed:
 
 ```sql
-'INSERT INTO `users` (`firstName`) VALUES (?);'
+INSERT INTO `users` (`firstName`) VALUES (?);
 ```
 
 #### Params
@@ -261,7 +276,7 @@ usersTable
 Query executed:
 
 ```sql
-'UPDATE `users` SET `firstName` = "Chriss" WHERE `users`.`id` = 3;'
+UPDATE `users` SET `firstName` = 'Chriss' WHERE `users`.`id` = 3;
 ```
 
 #### Params
@@ -296,7 +311,7 @@ usersTable
 Query executed:
 
 ```sql
-'DELETE FROM `users` WHERE `users`.`id` = 1;'
+DELETE FROM `users` WHERE `users`.`id` = 1;
 ```
 
 #### Params
@@ -314,8 +329,11 @@ Expecting:
 ```typescript
 usersTable
   .delete({ username: 'chriss', id: 3 })
-  .then((query: ORMModelQuery) => {
-    expect(query).toEqual(expected)
+  .then((data: any) => {
+    console.log(data)
+  })
+  .catch((err: any) => {
+    console.error(err)
   })
 ```
 
@@ -328,8 +346,11 @@ usersTable
       value: 3,
     },
   })
-  .then((query: ORMModelQuery) => {
-    expect(query).toEqual(expected)
+  .then((data: any) => {
+    console.log(data)
+  })
+  .catch((err: any) => {
+    console.error(err)
   })
 ```
 
@@ -362,7 +383,7 @@ usersTable
 Query executed:
 
 ```sql
-'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE (`users`.`id` = ?) OR (`users`.`created` >= now());'
+SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE (`users`.`id` = ?) OR (`users`.`created` >= now());
 ```
 
 ### Join
@@ -439,7 +460,7 @@ sessionsTable
 Query executed:
 
 ```sql
-UPDATE `sessions` INNER JOIN `users` ON `sessions`.`user` = `users`.`id` SET `ip` = "121.0.0.1" WHERE `users`.`id` = 3;
+UPDATE `sessions` INNER JOIN `users` ON `sessions`.`user` = `users`.`id` SET `ip` = '121.0.0.1' WHERE `users`.`id` = 3;
 ```
 
 ##### Params
