@@ -25,13 +25,12 @@
 import chalk from 'chalk'
 
 import { ORMAllowedFields } from '../enums'
-import { ORMModel, Config } from '..'
+import { Config } from '../interfaces/config'
 
 /**
  * Model Abstract
  */
 export class FieldsUtils {
-    protected model: ORMModel
     private regularQuotes = '"'
 
     /**
@@ -40,9 +39,8 @@ export class FieldsUtils {
      * @param model ORMModel
      * @param config Config
      */
-    constructor(model: ORMModel, config?: Config) {
-        this.model = model
-        this.regularQuotes = config && config.computed ? config.computed.regularQuotes : '"'
+    constructor(config: Config) {
+        this.regularQuotes = config.computed ? config.computed.regularQuotes : '"'
     }
 
     /**

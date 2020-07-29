@@ -23,18 +23,19 @@
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 import { FieldsUtils } from './fields'
+import { ValidatorUtils } from './validator'
+import { SqlPartialGeneratorUtils } from './sqlPartialGenerator'
 import { ORMModel } from '../model'
 import {
     Engines,
     Config,
-    ORMModelJoin,
     Drivers,
     ORMModelSelectLimit,
     ORMModelRow,
     ORMModelUpdate,
     ORMModelKeyValue,
 } from '../interfaces'
-import { ORMSupportedFields } from '../enums/db/fields'
+import { ParamCursor } from './paramCursor'
 
 /**
  * Model Abstract
@@ -42,11 +43,13 @@ import { ORMSupportedFields } from '../enums/db/fields'
 export class SqlGeneratorUtils {
     private model: ORMModel
     public config: Config = {} // ToDo: move all config to file
+    private paramCursor: ParamCursor = new ParamCursor()
     private fieldsUtils: FieldsUtils
+    private validatorUtils: ValidatorUtils
+    private partialGeneratorUtils: SqlPartialGeneratorUtils
     private readonly specialFunctions = ['now()']
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private emptyValues: any = []
-    private currentParamPosition = 0
     private regularQuotes = '"'
 
     /**
@@ -59,14 +62,10 @@ export class SqlGeneratorUtils {
         this.model = model
         this.config = config || {}
         this.regularQuotes = this.config.computed ? this.config.computed.regularQuotes : '"'
-        this.fieldsUtils = new FieldsUtils(this.model, config)
-    }
-
-    /**
-     * Restore shared params to original state
-     */
-    private restore(): void {
-        this.currentParamPosition = 0
+        this.fieldsUtils = new FieldsUtils(config)
+        this.fieldsUtils = new FieldsUtils(config)
+        this.validatorUtils = new ValidatorUtils(config)
+        this.partialGeneratorUtils = new SqlPartialGeneratorUtils(this.model, config, this.paramCursor)
     }
 
     /**
@@ -126,306 +125,6 @@ export class SqlGeneratorUtils {
     }
 
     /**
-     * Generates a select string from the Join configuration
-     *
-     * @var fields String array with field names.
-     * @return Object cointaining the SQL and a field report
-     */
-    private getJoinSelectFieldsSQL(): string {
-        const joins = this.model.joins
-        const joinsStringArray: string[] = []
-        let joinsSQL = ''
-        const config = this.model.config
-
-        if (typeof joins !== 'undefined' && joins.length) {
-            joins.forEach((join: ORMModelJoin) => {
-                if (typeof join.fields !== 'undefined') {
-                    joinsStringArray.push(join.keyField.model.setConfig(config).getSelectFieldsSQL(join.fields, true))
-                } else {
-                    joinsStringArray.push('ERROR;')
-                }
-            })
-            joinsSQL = joinsStringArray.join(', ')
-            joinsSQL = `, ${joinsSQL}`
-        }
-        return joinsSQL
-    }
-
-    /**
-     * Generate join sql code
-     *
-     * @return String with the where sql code
-     */
-    private generateJoinCode(): string {
-        const joins = this.model.joins
-        const joinsStringArray: string[] = []
-        let joinsSQL = ''
-
-        if (joins.length) {
-            joins.forEach((join: ORMModelJoin) => {
-                const linkedTableName = join.keyField.model.tableName
-                const sql = ` ${join.type.toUpperCase()} JOIN ${this.quote(linkedTableName)} ON ${this.quote(
-                    this.model.tableName,
-                )}.${this.quote(join.keyField.localField)} = ${this.quote(linkedTableName)}.${this.quote(
-                    join.keyField.linkedField,
-                )}`
-
-                joinsStringArray.push(sql)
-            })
-            joinsSQL = joinsStringArray.join(' ')
-        }
-        return joinsSQL
-    }
-
-    /////////////////////////////////////////////////////////////////////
-    // Validate and transform value against model type
-    // Only for DataApi so far.
-    // Join could only be an INT.
-    /////////////////////////////////////////////////////////////////////
-    private validateAndTransform(
-        key: string,
-        value: string | number,
-    ): { name: string; value: { [key: string]: string | number } } | string {
-        const joinkeys = key.split('__')
-        const fields = this.model.getFields({ all: true })
-
-        if (joinkeys.length == 2) {
-            return {
-                name: key,
-                value: { longValue: value },
-            }
-        }
-
-        if (fields[key]) {
-            const type = fields[key].type
-
-            if (type === ORMSupportedFields.BOOL) {
-                return {
-                    name: key,
-                    value: { booleanValue: value },
-                }
-            } else if (
-                type === ORMSupportedFields.INT ||
-                type === ORMSupportedFields.TINYINT ||
-                type === ORMSupportedFields.SMALLINT ||
-                type === ORMSupportedFields.BIGINT
-            ) {
-                return {
-                    name: key,
-                    value: { longValue: value },
-                }
-            } else if (
-                type === ORMSupportedFields.FLOAT ||
-                type === ORMSupportedFields.REAL ||
-                type === ORMSupportedFields.DOUBLE
-            ) {
-                return {
-                    name: key,
-                    value: { doubleValue: value },
-                }
-            } else if (
-                type === ORMSupportedFields.BLOB ||
-                type === ORMSupportedFields.BINARY ||
-                type === ORMSupportedFields.LONGVARBINARY ||
-                type === ORMSupportedFields.VARBINARY
-            ) {
-                return {
-                    name: key,
-                    value: { blobValue: value },
-                }
-            }
-            // ORMSupportedFields.DECIMAL, Clob?, Date, Hour
-            return {
-                name: key,
-                value: { stringValue: value },
-            }
-        }
-
-        return 'ERROR;'
-    }
-
-    /////////////////////////////////////////////////////////////////////
-    // Generate "AND" chained where sql code
-    // @return string
-    /////////////////////////////////////////////////////////////////////
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private generateWhereCodeChain(where: any): { sql: string; values: string[] } {
-        const values: string[] = []
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const valuesObj: any = []
-        const keys: string[] = []
-        let filteredKeys: string[] = []
-        // let modelFields = this.getFields();
-        // let config: Config = this.model.config;
-
-        for (const key in where) {
-            keys.push(key)
-
-            if (this.model.config.driver === Drivers.DataAPI) {
-                let value
-
-                if (typeof where[key].value === 'undefined') {
-                    value = where[key]
-                } else {
-                    value = where[key].value
-                }
-
-                const joinkeys = String(value).split('__')
-
-                if (
-                    String(value).charAt(0) !== '\\' &&
-                    joinkeys.length !== 2 &&
-                    this.specialFunctions.indexOf(value) < 0
-                ) {
-                    valuesObj.push(this.validateAndTransform(key, value))
-                }
-            }
-        }
-
-        filteredKeys = keys
-        // ToDo: Rewrite where keys to be able to test them
-        // if (config.debug) {
-        //    this.logMissingFields(keys, modelFields);
-        // }
-        // filteredKeys = this.filterFields(keys, modelFields);
-
-        if (typeof where !== 'undefined') {
-            let sql = ''
-
-            filteredKeys.forEach((item: string, index: number, array: string[]) => {
-                let operator = '='
-
-                if (typeof where[item].operator !== 'undefined') {
-                    operator = where[item].operator
-                    where[item] = where[item].value
-                }
-                if (String(where[item]).charAt(0) == '\\') {
-                    sql = `${sql + this.quote(this.model.tableName)}.${this.quote(item)} ${operator} ${String(
-                        where[item],
-                    ).substring(1)}`
-                } else {
-                    let joinkeys = item.split('__')
-                    // string literal
-
-                    if (joinkeys.length === 2) {
-                        sql = `${sql + this.quote(joinkeys[0])}.${this.quote(joinkeys[1])}`
-                    } else {
-                        sql = `${sql + this.quote(this.model.tableName)}.${this.quote(item)}`
-                    }
-                    joinkeys = String(where[item]).split('__')
-                    // joined column
-                    if (joinkeys.length == 2) {
-                        sql = `${sql} ${operator} ${this.quote(joinkeys[0])}.${this.quote(joinkeys[1])}`
-                    } else {
-                        // special functiom
-                        if (this.specialFunctions.indexOf(where[item]) >= 0) {
-                            sql = `${sql} ${operator} ${where[item]}`
-                        } else {
-                            if (this.model.config.driver === Drivers.DataAPI) {
-                                sql = `${sql} ${operator} :${item}`
-                            } else if (this.model.config.engine === Engines.PostgreSQL) {
-                                sql = `${sql} ${operator} $${++this.currentParamPosition}`
-                            } else if (this.model.config.engine === Engines.MySQL) {
-                                sql = `${sql} ${operator} ?`
-                            } else {
-                                sql = `${sql} ENGINE NOT SUPPORTED`
-                            }
-                        }
-                    }
-                }
-                if (index < array.length - 1) {
-                    sql = `${sql} AND `
-                }
-            })
-            if (this.model.config.driver === Drivers.DataAPI) {
-                return {
-                    sql: sql,
-                    values: valuesObj,
-                }
-            } else {
-                // getting values
-                filteredKeys.forEach((item: string) => {
-                    const joinkeys = String(where[item]).split('__')
-
-                    if (
-                        String(where[item]).charAt(0) != '\\' &&
-                        joinkeys.length != 2 &&
-                        this.specialFunctions.indexOf(where[item]) < 0
-                    ) {
-                        values.push(where[item])
-                    }
-                })
-                return {
-                    sql: sql,
-                    values: values,
-                }
-            }
-        } else {
-            return {
-                sql: '',
-                values: this.emptyValues,
-            }
-        }
-    }
-
-    /**
-     * Generate where sql code
-     *
-     * @var where Array of key/value objects with the conditions
-     * @return String with the where sql code
-     */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private generateWhereCode(where?: any): { sql: string; values: string[] } {
-        if (where == '*') {
-            return {
-                sql: '',
-                values: this.emptyValues,
-            }
-        } else if (typeof where === 'string' || (Array.isArray(where) && !where.length)) {
-            return {
-                sql: 'ERROR',
-                values: this.emptyValues,
-            }
-        } else {
-            let generated: { sql: string; values: string[] } = {
-                sql: '',
-                values: this.emptyValues,
-            }
-
-            if (Array.isArray(where)) {
-                let values: string[] = []
-                const SQLChains: string[] = []
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                let valuesObj: any = []
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-
-                where.forEach((chain: any) => {
-                    const localChain = this.generateWhereCodeChain(chain)
-
-                    valuesObj = valuesObj.concat(localChain.values)
-                    values = values.concat(localChain.values)
-                    SQLChains.push(localChain.sql)
-                })
-                generated.sql = `(${SQLChains.join(') OR (')})`
-                if (this.model.config.driver === Drivers.DataAPI) {
-                    generated.values = valuesObj
-                } else {
-                    generated.values = values
-                }
-            } else {
-                generated = this.generateWhereCodeChain(where)
-            }
-
-            if (generated.sql) {
-                generated.sql = ` WHERE ${generated.sql}`
-                return generated
-            } else {
-                return generated
-            }
-        }
-    }
-
-    /**
      * Select private query
      *
      * @var fields If is NOT set "*" will be used, if there's a string then it will be used as is, a plain query will be
@@ -444,12 +143,12 @@ export class SqlGeneratorUtils {
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public select(select: ORMModelSelectLimit): Promise<any> {
-        this.restore()
+        this.paramCursor.restore()
 
         const fieldsSQL = this.getSelectFieldsSQL(select.fields)
-        const joinFieldsSQL = this.getJoinSelectFieldsSQL()
-        const joinCode = this.generateJoinCode()
-        const whereCode = this.generateWhereCode(select.where)
+        const joinFieldsSQL = this.partialGeneratorUtils.getJoinSelectFieldsSQL()
+        const joinCode = this.partialGeneratorUtils.generateJoinCode()
+        const whereCode = this.partialGeneratorUtils.generateWhereCode(select.where)
         const groupBy = select.groupBy
         const orderBy = select.orderBy
         const limit = select.limit
@@ -505,7 +204,7 @@ export class SqlGeneratorUtils {
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public insert(data: ORMModelRow): Promise<any> {
-        this.restore()
+        this.paramCursor.restore()
 
         const fields: string[] = []
         const wildcards: string[] = []
@@ -518,12 +217,12 @@ export class SqlGeneratorUtils {
 
             fields.push(key)
             values.push(value)
-            valuesObj.push(this.validateAndTransform(key, value))
+            valuesObj.push(this.validatorUtils.transform({ fields: this.model.getFields({ all: true }), key, value }))
 
             if (this.model.config.driver === Drivers.DataAPI) {
                 wildcards.push(`:${key}`)
             } else if (this.model.config.engine === Engines.PostgreSQL) {
-                wildcards.push(`$${++this.currentParamPosition}`)
+                wildcards.push(`$${this.paramCursor.getNext()}`)
             } else if (this.model.config.engine === Engines.MySQL) {
                 wildcards.push('?')
             } else {
@@ -551,14 +250,14 @@ export class SqlGeneratorUtils {
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public update(update: ORMModelUpdate): Promise<any> {
-        this.restore()
+        this.paramCursor.restore()
 
         const fields = []
         const values = []
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const valuesObj: any = []
         let unifiedValues = []
-        const joinCode = this.generateJoinCode()
+        const joinCode = this.partialGeneratorUtils.generateJoinCode()
         const data = update.data
         const where = update.where
 
@@ -574,14 +273,20 @@ export class SqlGeneratorUtils {
             } else if (this.specialFunctions.indexOf(data[key]) >= 0) {
                 fields.push(`${this.quote(this.model.tableName)}.${this.quote(key)} = ${data[key]}`)
             } else {
-                valuesObj.push(this.validateAndTransform(key, data[key]))
+                valuesObj.push(
+                    this.validatorUtils.transform({
+                        fields: this.model.getFields({ all: true }),
+                        key,
+                        value: data[key],
+                    }),
+                )
                 values.push(data[key])
 
                 if (this.model.config.driver === Drivers.DataAPI) {
                     fields.push(`${this.quote(this.model.tableName)}.${this.quote(key)} = :${key}`)
                 } else if (this.model.config.engine === Engines.PostgreSQL) {
                     fields.push(
-                        `${this.quote(this.model.tableName)}.${this.quote(key)} = $${++this.currentParamPosition}`,
+                        `${this.quote(this.model.tableName)}.${this.quote(key)} = $${this.paramCursor.getNext()}`,
                     )
                 } else if (this.model.config.engine === Engines.MySQL) {
                     fields.push(`${this.quote(this.model.tableName)}.${this.quote(key)} = ?`)
@@ -598,7 +303,7 @@ export class SqlGeneratorUtils {
                 values: this.emptyValues,
             }
         } else {
-            whereCode = this.generateWhereCode(where)
+            whereCode = this.partialGeneratorUtils.generateWhereCode(where)
         }
 
         const query = `UPDATE ${this.quote(this.model.tableName)}${joinCode} SET ${fields.join(', ')}${whereCode.sql};`
@@ -619,10 +324,10 @@ export class SqlGeneratorUtils {
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public delete(where: string | ORMModelKeyValue | ORMModelKeyValue[]): Promise<any> {
-        this.restore()
+        this.paramCursor.restore()
 
         let whereCode
-        const joinCode = this.generateJoinCode()
+        const joinCode = this.partialGeneratorUtils.generateJoinCode()
 
         if (typeof where === 'undefined' || (!Array.isArray(where) && !Object.keys(where).length)) {
             whereCode = {
@@ -630,7 +335,7 @@ export class SqlGeneratorUtils {
                 values: this.emptyValues,
             }
         } else {
-            whereCode = this.generateWhereCode(where)
+            whereCode = this.partialGeneratorUtils.generateWhereCode(where)
         }
         const query = `DELETE FROM ${
             this.regularQuotes + this.model.tableName + this.regularQuotes + joinCode + whereCode.sql
