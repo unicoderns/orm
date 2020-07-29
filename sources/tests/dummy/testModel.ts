@@ -54,7 +54,7 @@ export interface Row {
  * Test Model
  */
 export class Test extends ORMModel {
-    protected tableName = 'test'
+    public tableName = 'test'
 
     public readonly fields = {
         tinyint: new ORMDatatypes().TINYINT(),

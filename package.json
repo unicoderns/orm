@@ -39,7 +39,9 @@
     "orm",
     "sql",
     "database",
-    "mapping"
+    "mapping",
+    "postgreSQL",
+    "mySQL"
   ],
   "license": "MIT",
   "devDependencies": {

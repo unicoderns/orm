@@ -44,7 +44,7 @@ export interface Row {
  * User Model
  */
 export class Users extends ORMModel {
-    protected tableName = 'users'
+    public tableName = 'users'
 
     public readonly fields = {
         id: new ORMDatatypes().ID(),

@@ -39,6 +39,7 @@ export interface Config {
     driver?: Drivers
     engine?: Engines
     settings?: Settings
+    computed?: Computed
 }
 
 /*** Connection configuration interface. */
@@ -50,4 +51,9 @@ export interface Connection {
 /*** Connection configuration interface. */
 export interface Settings {
     consistentReturn: boolean
+}
+
+/*** Connection configuration interface. */
+export interface Computed {
+    regularQuotes: string
 }
