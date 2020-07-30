@@ -241,25 +241,11 @@ export class SqlGeneratorUtils {
         }
     }
 
-    /**
-     * Update query
-     *
-     * @var data object data to be update in the table
-     * @var where Key/Value object used to filter the query, an array of Key/Value objects will generate a multiple filter separated by an "OR".
-     * @return Promise with query result
-     */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public update(update: ORMModelUpdate): Promise<any> {
-        this.paramCursor.restore()
-
+    private processUpdateKeys(update: ORMModelUpdate): any {
+        const data = update.data
         const fields = []
         const values = []
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const valuesObj: any = []
-        let unifiedValues = []
-        const joinCode = this.partialGeneratorUtils.generateJoinCode()
-        const data = update.data
-        const where = update.where
 
         for (const key in data) {
             const joinkeys = String(data[key]).split('__')
@@ -295,6 +281,31 @@ export class SqlGeneratorUtils {
                 }
             }
         }
+
+        return {
+            fields,
+            values,
+            valuesObj,
+        }
+    }
+
+    /**
+     * Update query
+     *
+     * @var data object data to be update in the table
+     * @var where Key/Value object used to filter the query, an array of Key/Value objects will generate a multiple filter separated by an "OR".
+     * @return Promise with query result
+     */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    public update(update: ORMModelUpdate): Promise<any> {
+        this.paramCursor.restore()
+
+        let unifiedValues = []
+        const joinCode = this.partialGeneratorUtils.generateJoinCode()
+        const where = update.where
+
+        const { fields, values, valuesObj } = this.processUpdateKeys(update)
+
         let whereCode
 
         if (typeof where === 'undefined' || (!Array.isArray(where) && !Object.keys(where).length)) {

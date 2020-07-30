@@ -55,7 +55,7 @@ export class ORMDatatypes {
     }
 
     /**
-     * Fill SQl defaults for fields
+     * Fill SQL defaults for fields
      *
      * @var settings Object with custom settings
      * @return Object with defaults
