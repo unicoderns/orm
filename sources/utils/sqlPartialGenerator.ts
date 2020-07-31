@@ -33,12 +33,12 @@ import { ParamCursor } from './paramCursor'
 export class SqlPartialGeneratorUtils {
     private model: ORMModel
     private config: Config = {}
-    private paramCursor: ParamCursor
     private validatorUtils: ValidatorUtils
     private readonly specialFunctions = ['now()']
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private emptyValues: any = []
     private regularQuotes = '"'
+    protected paramCursor: ParamCursor
 
     /**
      * Set model

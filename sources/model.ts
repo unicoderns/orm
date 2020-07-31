@@ -35,6 +35,7 @@ import {
 import { Config, Drivers, Engines } from './interfaces/config'
 import { ORMAllowedFields } from './enums'
 import { SqlGeneratorUtils } from './utils/sqlGenerator'
+import { Select } from './statements/select'
 
 /**
  * Model Abstract
@@ -47,6 +48,7 @@ export class ORMModel {
     public readonly fields: ORMAllowedFields = {}
     public readonly secured: ORMAllowedFields = {}
     private sqlGeneratorUtils: SqlGeneratorUtils
+    private select: Select
 
     /**
      * Create a table object.
@@ -62,6 +64,7 @@ export class ORMModel {
         }
 
         this.sqlGeneratorUtils = new SqlGeneratorUtils(this, this.fillConfig(config))
+        this.select = new Select(this, this.fillConfig(config))
     }
 
     /**
@@ -110,6 +113,7 @@ export class ORMModel {
         this.config = this.fillConfig(config)
         // Remove this duplicate - used for joins
         this.sqlGeneratorUtils = new SqlGeneratorUtils(this, this.config)
+        this.select = new Select(this, this.fillConfig(config))
         return this
     }
 
@@ -203,7 +207,7 @@ export class ORMModel {
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public get(select: ORMModelSelect): Promise<any> {
-        return this.sqlGeneratorUtils
+        return this.select
             .select({
                 fields: select.fields,
                 where: select.where,
@@ -234,7 +238,7 @@ export class ORMModel {
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public getSome(select: ORMModelSelectLimit): Promise<any> {
-        return this.sqlGeneratorUtils.select(select)
+        return this.select.select(select)
     }
 
     /**
@@ -249,7 +253,7 @@ export class ORMModel {
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public getAll(select: ORMModelSelect): Promise<any> {
-        return this.sqlGeneratorUtils.select(select)
+        return this.select.select(select)
     }
 
     /**
@@ -271,7 +275,7 @@ export class ORMModel {
 
     // todo: remove after join refactor
     public getSelectFieldsSQL(fields: string | string[] | undefined, prefix?: boolean): string {
-        return this.sqlGeneratorUtils.getSelectFieldsSQL(fields, prefix)
+        return this.select.getSelectFieldsSQL(fields, prefix)
     }
 
     /**

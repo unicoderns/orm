@@ -22,19 +22,32 @@
 // SOFTWARE.                                                                              //
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-import { ORMCommonFields, ORMBinaryDefault, ORMTimestampDefault } from '../../enums'
+import { Config } from '../interfaces'
+import { ParamCursor } from '../utils/paramCursor'
 
 /**
- * Internal abstract types
+ * Model Abstract
  */
-export interface ORMGeneralFieldType extends ORMCommonFields {
-    size?: number
-}
+export abstract class Statement {
+    public config: Config = {}
+    protected regularQuotes = '"'
+    protected paramCursor: ParamCursor = new ParamCursor()
 
-export interface ORMBoolFieldType extends ORMCommonFields {
-    default?: ORMBinaryDefault
-}
+    /**
+     * Set model
+     *
+     * @param model ORMModel
+     * @param config Config
+     */
+    constructor(config: Config) {
+        this.config = config || {}
+        this.regularQuotes = this.config.computed ? this.config.computed.regularQuotes : '"'
+    }
 
-export interface ORMTimestampFieldType extends ORMCommonFields {
-    default?: ORMTimestampDefault
+    /**
+     * Quote string
+     */
+    protected quote(value: string): string {
+        return this.regularQuotes + value + this.regularQuotes
+    }
 }

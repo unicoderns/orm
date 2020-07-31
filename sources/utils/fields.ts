@@ -67,6 +67,37 @@ export class FieldsUtils {
     }
 
     /**
+     * Clean and validate a select if is need it
+     * @todo change to private after join refactor
+     *
+     * @var fields String array with field names.
+     * @return Object cointaining the SQL and a field report
+     */
+    public clean({
+        modelFields,
+        fields,
+        debug,
+    }: {
+        modelFields: ORMAllowedFields
+        fields: string[] | undefined
+        debug: boolean
+    }): string[] {
+        let selectableFields: string[] = []
+
+        // Check if is an array or just SQL code
+        if (Array.isArray(fields) && fields.length) {
+            if (debug) {
+                this.logMissing(fields, modelFields)
+            }
+            selectableFields = this.filter(fields, modelFields)
+        } else {
+            selectableFields = this.toArray(modelFields)
+        }
+
+        return selectableFields
+    }
+
+    /**
      * Filter target fields if don't exists in model.
      */
     public filter(target: string[], scope: ORMAllowedFields): string[] {
