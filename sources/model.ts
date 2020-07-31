@@ -34,8 +34,10 @@ import {
 } from './interfaces'
 import { Config, Drivers, Engines } from './interfaces/config'
 import { ORMAllowedFields } from './enums'
-import { SqlGeneratorUtils } from './utils/sqlGenerator'
+import { Update } from './statements/update'
 import { Select } from './statements/select'
+import { Insert } from './statements/insert'
+import { Delete } from './statements/delete'
 
 /**
  * Model Abstract
@@ -47,8 +49,10 @@ export class ORMModel {
     public joins: ORMModelJoin[] = [] // ToDo: protect
     public readonly fields: ORMAllowedFields = {}
     public readonly secured: ORMAllowedFields = {}
-    private sqlGeneratorUtils: SqlGeneratorUtils
-    private select: Select
+    private updateStatement: Update
+    private selectStatement: Select
+    private insertStatement: Insert
+    private deleteStatement: Delete
 
     /**
      * Create a table object.
@@ -63,8 +67,10 @@ export class ORMModel {
             this.unsafe = true
         }
 
-        this.sqlGeneratorUtils = new SqlGeneratorUtils(this, this.fillConfig(config))
-        this.select = new Select(this, this.fillConfig(config))
+        this.selectStatement = new Select(this, this.fillConfig(config))
+        this.insertStatement = new Insert(this, this.fillConfig(config))
+        this.deleteStatement = new Delete(this, this.fillConfig(config))
+        this.updateStatement = new Update(this, this.fillConfig(config))
     }
 
     /**
@@ -112,8 +118,11 @@ export class ORMModel {
         config = config || {}
         this.config = this.fillConfig(config)
         // Remove this duplicate - used for joins
-        this.sqlGeneratorUtils = new SqlGeneratorUtils(this, this.config)
-        this.select = new Select(this, this.fillConfig(config))
+        this.selectStatement = new Select(this, this.fillConfig(config))
+        this.selectStatement = new Select(this, this.fillConfig(config))
+        this.insertStatement = new Insert(this, this.fillConfig(config))
+        this.deleteStatement = new Delete(this, this.fillConfig(config))
+        this.updateStatement = new Update(this, this.fillConfig(config))
         return this
     }
 
@@ -207,7 +216,7 @@ export class ORMModel {
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public get(select: ORMModelSelect): Promise<any> {
-        return this.select
+        return this.selectStatement
             .select({
                 fields: select.fields,
                 where: select.where,
@@ -238,7 +247,7 @@ export class ORMModel {
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public getSome(select: ORMModelSelectLimit): Promise<any> {
-        return this.select.select(select)
+        return this.selectStatement.select(select)
     }
 
     /**
@@ -253,7 +262,7 @@ export class ORMModel {
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public getAll(select: ORMModelSelect): Promise<any> {
-        return this.select.select(select)
+        return this.selectStatement.select(select)
     }
 
     /**
@@ -275,7 +284,7 @@ export class ORMModel {
 
     // todo: remove after join refactor
     public getSelectFieldsSQL(fields: string | string[] | undefined, prefix?: boolean): string {
-        return this.select.getSelectFieldsSQL(fields, prefix)
+        return this.selectStatement.getSelectFieldsSQL(fields, prefix)
     }
 
     /**
@@ -286,7 +295,7 @@ export class ORMModel {
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public insert(data: ORMModelRow): Promise<any> {
-        return this.sqlGeneratorUtils.insert(data)
+        return this.insertStatement.insert(data)
     }
 
     /**
@@ -298,7 +307,7 @@ export class ORMModel {
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public update(update: ORMModelUpdate): Promise<any> {
-        return this.sqlGeneratorUtils.update(update)
+        return this.updateStatement.update(update)
     }
 
     /**
@@ -309,6 +318,6 @@ export class ORMModel {
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public delete(where: string | ORMModelKeyValue | ORMModelKeyValue[]): Promise<any> {
-        return this.sqlGeneratorUtils.delete(where)
+        return this.deleteStatement.delete(where)
     }
 }

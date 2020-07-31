@@ -22,16 +22,16 @@
 // SOFTWARE.                                                                              //
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-import { ValidatorUtils } from './validator'
-import { SqlPartialGeneratorUtils } from './sqlPartialGenerator'
+import { ValidatorUtils } from '../utils/validator'
+import { SqlPartialGeneratorUtils } from '../utils/sqlPartialGenerator'
 import { ORMModel } from '../model'
-import { Engines, Config, Drivers, ORMModelRow, ORMModelUpdate, ORMModelKeyValue } from '../interfaces'
-import { Statement } from '../statements/statement'
+import { Engines, Config, Drivers, ORMModelUpdate } from '../interfaces'
+import { Statement } from './statement'
 
 /**
  * Model Abstract
  */
-export class SqlGeneratorUtils extends Statement {
+export class Update extends Statement {
     private model: ORMModel
     public config: Config = {} // ToDo: move all config to file
     private validatorUtils: ValidatorUtils
@@ -52,51 +52,6 @@ export class SqlGeneratorUtils extends Statement {
         this.config = config || {}
         this.validatorUtils = new ValidatorUtils(config)
         this.partialGeneratorUtils = new SqlPartialGeneratorUtils(this.model, config, this.paramCursor)
-    }
-
-    /**
-     * Insert query
-     *
-     * @var data object to be inserted in the table
-     * @return Promise with query result
-     */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public insert(data: ORMModelRow): Promise<any> {
-        this.paramCursor.restore()
-
-        const fields: string[] = []
-        const wildcards: string[] = []
-        const values: string[] = []
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const valuesObj: any = []
-
-        for (const key in data) {
-            const value = typeof data[key] === 'undefined' ? '' : data[key]
-
-            fields.push(key)
-            values.push(value)
-            valuesObj.push(this.validatorUtils.transform({ fields: this.model.getFields({ all: true }), key, value }))
-
-            if (this.model.config.driver === Drivers.DataAPI) {
-                wildcards.push(`:${key}`)
-            } else if (this.model.config.engine === Engines.PostgreSQL) {
-                wildcards.push(`$${this.paramCursor.getNext()}`)
-            } else if (this.model.config.engine === Engines.MySQL) {
-                wildcards.push('?')
-            } else {
-                wildcards.push('ENGINE NOT SUPPORTED')
-            }
-        }
-
-        const query = `INSERT INTO ${this.quote(this.model.tableName)} (${
-            this.regularQuotes + fields.join(`${this.regularQuotes}, ${this.regularQuotes}`) + this.regularQuotes
-            }) VALUES (${wildcards.join(', ')});`
-
-        if (this.model.config.driver === Drivers.DataAPI) {
-            return this.model.query({ sql: query, parameters: valuesObj })
-        } else {
-            return this.model.query({ sql: query, values: values })
-        }
     }
 
     private processUpdateKeys(update: ORMModelUpdate): any {
@@ -182,38 +137,6 @@ export class SqlGeneratorUtils extends Statement {
         } else {
             unifiedValues = values.concat(whereCode.values)
             return this.model.query({ sql: query, values: unifiedValues })
-        }
-    }
-
-    /**
-     * Delete query
-     *
-     * @var where Key/Value object used to filter the query, an array of Key/Value objects will generate a multiple filter separated by an "OR", a "*" string wildcard is required for security reasons if you want to match all rows.
-     * @return Promise with query result
-     */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public delete(where: string | ORMModelKeyValue | ORMModelKeyValue[]): Promise<any> {
-        this.paramCursor.restore()
-
-        let whereCode
-        const joinCode = this.partialGeneratorUtils.generateJoinCode()
-
-        if (typeof where === 'undefined' || (!Array.isArray(where) && !Object.keys(where).length)) {
-            whereCode = {
-                sql: 'ERROR',
-                values: this.emptyValues,
-            }
-        } else {
-            whereCode = this.partialGeneratorUtils.generateWhereCode(where)
-        }
-        const query = `DELETE FROM ${
-            this.regularQuotes + this.model.tableName + this.regularQuotes + joinCode + whereCode.sql
-            };`
-
-        if (this.model.config.driver === Drivers.DataAPI) {
-            return this.model.query({ sql: query, parameters: whereCode.values })
-        } else {
-            return this.model.query({ sql: query, values: whereCode.values })
         }
     }
 }
