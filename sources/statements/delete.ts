@@ -24,7 +24,7 @@
 
 import { SqlPartialGeneratorUtils } from '../utils/sqlPartialGenerator'
 import { ORMModel } from '../model'
-import { Config, Drivers, ORMModelKeyValue } from '../interfaces'
+import { Config, ORMModelKeyValue, ORMModelQuery } from '../interfaces'
 import { Statement } from './statement'
 
 /**
@@ -35,8 +35,10 @@ export class Delete extends Statement {
     public config: Config = {} // ToDo: move all config to file
     private partialGeneratorUtils: SqlPartialGeneratorUtils
     private readonly specialFunctions = ['now()']
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private emptyValues: any = []
+    protected template = 'DELETE FROM <orm_table_name>;'
+    protected templateJoin = 'DELETE FROM <orm_table_name> <orm_join>;'
+    protected templateWhere = 'DELETE FROM <orm_table_name> WHERE <orm_conditions>;'
+    protected templateJoinWhere = 'DELETE FROM <orm_table_name> <orm_join> WHERE <orm_conditions>;'
 
     /**
      * Set model
@@ -57,29 +59,24 @@ export class Delete extends Statement {
      * @var where Key/Value object used to filter the query, an array of Key/Value objects will generate a multiple filter separated by an "OR", a "*" string wildcard is required for security reasons if you want to match all rows.
      * @return Promise with query result
      */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public delete(where: string | ORMModelKeyValue | ORMModelKeyValue[]): Promise<any> {
+    public delete(where: string | ORMModelKeyValue | ORMModelKeyValue[]): ORMModelQuery {
         this.paramCursor.restore()
 
         let whereCode
         const joinCode = this.partialGeneratorUtils.generateJoinCode()
 
         if (typeof where === 'undefined' || (!Array.isArray(where) && !Object.keys(where).length)) {
-            whereCode = {
-                sql: 'ERROR',
-                values: this.emptyValues,
-            }
+            throw new Error('Invalid where value.')
         } else {
             whereCode = this.partialGeneratorUtils.generateWhereCode(where)
         }
-        const query = `DELETE FROM ${
-            this.regularQuotes + this.model.tableName + this.regularQuotes + joinCode + whereCode.sql
-            };`
 
-        if (this.model.config.driver === Drivers.DataAPI) {
-            return this.model.query({ sql: query, parameters: whereCode.values })
-        } else {
-            return this.model.query({ sql: query, values: whereCode.values })
-        }
+        const query = this.assembling({
+            tableName: this.quote(this.model.tableName),
+            conditions: whereCode.sql,
+            join: joinCode,
+        })
+
+        return this.query({ sql: query, parameters: whereCode.values, values: whereCode.values })
     }
 }

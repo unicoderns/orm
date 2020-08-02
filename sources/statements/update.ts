@@ -25,7 +25,7 @@
 import { ValidatorUtils } from '../utils/validator'
 import { SqlPartialGeneratorUtils } from '../utils/sqlPartialGenerator'
 import { ORMModel } from '../model'
-import { Engines, Config, Drivers, ORMModelUpdate } from '../interfaces'
+import { Engines, Config, Drivers, ORMModelUpdate, ORMModelQuery } from '../interfaces'
 import { Statement } from './statement'
 
 /**
@@ -37,8 +37,10 @@ export class Update extends Statement {
     private validatorUtils: ValidatorUtils
     private partialGeneratorUtils: SqlPartialGeneratorUtils
     private readonly specialFunctions = ['now()']
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private emptyValues: any = []
+    protected template = 'UPDATE <orm_table_name> SET <orm_column_names>;'
+    protected templateJoin = 'UPDATE <orm_table_name> <orm_join> SET <orm_column_names>;'
+    protected templateWhere = 'UPDATE <orm_table_name> SET <orm_column_names> WHERE <orm_conditions>;'
+    protected templateJoinWhere = 'UPDATE <orm_table_name> <orm_join> SET <orm_column_names> WHERE <orm_conditions>;'
 
     /**
      * Set model
@@ -49,7 +51,7 @@ export class Update extends Statement {
     constructor(model: ORMModel, config: Config) {
         super(config)
         this.model = model
-        this.config = config || {}
+        this.config = config
         this.validatorUtils = new ValidatorUtils(config)
         this.partialGeneratorUtils = new SqlPartialGeneratorUtils(this.model, config, this.paramCursor)
     }
@@ -110,7 +112,7 @@ export class Update extends Statement {
      * @return Promise with query result
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public update(update: ORMModelUpdate): Promise<any> {
+    public update(update: ORMModelUpdate): ORMModelQuery {
         this.paramCursor.restore()
 
         let unifiedValues = []
@@ -122,21 +124,19 @@ export class Update extends Statement {
         let whereCode
 
         if (typeof where === 'undefined' || (!Array.isArray(where) && !Object.keys(where).length)) {
-            whereCode = {
-                sql: 'ERROR',
-                values: this.emptyValues,
-            }
+            throw new Error('Invalid where value.')
         } else {
             whereCode = this.partialGeneratorUtils.generateWhereCode(where)
         }
 
-        const query = `UPDATE ${this.quote(this.model.tableName)}${joinCode} SET ${fields.join(', ')}${whereCode.sql};`
+        const query = this.assembling({
+            tableName: this.quote(this.model.tableName),
+            join: joinCode,
+            fields: fields.join(', '),
+            conditions: whereCode.sql,
+        })
 
-        if (this.model.config.driver === Drivers.DataAPI) {
-            return this.model.query({ sql: query, parameters: valuesObj.concat(whereCode.values) })
-        } else {
-            unifiedValues = values.concat(whereCode.values)
-            return this.model.query({ sql: query, values: unifiedValues })
-        }
+        unifiedValues = values.concat(whereCode.values)
+        return this.query({ sql: query, parameters: valuesObj.concat(whereCode.values), values: unifiedValues })
     }
 }

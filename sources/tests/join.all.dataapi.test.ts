@@ -51,23 +51,18 @@ beforeAll((done) => {
 describe('PostgreSQL', () => {
     describe('Joins', () => {
         it('Left join sessions with users without fields', () => {
-            const expected = {
-                sql:
-                    'SELECT "sessions"."id", "sessions"."created", "sessions"."ip", "sessions"."user", ERROR; FROM "sessions" LEFT JOIN "users" ON "sessions"."user" = "users"."id";',
-                parameters: [],
+            try {
+                sessionsTable
+                    .join([
+                        {
+                            keyField: sessionsTable.fields.user,
+                            type: 'LEFT',
+                        },
+                    ])
+                    .getAll({})
+            } catch (error) {
+                expect(error).toEqual(new Error('Invalid join fields.'))
             }
-
-            sessionsTable
-                .join([
-                    {
-                        keyField: sessionsTable.fields.user,
-                        type: 'LEFT',
-                    },
-                ])
-                .getAll({})
-                .then((query: ORMModelQuery) => {
-                    expect(query).toEqual(expected)
-                })
         })
 
         it('Left join sessions with users', () => {
@@ -75,6 +70,16 @@ describe('PostgreSQL', () => {
                 sql:
                     'SELECT "sessions"."id", "sessions"."created", "sessions"."ip", "sessions"."user", "users"."username" AS "users__username", "users"."email" AS "users__email", "users"."firstName" AS "users__firstName", "users"."lastName" AS "users__lastName" FROM "sessions" LEFT JOIN "users" ON "sessions"."user" = "users"."id";',
                 parameters: [],
+                fields: [
+                    'id',
+                    'created',
+                    'ip',
+                    'user',
+                    'users__username',
+                    'users__email',
+                    'users__firstName',
+                    'users__lastName',
+                ],
             }
 
             sessionsTable
@@ -96,6 +101,7 @@ describe('PostgreSQL', () => {
                 sql:
                     'SELECT "sessions"."id", "sessions"."created", "sessions"."ip", "sessions"."user", "users"."username" AS "users__username", "users"."email" AS "users__email" FROM "sessions" RIGHT JOIN "users" ON "sessions"."user" = "users"."id";',
                 parameters: [],
+                fields: ['id', 'created', 'ip', 'user', 'users__username', 'users__email'],
             }
 
             sessionsTable
@@ -117,6 +123,16 @@ describe('PostgreSQL', () => {
                 sql:
                     'SELECT "sessions"."id", "sessions"."created", "sessions"."ip", "sessions"."user", "users"."username" AS "users__username", "users"."email" AS "users__email", "users"."firstName" AS "users__firstName", "users"."lastName" AS "users__lastName" FROM "sessions" LEFT JOIN "users" ON "sessions"."user" = "users"."id" WHERE "users"."id" = :users__id;',
                 parameters: [{ name: 'users__id', value: { longValue: 3 } }],
+                fields: [
+                    'id',
+                    'created',
+                    'ip',
+                    'user',
+                    'users__username',
+                    'users__email',
+                    'users__firstName',
+                    'users__lastName',
+                ],
             }
 
             sessionsTable
@@ -142,6 +158,16 @@ describe('PostgreSQL', () => {
                 sql:
                     'SELECT "sessions"."id", "sessions"."created", "sessions"."ip", "sessions"."user", "users"."username" AS "users__username", "users"."email" AS "users__email", "users"."firstName" AS "users__firstName", "users"."lastName" AS "users__lastName" FROM "sessions" LEFT JOIN "users" ON "sessions"."user" = "users"."id" WHERE "users"."id" != :users__id;',
                 parameters: [{ name: 'users__id', value: { longValue: 3 } }],
+                fields: [
+                    'id',
+                    'created',
+                    'ip',
+                    'user',
+                    'users__username',
+                    'users__email',
+                    'users__firstName',
+                    'users__lastName',
+                ],
             }
 
             sessionsTable

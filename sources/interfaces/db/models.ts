@@ -53,6 +53,7 @@ export interface ORMModelOperatorValue {
  */
 export interface ORMModelQuery {
     sql: string
+    fields?: string[]
     values?: (string | number)[] | Record<string, any>
     parameters?: (string | number)[] | Record<string, any>
 }

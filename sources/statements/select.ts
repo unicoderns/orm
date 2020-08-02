@@ -23,7 +23,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 import { Statement } from './statement'
-import { ORMModelSelectLimit, Drivers, Config } from '../interfaces'
+import { ORMModelSelectLimit, Drivers, Config, ORMModelQuery } from '../interfaces'
 import { ORMModel } from '..'
 import { FieldsUtils } from '../utils/fields'
 import { SqlPartialGeneratorUtils } from '../utils/sqlPartialGenerator'
@@ -35,6 +35,10 @@ export class Select extends Statement {
     private model: ORMModel
     private fieldsUtils: FieldsUtils
     private partialGeneratorUtils: SqlPartialGeneratorUtils
+    protected template = 'SELECT <orm_column_names> FROM <orm_table_name><orm_extra>;'
+    protected templateJoin = 'SELECT <orm_column_names> FROM <orm_table_name> <orm_join><orm_extra>;'
+    protected templateWhere = 'SELECT <orm_column_names> FROM <orm_table_name> WHERE <orm_conditions><orm_extra>;'
+    protected templateJoinWhere = 'SELECT <orm_column_names> FROM <orm_table_name> <orm_join> WHERE <orm_conditions>;'
 
     /**
      * Set model
@@ -124,7 +128,7 @@ export class Select extends Statement {
      * Group this using functions like select("").orderBy() is just easier to understand
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public select(select: ORMModelSelectLimit): Promise<any> {
+    public select(select: ORMModelSelectLimit): ORMModelQuery {
         this.paramCursor.restore()
 
         const fieldsSQL = this.getSelectFieldsSQL(select.fields)
@@ -145,13 +149,20 @@ export class Select extends Statement {
         if (typeof limit !== 'undefined' && limit !== null) {
             extra += ` LIMIT ${limit}`
         }
-        const sql = `SELECT ${fieldsSQL + joinFieldsSQL} FROM ${
-            this.quote(this.model.tableName) + joinCode + whereCode.sql + extra
-            };`
+        const where = whereCode.sql ? whereCode.sql : ''
+
+        const sql = this.assembling({
+            tableName: this.quote(this.model.tableName),
+            join: joinCode,
+            fields: fieldsSQL + joinFieldsSQL,
+            conditions: where,
+            values: whereCode.sql,
+            extra,
+        })
 
         this.model.joins = []
 
-        const query: { sql: string; parameters?: string[]; values?: string[] } = { sql }
+        const query: ORMModelQuery = { sql }
 
         if (this.model.config.driver === Drivers.DataAPI) {
             query.parameters = whereCode.values || []
@@ -159,7 +170,7 @@ export class Select extends Statement {
             query.values = whereCode.values
         }
 
-        const keyArray = String(fieldsSQL.replace(/"/g, '') + joinFieldsSQL.replace(/"/g, '')).split(', ')
+        const keyArray = String(fieldsSQL.replace(/"|`/g, '') + joinFieldsSQL.replace(/"|`/g, '')).split(', ')
         const keys: string[] = []
 
         keyArray.forEach((key) => {
@@ -172,8 +183,8 @@ export class Select extends Statement {
                 keys.push(temp[1])
             }
         })
-        return this.model.query(query).then((data: any) => {
-            return Promise.resolve(this.model.selectConsistentReturn(keys, data))
-        })
+
+        query.fields = keys
+        return this.query(query)
     }
 }

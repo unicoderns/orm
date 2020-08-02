@@ -78,7 +78,7 @@ export class SqlPartialGeneratorUtils {
                 if (typeof join.fields !== 'undefined') {
                     joinsStringArray.push(join.keyField.model.setConfig(config).getSelectFieldsSQL(join.fields, true))
                 } else {
-                    joinsStringArray.push('ERROR;')
+                    throw new Error('Invalid join fields.')
                 }
             })
             joinsSQL = joinsStringArray.join(', ')
@@ -100,7 +100,7 @@ export class SqlPartialGeneratorUtils {
         if (joins.length) {
             joins.forEach((join: ORMModelJoin) => {
                 const linkedTableName = join.keyField.model.tableName
-                const sql = ` ${join.type.toUpperCase()} JOIN ${this.quote(linkedTableName)} ON ${this.quote(
+                const sql = `${join.type.toUpperCase()} JOIN ${this.quote(linkedTableName)} ON ${this.quote(
                     this.model.tableName,
                 )}.${this.quote(join.keyField.localField)} = ${this.quote(linkedTableName)}.${this.quote(
                     join.keyField.linkedField,
@@ -262,16 +262,13 @@ export class SqlPartialGeneratorUtils {
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public generateWhereCode(where?: any): { sql: string; values: string[] } {
-        if (where == '*') {
+        if (where === '*') {
             return {
                 sql: '',
                 values: this.emptyValues,
             }
         } else if (typeof where === 'string' || (Array.isArray(where) && !where.length)) {
-            return {
-                sql: 'ERROR',
-                values: this.emptyValues,
-            }
+            throw new Error('Invalid where value.')
         } else {
             let generated: { sql: string; values: string[] } = {
                 sql: '',
@@ -302,12 +299,7 @@ export class SqlPartialGeneratorUtils {
                 generated = this.generateWhereCodeChain(where)
             }
 
-            if (generated.sql) {
-                generated.sql = ` WHERE ${generated.sql}`
-                return generated
-            } else {
-                return generated
-            }
+            return generated
         }
     }
 }

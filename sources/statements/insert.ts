@@ -24,7 +24,7 @@
 
 import { ValidatorUtils } from '../utils/validator'
 import { ORMModel } from '../model'
-import { Engines, Config, Drivers, ORMModelRow } from '../interfaces'
+import { Engines, Config, Drivers, ORMModelRow, ORMModelQuery } from '../interfaces'
 import { Statement } from './statement'
 
 /**
@@ -35,6 +35,10 @@ export class Insert extends Statement {
     public config: Config = {} // ToDo: move all config to file
     private validatorUtils: ValidatorUtils
     private readonly specialFunctions = ['now()']
+    protected template = 'INSERT INTO <orm_table_name> (<orm_column_names>) VALUES (<orm_value_keys>);'
+    protected templateJoin = ''
+    protected templateWhere = ''
+    protected templateJoinWhere = ''
 
     /**
      * Set model
@@ -45,7 +49,7 @@ export class Insert extends Statement {
     constructor(model: ORMModel, config: Config) {
         super(config)
         this.model = model
-        this.config = config || {}
+        this.config = config
         this.validatorUtils = new ValidatorUtils(config)
     }
 
@@ -56,7 +60,7 @@ export class Insert extends Statement {
      * @return Promise with query result
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public insert(data: ORMModelRow): Promise<any> {
+    public insert(data: ORMModelRow): ORMModelQuery {
         this.paramCursor.restore()
 
         const fields: string[] = []
@@ -83,14 +87,13 @@ export class Insert extends Statement {
             }
         }
 
-        const query = `INSERT INTO ${this.quote(this.model.tableName)} (${
-            this.regularQuotes + fields.join(`${this.regularQuotes}, ${this.regularQuotes}`) + this.regularQuotes
-            }) VALUES (${wildcards.join(', ')});`
+        const query = this.assembling({
+            tableName: this.quote(this.model.tableName),
+            fields:
+                this.regularQuotes + fields.join(`${this.regularQuotes}, ${this.regularQuotes}`) + this.regularQuotes,
+            values: wildcards.join(', '),
+        })
 
-        if (this.model.config.driver === Drivers.DataAPI) {
-            return this.model.query({ sql: query, parameters: valuesObj })
-        } else {
-            return this.model.query({ sql: query, values: values })
-        }
+        return this.query({ sql: query, parameters: valuesObj, values: values })
     }
 }

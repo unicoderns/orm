@@ -109,6 +109,6 @@ export class ValidatorUtils {
             }
         }
 
-        return 'ERROR;'
+        throw new Error(`Type transformation for: ${key}.`)
     }
 }

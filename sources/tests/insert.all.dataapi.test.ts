@@ -43,26 +43,20 @@ beforeAll((done) => {
 
 describe('DataAPI', () => {
     describe('Insert', () => {
-        it('undefined value should be escaped', () => {
-            const expected = {
-                sql: 'INSERT INTO "users" ("firstName") VALUES (:firstName);',
-                parameters: [{ name: 'firstName', value: { stringValue: '' } }],
+        it('undefined value should fail', () => {
+            try {
+                usersTable.insert({ first_name: undefined })
+            } catch (error) {
+                expect(error).toEqual(new Error('Type transformation for: first_name.'))
             }
-
-            usersTable.insert({ firstName: undefined }).then((query: ORMModelQuery) => {
-                expect(query).toEqual(expected)
-            })
         })
 
         it('undefined field should fail', () => {
-            const expected = {
-                sql: 'INSERT INTO "users" ("first_name") VALUES (:first_name);',
-                parameters: ['ERROR;'],
+            try {
+                usersTable.insert({ first_name: '' })
+            } catch (error) {
+                expect(error).toEqual(new Error('Type transformation for: first_name.'))
             }
-
-            usersTable.insert({ first_name: '' }).then((query: ORMModelQuery) => {
-                expect(query).toEqual(expected)
-            })
         })
 
         it('1 value', () => {

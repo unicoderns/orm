@@ -22,7 +22,7 @@
 // SOFTWARE.                                                                              //
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-import { Config } from '../interfaces'
+import { Config, Drivers, ORMModelQuery } from '../interfaces'
 import { ParamCursor } from '../utils/paramCursor'
 
 /**
@@ -32,6 +32,11 @@ export abstract class Statement {
     public config: Config = {}
     protected regularQuotes = '"'
     protected paramCursor: ParamCursor = new ParamCursor()
+    protected error = ''
+    protected abstract template: string
+    protected abstract templateJoin: string
+    protected abstract templateWhere: string
+    protected abstract templateJoinWhere: string
 
     /**
      * Set model
@@ -40,7 +45,7 @@ export abstract class Statement {
      * @param config Config
      */
     constructor(config: Config) {
-        this.config = config || {}
+        this.config = config
         this.regularQuotes = this.config.computed ? this.config.computed.regularQuotes : '"'
     }
 
@@ -49,5 +54,50 @@ export abstract class Statement {
      */
     protected quote(value: string): string {
         return this.regularQuotes + value + this.regularQuotes
+    }
+
+    public query(query: ORMModelQuery): ORMModelQuery {
+        const { sql, values, parameters, fields } = query
+
+        if (this.config.driver === Drivers.DataAPI) {
+            return { sql, parameters, fields }
+        } else {
+            return { sql, values, fields }
+        }
+    }
+
+    protected assembling({
+        tableName,
+        fields,
+        values,
+        join,
+        conditions,
+        extra,
+    }: {
+        tableName: string
+        fields?: string
+        values?: string
+        join?: string
+        conditions?: string
+        extra?: string
+    }): string {
+        let query = ''
+
+        if (conditions && join) {
+            query = this.templateJoinWhere
+        } else if (conditions) {
+            query = this.templateWhere
+        } else if (join) {
+            query = this.templateJoin
+        } else {
+            query = this.template
+        }
+
+        query = query.replace('<orm_column_names>', fields || '')
+        query = query.replace('<orm_table_name>', tableName || '')
+        query = query.replace('<orm_conditions>', conditions || '')
+        query = query.replace('<orm_value_keys>', values || '')
+        query = query.replace('<orm_join>', join || '')
+        return query.replace('<orm_extra>', extra || '')
     }
 }

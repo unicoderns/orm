@@ -43,15 +43,12 @@ beforeAll((done) => {
 
 describe('MYSQL', () => {
     describe('Insert', () => {
-        it('undefined value should be escaped', () => {
-            const expected = {
-                sql: 'INSERT INTO `users` (`first_name`) VALUES (?);',
-                values: [''],
+        it('undefined value should fail', () => {
+            try {
+                usersTable.insert({ first_name: undefined })
+            } catch (error) {
+                expect(error).toEqual(new Error('Type transformation for: first_name.'))
             }
-
-            usersTable.insert({ first_name: undefined }).then((query: ORMModelQuery) => {
-                expect(query).toEqual(expected)
-            })
         })
 
         it('1 value', () => {

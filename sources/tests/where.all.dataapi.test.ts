@@ -44,64 +44,44 @@ beforeAll((done) => {
 describe('DataApi', () => {
     describe('Get general', () => {
         it('Simple with empty where array should fail', () => {
-            const expected = {
-                sql:
-                    'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users"ERROR;',
-                parameters: [],
-            }
-
-            usersTable
-                .getAll({
+            try {
+                usersTable.getAll({
                     where: [],
                 })
-                .then((query: ORMModelQuery) => {
-                    expect(query).toEqual(expected)
-                })
+            } catch (error) {
+                expect(error).toEqual(new Error('Invalid where value.'))
+            }
         })
 
         it('Simple update with empty where object should fail', () => {
-            const expected = {
-                sql: 'UPDATE "users" SET "users"."username" = :usernameERROR;',
-                parameters: [{ name: 'username', value: { stringValue: 'chriss' } }],
-            }
-
-            usersTable
-                .update({
+            try {
+                usersTable.update({
                     data: {
                         username: 'chriss',
                     },
                     where: {},
                 })
-                .then((query: ORMModelQuery) => {
-                    expect(query).toEqual(expected)
-                })
+            } catch (error) {
+                expect(error).toEqual(new Error('Invalid where value.'))
+            }
         })
 
         it('Simple delete with empty where object should fail', () => {
-            const expected = {
-                sql: 'DELETE FROM "users"ERROR;',
-                parameters: [],
+            try {
+                usersTable.delete({})
+            } catch (error) {
+                expect(error).toEqual(new Error('Invalid where value.'))
             }
-
-            usersTable.delete({}).then((query: ORMModelQuery) => {
-                expect(query).toEqual(expected)
-            })
         })
 
         it('Simple with where string different than "*" should fail', () => {
-            const expected = {
-                sql:
-                    'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users"ERROR;',
-                parameters: [],
-            }
-
-            usersTable
-                .getAll({
+            try {
+                usersTable.getAll({
                     where: 'hello',
                 })
-                .then((query: ORMModelQuery) => {
-                    expect(query).toEqual(expected)
-                })
+            } catch (error) {
+                expect(error).toEqual(new Error('Invalid where value.'))
+            }
         })
 
         it('Simple with Boolean', () => {
@@ -113,6 +93,17 @@ describe('DataApi', () => {
                         name: 'active',
                         value: { booleanValue: true },
                     },
+                ],
+                fields: [
+                    'id',
+                    'created',
+                    'username',
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'admin',
+                    'verified',
+                    'active',
                 ],
             }
 
@@ -135,6 +126,17 @@ describe('DataApi', () => {
                         value: { booleanValue: true },
                     },
                 ],
+                fields: [
+                    'id',
+                    'created',
+                    'username',
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'admin',
+                    'verified',
+                    'active',
+                ],
             }
 
             usersTable
@@ -151,6 +153,17 @@ describe('DataApi', () => {
                 sql:
                     'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" WHERE ("users"."id" = :id) OR ("users"."username" = \'chriss\');',
                 parameters: [{ name: 'id', value: { longValue: 3 } }],
+                fields: [
+                    'id',
+                    'created',
+                    'username',
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'admin',
+                    'verified',
+                    'active',
+                ],
             }
 
             usersTable
@@ -170,6 +183,17 @@ describe('DataApi', () => {
                     { name: 'id', value: { longValue: 3 } },
                     { name: 'email', value: { stringValue: 'chriss@unicoderns.com' } },
                     { name: 'username', value: { stringValue: 'chriss' } },
+                ],
+                fields: [
+                    'id',
+                    'created',
+                    'username',
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'admin',
+                    'verified',
+                    'active',
                 ],
             }
 
@@ -191,6 +215,17 @@ describe('DataApi', () => {
                     { name: 'username', value: { stringValue: 'chriss' } },
                     { name: 'email', value: { stringValue: 'chriss@unicoderns.com' } },
                 ],
+                fields: [
+                    'id',
+                    'created',
+                    'username',
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'admin',
+                    'verified',
+                    'active',
+                ],
             }
 
             usersTable
@@ -210,6 +245,17 @@ describe('DataApi', () => {
                     { name: 'id', value: { longValue: 3 } },
                     { name: 'username', value: { stringValue: 'chriss' } },
                     { name: 'email', value: { stringValue: 'chriss@unicoderns.com' } },
+                ],
+                fields: [
+                    'id',
+                    'created',
+                    'username',
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'admin',
+                    'verified',
+                    'active',
                 ],
             }
 
@@ -231,6 +277,17 @@ describe('DataApi', () => {
                     { name: 'username', value: { stringValue: 'chriss' } },
                     { name: 'email', value: { stringValue: 'chriss@unicoderns.com' } },
                 ],
+                fields: [
+                    'id',
+                    'created',
+                    'username',
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'admin',
+                    'verified',
+                    'active',
+                ],
             }
 
             usersTable
@@ -247,6 +304,17 @@ describe('DataApi', () => {
                 sql:
                     'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" GROUP BY username, active;',
                 parameters: [],
+                fields: [
+                    'id',
+                    'created',
+                    'username',
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'admin',
+                    'verified',
+                    'active',
+                ],
             }
 
             usersTable
@@ -263,6 +331,17 @@ describe('DataApi', () => {
                 sql:
                     'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" ORDER BY id ASC;',
                 parameters: [],
+                fields: [
+                    'id',
+                    'created',
+                    'username',
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'admin',
+                    'verified',
+                    'active',
+                ],
             }
 
             usersTable
@@ -279,6 +358,17 @@ describe('DataApi', () => {
                 sql:
                     'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" GROUP BY username, active ORDER BY id ASC;',
                 parameters: [],
+                fields: [
+                    'id',
+                    'created',
+                    'username',
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'admin',
+                    'verified',
+                    'active',
+                ],
             }
 
             usersTable
@@ -296,6 +386,17 @@ describe('DataApi', () => {
                 sql:
                     'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" WHERE ("users"."id" <= :id);',
                 parameters: [{ name: 'id', value: { longValue: 3 } }],
+                fields: [
+                    'id',
+                    'created',
+                    'username',
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'admin',
+                    'verified',
+                    'active',
+                ],
             }
 
             usersTable
@@ -319,6 +420,17 @@ describe('DataApi', () => {
                 sql:
                     'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" WHERE ("users"."id" = :id) OR ("users"."username" != \'chriss\');',
                 parameters: [{ name: 'id', value: { longValue: 3 } }],
+                fields: [
+                    'id',
+                    'created',
+                    'username',
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'admin',
+                    'verified',
+                    'active',
+                ],
             }
 
             usersTable
@@ -344,6 +456,17 @@ describe('DataApi', () => {
                 sql:
                     'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" WHERE ("users"."id" = :id) OR ("users"."created" = now());',
                 parameters: [{ name: 'id', value: { longValue: 3 } }],
+                fields: [
+                    'id',
+                    'created',
+                    'username',
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'admin',
+                    'verified',
+                    'active',
+                ],
             }
 
             usersTable
@@ -360,6 +483,17 @@ describe('DataApi', () => {
                 sql:
                     'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" WHERE ("users"."id" = :id) OR ("users"."created" >= now());',
                 parameters: [{ name: 'id', value: { longValue: 3 } }],
+                fields: [
+                    'id',
+                    'created',
+                    'username',
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'admin',
+                    'verified',
+                    'active',
+                ],
             }
 
             usersTable

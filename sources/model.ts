@@ -49,10 +49,11 @@ export class ORMModel {
     public joins: ORMModelJoin[] = [] // ToDo: protect
     public readonly fields: ORMAllowedFields = {}
     public readonly secured: ORMAllowedFields = {}
-    private updateStatement: Update
-    private selectStatement: Select
-    private insertStatement: Insert
-    private deleteStatement: Delete
+    // Initialized on setConfig
+    private updateStatement!: Update
+    private selectStatement!: Select
+    private insertStatement!: Insert
+    private deleteStatement!: Delete
 
     /**
      * Create a table object.
@@ -66,11 +67,6 @@ export class ORMModel {
         if (privacy == 'unsafe') {
             this.unsafe = true
         }
-
-        this.selectStatement = new Select(this, this.fillConfig(config))
-        this.insertStatement = new Insert(this, this.fillConfig(config))
-        this.deleteStatement = new Delete(this, this.fillConfig(config))
-        this.updateStatement = new Update(this, this.fillConfig(config))
     }
 
     /**
@@ -117,7 +113,6 @@ export class ORMModel {
     public setConfig(config?: Config): this {
         config = config || {}
         this.config = this.fillConfig(config)
-        // Remove this duplicate - used for joins
         this.selectStatement = new Select(this, this.fillConfig(config))
         this.selectStatement = new Select(this, this.fillConfig(config))
         this.insertStatement = new Insert(this, this.fillConfig(config))
@@ -160,6 +155,10 @@ export class ORMModel {
     public query(query: ORMModelQuery): Promise<any> {
         const connection = this.config.connection
 
+        if (typeof query.fields === 'undefined') {
+            delete query.fields
+        }
+
         if (this.config.debug) {
             console.log('Query:', JSON.stringify(query, null, 2))
         }
@@ -169,6 +168,25 @@ export class ORMModel {
         } else {
             return connection.query(query)
         }
+    }
+
+    /**
+     * Plain query
+     *
+     * Any query over any table can be done here
+     *
+     * Warnings:
+     * - Field privacity or data integrity will not apply to a direct query, you are responsable for the data security.
+     *
+     * @var sql SQL query
+     * @var values Values to replace in the query
+     * @return Promise with query result
+     */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    public querySelect(query: ORMModelQuery): Promise<any> {
+        return this.query(query).then((data: any) => {
+            return Promise.resolve(this.selectConsistentReturn(query.fields || [], data))
+        })
     }
 
     /**
@@ -216,22 +234,22 @@ export class ORMModel {
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public get(select: ORMModelSelect): Promise<any> {
-        return this.selectStatement
-            .select({
+        return this.querySelect(
+            this.selectStatement.select({
                 fields: select.fields,
                 where: select.where,
                 groupBy: select.groupBy,
                 orderBy: select.orderBy,
                 limit: 1,
-            })
-            .then((data: any) => {
-                if (data.length) {
-                    return Promise.resolve(data[0])
-                } else {
-                    // Return unexecuted query
-                    return Promise.resolve(data)
-                }
-            })
+            }),
+        ).then((data: any) => {
+            if (data.length) {
+                return Promise.resolve(data[0])
+            } else {
+                // Return unexecuted query
+                return Promise.resolve(data)
+            }
+        })
     }
 
     /**
@@ -247,7 +265,7 @@ export class ORMModel {
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public getSome(select: ORMModelSelectLimit): Promise<any> {
-        return this.selectStatement.select(select)
+        return this.querySelect(this.selectStatement.select(select))
     }
 
     /**
@@ -262,7 +280,7 @@ export class ORMModel {
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public getAll(select: ORMModelSelect): Promise<any> {
-        return this.selectStatement.select(select)
+        return this.querySelect(this.selectStatement.select(select))
     }
 
     /**
@@ -295,7 +313,7 @@ export class ORMModel {
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public insert(data: ORMModelRow): Promise<any> {
-        return this.insertStatement.insert(data)
+        return this.query(this.insertStatement.insert(data))
     }
 
     /**
@@ -307,7 +325,7 @@ export class ORMModel {
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public update(update: ORMModelUpdate): Promise<any> {
-        return this.updateStatement.update(update)
+        return this.query(this.updateStatement.update(update))
     }
 
     /**
@@ -316,8 +334,7 @@ export class ORMModel {
      * @var where Key/Value object used to filter the query, an array of Key/Value objects will generate a multiple filter separated by an "OR", a "*" string wildcard is required for security reasons if you want to match all rows.
      * @return Promise with query result
      */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public delete(where: string | ORMModelKeyValue | ORMModelKeyValue[]): Promise<any> {
-        return this.deleteStatement.delete(where)
+        return this.query(this.deleteStatement.delete(where))
     }
 }

@@ -58,6 +58,28 @@ describe('MYSQL', () => {
                 sql:
                     'SELECT `test`.`tinyint`, `test`.`smallint`, `test`.`int`, `test`.`id`, `test`.`foreignkey`, `test`.`statickey`, `test`.`float`, `test`.`double`, `test`.`decimal`, `test`.`char`, `test`.`varchar`, `test`.`tinytext`, `test`.`text`, `test`.`longtext`, `test`.`bool`, `test`.`year`, `test`.`date`, `test`.`time`, `test`.`datetime`, `test`.`timestamp` FROM `test`;',
                 values: [],
+                fields: [
+                    'tinyint',
+                    'smallint',
+                    'int',
+                    'id',
+                    'foreignkey',
+                    'statickey',
+                    'float',
+                    'double',
+                    'decimal',
+                    'char',
+                    'varchar',
+                    'tinytext',
+                    'text',
+                    'longtext',
+                    'bool',
+                    'year',
+                    'date',
+                    'time',
+                    'datetime',
+                    'timestamp',
+                ],
             }
 
             const testTable: test.Test = new test.Test({
@@ -77,6 +99,7 @@ describe('MYSQL', () => {
             const expected = {
                 sql: 'SELECT username AS user FROM `users`;',
                 values: [],
+                fields: ['user'],
             }
 
             usersTable
@@ -92,6 +115,17 @@ describe('MYSQL', () => {
                 sql:
                     'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users`;',
                 values: [],
+                fields: [
+                    'id',
+                    'created',
+                    'username',
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'admin',
+                    'verified',
+                    'active',
+                ],
             }
 
             usersTable
@@ -108,6 +142,18 @@ describe('MYSQL', () => {
                 sql:
                     'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active`, `users`.`password` FROM `users`;',
                 values: [],
+                fields: [
+                    'id',
+                    'created',
+                    'username',
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'admin',
+                    'verified',
+                    'active',
+                    'password',
+                ],
             }
 
             usersUnsafeTable
@@ -126,6 +172,17 @@ describe('MYSQL', () => {
                 sql:
                     'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users`;',
                 values: [],
+                fields: [
+                    'id',
+                    'created',
+                    'username',
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'admin',
+                    'verified',
+                    'active',
+                ],
             }
 
             usersTable.getAll({}).then((query: ORMModelQuery) => {
@@ -138,6 +195,17 @@ describe('MYSQL', () => {
                 sql:
                     'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE `users`.`active` = ?;',
                 values: [true],
+                fields: [
+                    'id',
+                    'created',
+                    'username',
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'admin',
+                    'verified',
+                    'active',
+                ],
             }
 
             usersTable
@@ -154,6 +222,17 @@ describe('MYSQL', () => {
                 sql:
                     'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE `users`.`id` = ?;',
                 values: [3],
+                fields: [
+                    'id',
+                    'created',
+                    'username',
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'admin',
+                    'verified',
+                    'active',
+                ],
             }
 
             usersTable
@@ -171,6 +250,7 @@ describe('MYSQL', () => {
             const expected = {
                 sql: 'SELECT `users`.`created`, `users`.`email` FROM `users`;',
                 values: [],
+                fields: ['created', 'email'],
             }
 
             usersTable
@@ -186,6 +266,7 @@ describe('MYSQL', () => {
             const expected = {
                 sql: 'SELECT `users`.`created`, `users`.`email` FROM `users` WHERE `users`.`id` = ?;',
                 values: [3],
+                fields: ['created', 'email'],
             }
 
             usersTable
@@ -207,6 +288,17 @@ describe('MYSQL', () => {
                 sql:
                     'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` LIMIT 3;',
                 values: [],
+                fields: [
+                    'id',
+                    'created',
+                    'username',
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'admin',
+                    'verified',
+                    'active',
+                ],
             }
 
             usersTable
@@ -223,6 +315,17 @@ describe('MYSQL', () => {
                 sql:
                     'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users`;',
                 values: [],
+                fields: [
+                    'id',
+                    'created',
+                    'username',
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'admin',
+                    'verified',
+                    'active',
+                ],
             }
 
             usersTable.getSome({}).then((query: ORMModelQuery) => {
@@ -235,6 +338,17 @@ describe('MYSQL', () => {
                 sql:
                     'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE `users`.`id` = ? LIMIT 3;',
                 values: [3],
+                fields: [
+                    'id',
+                    'created',
+                    'username',
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'admin',
+                    'verified',
+                    'active',
+                ],
             }
 
             usersTable
@@ -253,6 +367,7 @@ describe('MYSQL', () => {
             const expected = {
                 sql: 'SELECT `users`.`created`, `users`.`email` FROM `users` LIMIT 3;',
                 values: [],
+                fields: ['created', 'email'],
             }
 
             usersTable
@@ -269,6 +384,7 @@ describe('MYSQL', () => {
             const expected = {
                 sql: 'SELECT `users`.`created`, `users`.`email` FROM `users` WHERE `users`.`id` = ? LIMIT 3;',
                 values: [3],
+                fields: ['created', 'email'],
             }
 
             usersTable
@@ -291,6 +407,17 @@ describe('MYSQL', () => {
                 sql:
                     'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` LIMIT 1;',
                 values: [],
+                fields: [
+                    'id',
+                    'created',
+                    'username',
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'admin',
+                    'verified',
+                    'active',
+                ],
             }
 
             usersTable.get({}).then((query: ORMModelQuery) => {
@@ -303,6 +430,17 @@ describe('MYSQL', () => {
                 sql:
                     'SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE `users`.`id` = ? LIMIT 1;',
                 values: [3],
+                fields: [
+                    'id',
+                    'created',
+                    'username',
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'admin',
+                    'verified',
+                    'active',
+                ],
             }
 
             usersTable
@@ -320,6 +458,7 @@ describe('MYSQL', () => {
             const expected = {
                 sql: 'SELECT `users`.`created`, `users`.`email` FROM `users` LIMIT 1;',
                 values: [],
+                fields: ['created', 'email'],
             }
 
             usersTable
@@ -335,6 +474,7 @@ describe('MYSQL', () => {
             const expected = {
                 sql: 'SELECT `users`.`created`, `users`.`email` FROM `users` WHERE `users`.`id` = ? LIMIT 1;',
                 values: [3],
+                fields: ['created', 'email'],
             }
 
             usersTable

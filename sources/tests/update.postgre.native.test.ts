@@ -44,55 +44,40 @@ beforeAll((done) => {
 describe('PostgreSQL', () => {
     describe('Update', () => {
         it('Fails if where is an object', () => {
-            const expected = {
-                sql: 'UPDATE "users" SET "users"."firstName" = $1ERROR;',
-                values: ['Chriss'],
-            }
-
-            usersTable
-                .update({
+            try {
+                usersTable.update({
                     data: {
                         firstName: 'Chriss',
                     },
                     where: {},
                 })
-                .then((query: ORMModelQuery) => {
-                    expect(query).toEqual(expected)
-                })
+            } catch (error) {
+                expect(error).toEqual(new Error('Invalid where value.'))
+            }
         })
 
         it('Fails if where is an array', () => {
-            const expected = {
-                sql: 'UPDATE "users" SET "users"."firstName" = $1ERROR;',
-                values: ['Chriss'],
-            }
-
-            usersTable
-                .update({
+            try {
+                usersTable.update({
                     data: {
                         firstName: 'Chriss',
                     },
                     where: [],
                 })
-                .then((query: ORMModelQuery) => {
-                    expect(query).toEqual(expected)
-                })
+            } catch (error) {
+                expect(error).toEqual(new Error('Invalid where value.'))
+            }
         })
 
         it('Fails if data is empty', () => {
-            const expected = {
-                sql: 'UPDATE "users" SET ;',
-                values: [],
-            }
-
-            usersTable
-                .update({
+            try {
+                usersTable.update({
                     data: {},
                     where: '*',
                 })
-                .then((query: ORMModelQuery) => {
-                    expect(query).toEqual(expected)
-                })
+            } catch (error) {
+                expect(error).toEqual(new Error('Invalid where value.'))
+            }
         })
 
         it('1 field 1 where', () => {

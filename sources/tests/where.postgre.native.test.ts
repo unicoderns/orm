@@ -44,64 +44,44 @@ beforeAll((done) => {
 describe('PostgreSQL', () => {
     describe('Get general', () => {
         it('Simple with empty where array should fail', () => {
-            const expected = {
-                sql:
-                    'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users"ERROR;',
-                values: [],
-            }
-
-            usersTable
-                .getAll({
+            try {
+                usersTable.getAll({
                     where: [],
                 })
-                .then((query: ORMModelQuery) => {
-                    expect(query).toEqual(expected)
-                })
+            } catch (error) {
+                expect(error).toEqual(new Error('Invalid where value.'))
+            }
         })
 
         it('Simple update with empty where object should fail', () => {
-            const expected = {
-                sql: 'UPDATE "users" SET "users"."username" = $1ERROR;',
-                values: ['chriss'],
-            }
-
-            usersTable
-                .update({
+            try {
+                usersTable.update({
                     data: {
                         username: 'chriss',
                     },
                     where: {},
                 })
-                .then((query: ORMModelQuery) => {
-                    expect(query).toEqual(expected)
-                })
+            } catch (error) {
+                expect(error).toEqual(new Error('Invalid where value.'))
+            }
         })
 
         it('Simple delete with empty where object should fail', () => {
-            const expected = {
-                sql: 'DELETE FROM "users"ERROR;',
-                values: [],
+            try {
+                usersTable.delete({})
+            } catch (error) {
+                expect(error).toEqual(new Error('Invalid where value.'))
             }
-
-            usersTable.delete({}).then((query: ORMModelQuery) => {
-                expect(query).toEqual(expected)
-            })
         })
 
         it('Simple with where string different than "*" should fail', () => {
-            const expected = {
-                sql:
-                    'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users"ERROR;',
-                values: [],
-            }
-
-            usersTable
-                .getAll({
+            try {
+                usersTable.getAll({
                     where: 'hello',
                 })
-                .then((query: ORMModelQuery) => {
-                    expect(query).toEqual(expected)
-                })
+            } catch (error) {
+                expect(error).toEqual(new Error('Invalid where value.'))
+            }
         })
 
         it('Simple with Boolean', () => {
@@ -109,6 +89,17 @@ describe('PostgreSQL', () => {
                 sql:
                     'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" WHERE "users"."active" = $1;',
                 values: [true],
+                fields: [
+                    'id',
+                    'created',
+                    'username',
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'admin',
+                    'verified',
+                    'active',
+                ],
             }
 
             usersTable
@@ -125,6 +116,17 @@ describe('PostgreSQL', () => {
                 sql:
                     'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" WHERE ("users"."id" = $1) OR ("users"."username" = $2);',
                 values: [3, 'chriss'],
+                fields: [
+                    'id',
+                    'created',
+                    'username',
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'admin',
+                    'verified',
+                    'active',
+                ],
             }
 
             usersTable
@@ -141,6 +143,17 @@ describe('PostgreSQL', () => {
                 sql:
                     'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" WHERE ("users"."id" = $1) OR ("users"."username" = \'chriss\');',
                 values: [3],
+                fields: [
+                    'id',
+                    'created',
+                    'username',
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'admin',
+                    'verified',
+                    'active',
+                ],
             }
 
             usersTable
@@ -157,6 +170,17 @@ describe('PostgreSQL', () => {
                 sql:
                     'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" WHERE ("users"."id" = $1 AND "users"."email" = $2) OR ("users"."username" = $3);',
                 values: [3, 'chriss@unicoderns.com', 'chriss'],
+                fields: [
+                    'id',
+                    'created',
+                    'username',
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'admin',
+                    'verified',
+                    'active',
+                ],
             }
 
             usersTable
@@ -173,6 +197,17 @@ describe('PostgreSQL', () => {
                 sql:
                     'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" WHERE "users"."id" = $1 AND "users"."username" = $2 AND "users"."email" = $3;',
                 values: [3, 'chriss', 'chriss@unicoderns.com'],
+                fields: [
+                    'id',
+                    'created',
+                    'username',
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'admin',
+                    'verified',
+                    'active',
+                ],
             }
 
             usersTable
@@ -189,6 +224,17 @@ describe('PostgreSQL', () => {
                 sql:
                     'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" WHERE "users"."id" != $1 AND "users"."username" = $2 AND "users"."email" = $3;',
                 values: [3, 'chriss', 'chriss@unicoderns.com'],
+                fields: [
+                    'id',
+                    'created',
+                    'username',
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'admin',
+                    'verified',
+                    'active',
+                ],
             }
 
             usersTable
@@ -205,6 +251,17 @@ describe('PostgreSQL', () => {
                 sql:
                     'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" WHERE ("users"."id" = $1) OR ("users"."username" = $2) OR ("users"."email" = $3);',
                 values: [3, 'chriss', 'chriss@unicoderns.com'],
+                fields: [
+                    'id',
+                    'created',
+                    'username',
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'admin',
+                    'verified',
+                    'active',
+                ],
             }
 
             usersTable
@@ -221,6 +278,17 @@ describe('PostgreSQL', () => {
                 sql:
                     'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" GROUP BY username, active;',
                 values: [],
+                fields: [
+                    'id',
+                    'created',
+                    'username',
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'admin',
+                    'verified',
+                    'active',
+                ],
             }
 
             usersTable
@@ -237,6 +305,17 @@ describe('PostgreSQL', () => {
                 sql:
                     'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" ORDER BY id ASC;',
                 values: [],
+                fields: [
+                    'id',
+                    'created',
+                    'username',
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'admin',
+                    'verified',
+                    'active',
+                ],
             }
 
             usersTable
@@ -253,6 +332,17 @@ describe('PostgreSQL', () => {
                 sql:
                     'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" GROUP BY username, active ORDER BY id ASC;',
                 values: [],
+                fields: [
+                    'id',
+                    'created',
+                    'username',
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'admin',
+                    'verified',
+                    'active',
+                ],
             }
 
             usersTable
@@ -270,6 +360,17 @@ describe('PostgreSQL', () => {
                 sql:
                     'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" WHERE ("users"."id" <= $1);',
                 values: [3],
+                fields: [
+                    'id',
+                    'created',
+                    'username',
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'admin',
+                    'verified',
+                    'active',
+                ],
             }
 
             usersTable
@@ -293,6 +394,17 @@ describe('PostgreSQL', () => {
                 sql:
                     'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" WHERE ("users"."id" = $1) OR ("users"."username" != \'chriss\');',
                 values: [3],
+                fields: [
+                    'id',
+                    'created',
+                    'username',
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'admin',
+                    'verified',
+                    'active',
+                ],
             }
 
             usersTable
@@ -318,6 +430,17 @@ describe('PostgreSQL', () => {
                 sql:
                     'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" WHERE ("users"."id" = $1) OR ("users"."created" = now());',
                 values: [3],
+                fields: [
+                    'id',
+                    'created',
+                    'username',
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'admin',
+                    'verified',
+                    'active',
+                ],
             }
 
             usersTable
@@ -334,6 +457,17 @@ describe('PostgreSQL', () => {
                 sql:
                     'SELECT "users"."id", "users"."created", "users"."username", "users"."email", "users"."firstName" AS "first_name", "users"."lastName" AS "last_name", "users"."admin", "users"."verified", "users"."active" FROM "users" WHERE ("users"."id" = $1) OR ("users"."created" >= now());',
                 values: [3],
+                fields: [
+                    'id',
+                    'created',
+                    'username',
+                    'email',
+                    'first_name',
+                    'last_name',
+                    'admin',
+                    'verified',
+                    'active',
+                ],
             }
 
             usersTable
