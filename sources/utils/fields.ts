@@ -25,24 +25,12 @@
 import chalk from 'chalk'
 
 import { ORMAllowedFields } from '../enums'
-import { Config } from '../interfaces/config'
+import { regularQuotes } from './defaultValues'
 
 /**
  * Model Abstract
  */
 export class FieldsUtils {
-    private regularQuotes = '"'
-
-    /**
-     * Set model
-     *
-     * @param model ORMModel
-     * @param config Config
-     */
-    constructor(config: Config) {
-        this.regularQuotes = config.computed ? config.computed.regularQuotes : '"'
-    }
-
     /**
      * Convert a field keys into array.
      */
@@ -55,7 +43,7 @@ export class FieldsUtils {
 
                 if (typeof alias !== 'undefined' && alias != key) {
                     // RegularQuotes need to be removed from this file
-                    keys.push(`${key + this.regularQuotes} AS ${this.regularQuotes + alias}`)
+                    keys.push(`${key + regularQuotes} AS ${regularQuotes + alias}`)
                 } else {
                     keys.push(key)
                 }

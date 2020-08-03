@@ -27,6 +27,7 @@ import { ORMModelSelectLimit, Drivers, Config, ORMModelQuery } from '../interfac
 import { ORMModel } from '..'
 import { FieldsUtils } from '../utils/fields'
 import { SqlPartialGeneratorUtils } from '../utils/sqlPartialGenerator'
+import { regularQuotes } from '../utils/defaultValues'
 
 /**
  * Model Abstract
@@ -49,7 +50,7 @@ export class Select extends Statement {
     constructor(model: ORMModel, config: Config) {
         super(config)
         this.model = model
-        this.fieldsUtils = new FieldsUtils(config)
+        this.fieldsUtils = new FieldsUtils()
         this.partialGeneratorUtils = new SqlPartialGeneratorUtils(this.model, config, this.paramCursor)
     }
 
@@ -69,13 +70,11 @@ export class Select extends Statement {
         let fieldsSQL = ''
 
         if (typeof prefix === 'undefined') {
-            fieldsSQL = `${this.quote(this.model.tableName)}.${this.regularQuotes}`
+            fieldsSQL = `${this.quote(this.model.tableName)}.${regularQuotes}`
             fieldsSQL =
                 fieldsSQL +
-                selectableFields.join(
-                    `${this.regularQuotes}, ${this.quote(this.model.tableName)}.${this.regularQuotes}`,
-                ) +
-                this.regularQuotes
+                selectableFields.join(`${regularQuotes}, ${this.quote(this.model.tableName)}.${regularQuotes}`) +
+                regularQuotes
         } else {
             const formatedFields: string[] = []
 

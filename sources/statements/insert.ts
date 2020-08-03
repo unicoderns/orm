@@ -26,6 +26,7 @@ import { ValidatorUtils } from '../utils/validator'
 import { ORMModel } from '../model'
 import { Engines, Config, Drivers, ORMModelRow, ORMModelQuery } from '../interfaces'
 import { Statement } from './statement'
+import { regularQuotes } from '../utils/defaultValues'
 
 /**
  * Model Abstract
@@ -89,8 +90,7 @@ export class Insert extends Statement {
 
         const query = this.assembling({
             tableName: this.quote(this.model.tableName),
-            fields:
-                this.regularQuotes + fields.join(`${this.regularQuotes}, ${this.regularQuotes}`) + this.regularQuotes,
+            fields: regularQuotes + fields.join(`${regularQuotes}, ${regularQuotes}`) + regularQuotes,
             values: wildcards.join(', '),
         })
 

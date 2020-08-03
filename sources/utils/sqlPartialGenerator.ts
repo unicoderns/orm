@@ -26,6 +26,7 @@ import { ValidatorUtils } from './validator'
 import { ORMModel } from '../model'
 import { Engines, Config, ORMModelJoin, Drivers } from '../interfaces'
 import { ParamCursor } from './paramCursor'
+import { regularQuotes } from './defaultValues'
 
 /**
  * Model Abstract
@@ -37,7 +38,6 @@ export class SqlPartialGeneratorUtils {
     private readonly specialFunctions = ['now()']
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private emptyValues: any = []
-    private regularQuotes = '"'
     protected paramCursor: ParamCursor
 
     /**
@@ -49,7 +49,6 @@ export class SqlPartialGeneratorUtils {
     constructor(model: ORMModel, config: Config, paramCursor: ParamCursor) {
         this.model = model
         this.config = config || {}
-        this.regularQuotes = this.config.computed ? this.config.computed.regularQuotes : '"'
         this.paramCursor = paramCursor
         this.validatorUtils = new ValidatorUtils(config)
     }
@@ -58,7 +57,7 @@ export class SqlPartialGeneratorUtils {
      * Quote string
      */
     private quote(value: string): string {
-        return this.regularQuotes + value + this.regularQuotes
+        return regularQuotes + value + regularQuotes
     }
 
     /**
@@ -196,7 +195,7 @@ export class SqlPartialGeneratorUtils {
                         } else if (this.config.engine === Engines.MySQL) {
                             sql = `${sql} ${operator} ?`
                         } else {
-                            sql = `${sql} ENGINE NOT SUPPORTED`
+                            throw new Error('ENGINE NOT SUPPORTED')
                         }
                     }
                 }

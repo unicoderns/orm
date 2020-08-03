@@ -22,8 +22,9 @@
 // SOFTWARE.                                                                              //
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-import { Config, Drivers, ORMModelQuery } from '../interfaces'
+import { Config, Drivers, ORMModelQuery, Engines } from '../interfaces'
 import { ParamCursor } from '../utils/paramCursor'
+import { regularQuotes } from '../utils/defaultValues'
 
 /**
  * Model Abstract
@@ -46,18 +47,22 @@ export abstract class Statement {
      */
     constructor(config: Config) {
         this.config = config
-        this.regularQuotes = this.config.computed ? this.config.computed.regularQuotes : '"'
     }
 
     /**
      * Quote string
      */
     protected quote(value: string): string {
-        return this.regularQuotes + value + this.regularQuotes
+        return regularQuotes + value + regularQuotes
     }
 
     public query(query: ORMModelQuery): ORMModelQuery {
-        const { sql, values, parameters, fields } = query
+        const { values, parameters, fields } = query
+        let { sql } = query
+
+        if (this.config.engine === Engines.MySQL) {
+            sql = sql.replace(/"/g, '`')
+        }
 
         if (this.config.driver === Drivers.DataAPI) {
             return { sql, parameters, fields }
