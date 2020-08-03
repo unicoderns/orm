@@ -25,13 +25,11 @@
 import {
     ORMCommonFields,
     ORMDataTimestampField,
-    ORMSupportedFields,
     ORMForeignKeyField,
     ORMStaticKeyField,
     ORMFloatField,
     ORMVarCharField,
     ORMBoolField,
-    ORMTimestampDefault,
 } from './enums'
 import { ORMGeneralFieldType, ORMTimestampFieldType, ORMBoolFieldType } from './interfaces/db/types'
 import { ORMModel } from '.'
@@ -57,47 +55,9 @@ import { ORMTimeDatatype } from './datatypes/time'
 import { ORMTimestampDatatype } from './datatypes/timestamp'
 
 /**
- * JSloth DB Datatypes
+ * ORM DB Datatypes
  */
 export class ORMDatatypes {
-    /**
-     * Merge 2 objects
-     *
-     * @var commonType Object 1
-     * @var customType Object 2 (will overwrite Object 1 keys)
-     * @return Merged object
-     */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private mergeTypes(commonType: any, customType: any): any {
-        const type = { ...commonType, ...customType }
-
-        return type
-    }
-
-    /**
-     * Fill SQL defaults for fields
-     *
-     * @var settings Object with custom settings
-     * @return Object with defaults
-     */
-    private fillDefault(settings: ORMGeneralFieldType = {}): ORMGeneralFieldType {
-        const type: ORMGeneralFieldType = {
-            primaryKey: settings.primaryKey || false,
-            notNull: settings.notNull || false,
-            unique: settings.unique || false,
-            // binary: settings.binary || false,
-            unsigned: settings.unsigned || false,
-            zeroFill: settings.zeroFill || false,
-            autoincrement: settings.autoincrement || false,
-            generated: settings.generated || false,
-            alias: settings.alias || undefined,
-            protected: settings.protected || false,
-            private: settings.private || false,
-        }
-
-        return type
-    }
-
     /////////////////////////////////////////////////////////////////////
     // Numbers
     /////////////////////////////////////////////////////////////////////

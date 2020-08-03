@@ -30,7 +30,7 @@ export class ORMYearDatatype extends ORMDatatype {
     protected type = ORMSupportedFields.YEAR
     protected default: ORMTimestampDefault
 
-    constructor(settings: ORMTimestampFieldType = {}) {
+    constructor(settings: ORMTimestampFieldType) {
         super(settings)
 
         this.default = settings.default || ORMTimestampDefault.NULL

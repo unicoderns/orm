@@ -83,7 +83,7 @@ export class Insert extends Statement {
             } else if (this.model.config.engine === Engines.MySQL) {
                 wildcards.push('?')
             } else {
-                wildcards.push('ENGINE NOT SUPPORTED')
+                throw new Error('ENGINE NOT SUPPORTED')
             }
         }
 

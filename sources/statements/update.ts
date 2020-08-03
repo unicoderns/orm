@@ -58,8 +58,8 @@ export class Update extends Statement {
 
     private processUpdateKeys(update: ORMModelUpdate): any {
         const data = update.data
-        const fields = []
-        const values = []
+        const fields: any = []
+        const values: any = []
         const valuesObj: any = []
 
         for (const key in data) {
@@ -92,7 +92,7 @@ export class Update extends Statement {
                 } else if (this.model.config.engine === Engines.MySQL) {
                     fields.push(`${this.quote(this.model.tableName)}.${this.quote(key)} = ?`)
                 } else {
-                    fields.push('ENGINE NOT SUPPORTED')
+                    throw new Error('ENGINE NOT SUPPORTED')
                 }
             }
         }

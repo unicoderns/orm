@@ -22,16 +22,15 @@
 // SOFTWARE.                                                                              //
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-import { ORMSupportedFields } from '../enums'
+import { ORMSupportedFields, ORMStaticKeyField } from '../enums'
 import { ORMDatatype } from './datatype'
 import { ORMGeneralFieldType } from '../interfaces/db/types'
-import { ORMModel, ORMForeignKeyField, ORMStaticKeyField } from '..'
 
 export class ORMStaticKeyDatatype extends ORMDatatype {
     protected type = ORMSupportedFields.INT
     protected keys: any
 
-    constructor(keys: any, settings: ORMGeneralFieldType = {}) {
+    constructor(keys: any, settings: ORMGeneralFieldType) {
         super(settings)
 
         this.keys = keys

@@ -29,7 +29,7 @@ import { ORMGeneralFieldType } from '../interfaces/db/types'
 export class ORMIdDatatype extends ORMDatatype {
     protected type = ORMSupportedFields.INT
 
-    constructor(settings: ORMGeneralFieldType = {}) {
+    constructor(settings: ORMGeneralFieldType) {
         super(settings)
         this.primaryKey = true
         this.notNull = true

@@ -42,7 +42,7 @@ export abstract class ORMDatatype {
     protected size: number
     protected abstract type: ORMSupportedFields
 
-    constructor(settings: ORMGeneralFieldType = {}) {
+    constructor(settings: ORMGeneralFieldType) {
         this.primaryKey = settings.primaryKey || false
         this.notNull = settings.notNull || false
         this.unique = settings.unique || false

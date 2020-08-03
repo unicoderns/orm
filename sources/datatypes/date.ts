@@ -30,7 +30,7 @@ export class ORMDateDatatype extends ORMDatatype {
     protected type = ORMSupportedFields.DATE
     protected default: ORMTimestampDefault
 
-    constructor(settings: ORMTimestampFieldType = {}) {
+    constructor(settings: ORMTimestampFieldType) {
         super(settings)
 
         this.default = settings.default || ORMTimestampDefault.NULL

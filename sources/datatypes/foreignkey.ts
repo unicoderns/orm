@@ -33,7 +33,7 @@ export class ORMForeignKeyDatatype extends ORMDatatype {
     protected linkedField: string
     protected model: ORMModel
 
-    constructor(localField: string, linkedField: string, model: ORMModel, settings: ORMGeneralFieldType = {}) {
+    constructor(localField: string, linkedField: string, model: ORMModel, settings: ORMGeneralFieldType) {
         super(settings)
 
         this.model = model

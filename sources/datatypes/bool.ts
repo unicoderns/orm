@@ -31,7 +31,7 @@ export class ORMBoolDatatype extends ORMDatatype {
     protected type = ORMSupportedFields.BOOL
     protected default: number
 
-    constructor(settings: ORMGeneralFieldType = {}) {
+    constructor(settings: ORMGeneralFieldType) {
         super(settings)
 
         this.default = settings.default || 0
