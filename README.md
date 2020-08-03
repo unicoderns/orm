@@ -11,7 +11,7 @@
 [![Dependencies](https://david-dm.org/unicoderns/orm.svg)](https://david-dm.org/unicoderns/orm/)
 [![Dev Dependencies](https://david-dm.org/unicoderns/orm/dev-status.svg)](https://david-dm.org/unicoderns/orm/?type=dev)
 
-Docs available at [unicoderns.com](http://unicoderns.com/docs/ORM/) `Work in progress`
+Docs available at [unicoderns.com](https://unicoderns.com/_/orm/docs/)
 
 This is a typescript light layer package that allows you to manage and do queries to the DB in an easier way, even without SQL knowledge.
 
