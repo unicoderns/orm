@@ -22,88 +22,23 @@
 // SOFTWARE.                                                                              //
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-import { ORMTimestampDefault, ORMBinaryDefault } from './defaults'
-import { ORMModel } from '../../model'
+import { ORMSupportedFields, ORMTimestampDefault, ORMDataTimestampField } from '../enums'
+import { ORMDatatype } from './datatype'
+import { ORMTimestampFieldType } from '../interfaces/db/types'
 
-export enum ORMSupportedFields {
-    'TINYINT',
-    'SMALLINT',
-    'BIGINT',
-    'INT',
-    'FLOAT',
-    'REAL',
-    'DOUBLE',
-    'DECIMAL',
-    'CHAR',
-    'VARCHAR',
-    'TINYTEXT',
-    'TEXT',
-    'LONGTEXT',
-    'BOOL',
-    'YEAR',
-    'DATE',
-    'TIME',
-    'DATETIME',
-    'TIMESTAMP',
-    'BLOB',
-    'BINARY',
-    'LONGVARBINARY',
-    'VARBINARY',
-}
+export class ORMTimestampDatatype extends ORMDatatype {
+    protected type = ORMSupportedFields.TIMESTAMP
+    protected default: ORMTimestampDefault
 
-export interface ORMAllowedFields {
-    [key: string]: ORMSystemFields
-}
+    constructor(settings: ORMTimestampFieldType = {}) {
+        super(settings)
 
-// Field internal flags
-export interface ORMSystemFields {
-    type?: ORMSupportedFields
-    alias?: string
-    protected?: boolean
-    private?: boolean
-}
+        this.default = settings.default || ORMTimestampDefault.NULL
+    }
 
-export interface ORMCommonFields extends ORMSystemFields {
-    primaryKey?: boolean
-    notNull?: boolean
-    unique?: boolean
-    // binary?: boolean;
-    unsigned?: boolean
-    zeroFill?: boolean
-    autoincrement?: boolean
-    generated?: boolean
-    size?: number
-    default?: number
-}
+    public getConfig(): ORMDataTimestampField {
+        const type = super.getConfig()
 
-export interface ORMVarCharField extends ORMCommonFields {
-    size: number
-}
-
-export interface ORMFloatField extends ORMCommonFields {
-    precision?: number
-}
-
-export interface ORMBoolField extends ORMCommonFields {
-    default: ORMBinaryDefault
-}
-
-export interface ORMDataTimestampField extends ORMCommonFields {
-    default: ORMTimestampDefault
-}
-
-/**
- * Foreign key to model
- */
-export interface ORMForeignKeyField extends ORMCommonFields {
-    localField: string
-    linkedField: string
-    model: ORMModel
-}
-
-/**
- * Foreign key to static enum model
- */
-export interface ORMStaticKeyField extends ORMCommonFields {
-    keys: any
+        return { ...type, ...{ default: this.default } }
+    }
 }

@@ -20,6 +20,7 @@
       ".ts"
     ],
     "exclude": [
+      "**/tests/",
       "**/*.d.ts",
       "**/*.js",
       "**/.eslintrc.js",

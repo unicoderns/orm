@@ -22,88 +22,9 @@
 // SOFTWARE.                                                                              //
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-import { ORMTimestampDefault, ORMBinaryDefault } from './defaults'
-import { ORMModel } from '../../model'
+import { ORMSupportedFields } from '../enums'
+import { ORMDatatype } from './datatype'
 
-export enum ORMSupportedFields {
-    'TINYINT',
-    'SMALLINT',
-    'BIGINT',
-    'INT',
-    'FLOAT',
-    'REAL',
-    'DOUBLE',
-    'DECIMAL',
-    'CHAR',
-    'VARCHAR',
-    'TINYTEXT',
-    'TEXT',
-    'LONGTEXT',
-    'BOOL',
-    'YEAR',
-    'DATE',
-    'TIME',
-    'DATETIME',
-    'TIMESTAMP',
-    'BLOB',
-    'BINARY',
-    'LONGVARBINARY',
-    'VARBINARY',
-}
-
-export interface ORMAllowedFields {
-    [key: string]: ORMSystemFields
-}
-
-// Field internal flags
-export interface ORMSystemFields {
-    type?: ORMSupportedFields
-    alias?: string
-    protected?: boolean
-    private?: boolean
-}
-
-export interface ORMCommonFields extends ORMSystemFields {
-    primaryKey?: boolean
-    notNull?: boolean
-    unique?: boolean
-    // binary?: boolean;
-    unsigned?: boolean
-    zeroFill?: boolean
-    autoincrement?: boolean
-    generated?: boolean
-    size?: number
-    default?: number
-}
-
-export interface ORMVarCharField extends ORMCommonFields {
-    size: number
-}
-
-export interface ORMFloatField extends ORMCommonFields {
-    precision?: number
-}
-
-export interface ORMBoolField extends ORMCommonFields {
-    default: ORMBinaryDefault
-}
-
-export interface ORMDataTimestampField extends ORMCommonFields {
-    default: ORMTimestampDefault
-}
-
-/**
- * Foreign key to model
- */
-export interface ORMForeignKeyField extends ORMCommonFields {
-    localField: string
-    linkedField: string
-    model: ORMModel
-}
-
-/**
- * Foreign key to static enum model
- */
-export interface ORMStaticKeyField extends ORMCommonFields {
-    keys: any
+export class ORMTinyTextDatatype extends ORMDatatype {
+    protected type = ORMSupportedFields.TINYTEXT
 }

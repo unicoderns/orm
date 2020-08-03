@@ -22,88 +22,58 @@
 // SOFTWARE.                                                                              //
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-import { ORMTimestampDefault, ORMBinaryDefault } from './defaults'
-import { ORMModel } from '../../model'
-
-export enum ORMSupportedFields {
-    'TINYINT',
-    'SMALLINT',
-    'BIGINT',
-    'INT',
-    'FLOAT',
-    'REAL',
-    'DOUBLE',
-    'DECIMAL',
-    'CHAR',
-    'VARCHAR',
-    'TINYTEXT',
-    'TEXT',
-    'LONGTEXT',
-    'BOOL',
-    'YEAR',
-    'DATE',
-    'TIME',
-    'DATETIME',
-    'TIMESTAMP',
-    'BLOB',
-    'BINARY',
-    'LONGVARBINARY',
-    'VARBINARY',
-}
-
-export interface ORMAllowedFields {
-    [key: string]: ORMSystemFields
-}
-
-// Field internal flags
-export interface ORMSystemFields {
-    type?: ORMSupportedFields
-    alias?: string
-    protected?: boolean
-    private?: boolean
-}
-
-export interface ORMCommonFields extends ORMSystemFields {
-    primaryKey?: boolean
-    notNull?: boolean
-    unique?: boolean
-    // binary?: boolean;
-    unsigned?: boolean
-    zeroFill?: boolean
-    autoincrement?: boolean
-    generated?: boolean
-    size?: number
-    default?: number
-}
-
-export interface ORMVarCharField extends ORMCommonFields {
-    size: number
-}
-
-export interface ORMFloatField extends ORMCommonFields {
-    precision?: number
-}
-
-export interface ORMBoolField extends ORMCommonFields {
-    default: ORMBinaryDefault
-}
-
-export interface ORMDataTimestampField extends ORMCommonFields {
-    default: ORMTimestampDefault
-}
+import { ORMCommonFields, ORMSupportedFields } from '../enums'
+import { ORMGeneralFieldType } from '../interfaces/db/types'
 
 /**
- * Foreign key to model
+ * ORM DB Datatypes
  */
-export interface ORMForeignKeyField extends ORMCommonFields {
-    localField: string
-    linkedField: string
-    model: ORMModel
-}
+export abstract class ORMDatatype {
+    protected primaryKey: boolean
+    protected notNull: boolean
+    protected unique: boolean
+    protected unsigned: boolean
+    protected zeroFill: boolean
+    protected autoincrement: boolean
+    protected generated: boolean
+    protected alias: string | undefined
+    protected protected: boolean
+    protected private: boolean
+    protected size: number
+    protected abstract type: ORMSupportedFields
 
-/**
- * Foreign key to static enum model
- */
-export interface ORMStaticKeyField extends ORMCommonFields {
-    keys: any
+    constructor(settings: ORMGeneralFieldType = {}) {
+        this.primaryKey = settings.primaryKey || false
+        this.notNull = settings.notNull || false
+        this.unique = settings.unique || false
+        // this.binary = settings.binary || false
+        this.unsigned = settings.unsigned || false
+        this.zeroFill = settings.zeroFill || false
+        this.autoincrement = settings.autoincrement || false
+        this.generated = settings.generated || false
+        this.alias = settings.alias || undefined
+        this.protected = settings.protected || false
+        this.private = settings.private || false
+        this.size = settings.size || 0
+    }
+
+    public getConfig(): ORMCommonFields {
+        const type: ORMGeneralFieldType = {
+            type: this.type,
+            primaryKey: this.primaryKey,
+            notNull: this.notNull,
+            unique: this.unique,
+            // binary: this.binary,
+            unsigned: this.unsigned,
+            zeroFill: this.zeroFill,
+            autoincrement: this.autoincrement,
+            generated: this.generated,
+            alias: this.alias,
+            protected: this.protected,
+            size: this.size,
+            private: this.private,
+        }
+
+        return type
+    }
 }
