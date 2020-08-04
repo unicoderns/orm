@@ -34,7 +34,6 @@ export class Delete extends Statement {
     private model: ORMModel
     public config: Config = {} // ToDo: move all config to file
     private partialGeneratorUtils: SqlPartialGeneratorUtils
-    private readonly specialFunctions = ['now()']
     protected template = 'DELETE FROM <orm_table_name>;'
     protected templateJoin = 'DELETE FROM <orm_table_name> <orm_join>;'
     protected templateWhere = 'DELETE FROM <orm_table_name> WHERE <orm_conditions>;'

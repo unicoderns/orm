@@ -71,6 +71,30 @@ export abstract class Statement {
         }
     }
 
+    private getTemplate({ join, conditions }: { join?: string; conditions?: string }): string {
+        if (conditions && join) {
+            return this.templateJoinWhere
+        } else if (conditions) {
+            return this.templateWhere
+        } else if (join) {
+            return this.templateJoin
+        } else {
+            return this.template
+        }
+    }
+
+    protected strToReplace(item: string): string {
+        if (this.config.driver === Drivers.DataAPI) {
+            return `:${item}`
+        } else if (this.config.engine === Engines.PostgreSQL) {
+            return `$${this.paramCursor.getNext()}`
+        } else if (this.config.engine === Engines.MySQL) {
+            return '?'
+        } else {
+            throw new Error('ENGINE NOT SUPPORTED')
+        }
+    }
+
     protected assembling({
         tableName,
         fields,
@@ -86,17 +110,7 @@ export abstract class Statement {
         conditions?: string
         extra?: string
     }): string {
-        let query = ''
-
-        if (conditions && join) {
-            query = this.templateJoinWhere
-        } else if (conditions) {
-            query = this.templateWhere
-        } else if (join) {
-            query = this.templateJoin
-        } else {
-            query = this.template
-        }
+        let query = this.getTemplate({ join, conditions })
 
         query = query.replace('<orm_column_names>', fields || '')
         query = query.replace('<orm_table_name>', tableName || '')

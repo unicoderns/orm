@@ -109,6 +109,55 @@ export class Select extends Statement {
         return this.generateSelectSQL({ selectableFields, prefix: prefix || undefined })
     }
 
+    public getExtra(select: ORMModelSelectLimit): string {
+        const groupBy = select.groupBy
+        const orderBy = select.orderBy
+        const limit = select.limit
+        let extra = ''
+
+        if (typeof groupBy !== 'undefined' && groupBy !== null) {
+            extra += ` GROUP BY ${groupBy}`
+        }
+        if (typeof orderBy !== 'undefined' && orderBy !== null) {
+            extra += ` ORDER BY ${orderBy}`
+        }
+        if (typeof limit !== 'undefined' && limit !== null) {
+            extra += ` LIMIT ${limit}`
+        }
+
+        return extra
+    }
+
+    public getFields(
+        select: ORMModelSelectLimit,
+    ): {
+        keys: string[]
+        joinFieldsSQL: string
+        fieldsSQL: string
+    } {
+        const joinFieldsSQL = this.partialGeneratorUtils.getJoinSelectFieldsSQL()
+        const fieldsSQL = this.getSelectFieldsSQL(select.fields)
+        const keyArray = String(fieldsSQL.replace(/"|`/g, '') + joinFieldsSQL.replace(/"|`/g, '')).split(', ')
+        const keys: string[] = []
+
+        keyArray.forEach((key) => {
+            let temp = key.split(' AS ')
+
+            if (temp.length === 2) {
+                keys.push(temp[1])
+            } else {
+                temp = key.split('.')
+                keys.push(temp[1])
+            }
+        })
+
+        return {
+            keys,
+            joinFieldsSQL,
+            fieldsSQL,
+        }
+    }
+
     /**
      * Select private query
      *
@@ -126,37 +175,17 @@ export class Select extends Statement {
      * Join at least 2 tables is important
      * Group this using functions like select("").orderBy() is just easier to understand
      */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public select(select: ORMModelSelectLimit): ORMModelQuery {
         this.paramCursor.restore()
-
-        const fieldsSQL = this.getSelectFieldsSQL(select.fields)
-        const joinFieldsSQL = this.partialGeneratorUtils.getJoinSelectFieldsSQL()
         const joinCode = this.partialGeneratorUtils.generateJoinCode()
         const whereCode = this.partialGeneratorUtils.generateWhereCode(select.where)
-        const groupBy = select.groupBy
-        const orderBy = select.orderBy
-        const limit = select.limit
-        let extra = ''
-
-        if (typeof groupBy !== 'undefined' && groupBy !== null) {
-            extra += ` GROUP BY ${groupBy}`
-        }
-        if (typeof orderBy !== 'undefined' && orderBy !== null) {
-            extra += ` ORDER BY ${orderBy}`
-        }
-        if (typeof limit !== 'undefined' && limit !== null) {
-            extra += ` LIMIT ${limit}`
-        }
-        const where = whereCode.sql ? whereCode.sql : ''
-
+        const fields = this.getFields(select)
         const sql = this.assembling({
             tableName: this.quote(this.model.tableName),
             join: joinCode,
-            fields: fieldsSQL + joinFieldsSQL,
-            conditions: where,
-            values: whereCode.sql,
-            extra,
+            fields: fields.fieldsSQL + fields.joinFieldsSQL,
+            conditions: whereCode.sql ? whereCode.sql : '',
+            extra: this.getExtra(select),
         })
 
         this.model.joins = []
@@ -168,22 +197,7 @@ export class Select extends Statement {
         } else {
             query.values = whereCode.values
         }
-
-        const keyArray = String(fieldsSQL.replace(/"|`/g, '') + joinFieldsSQL.replace(/"|`/g, '')).split(', ')
-        const keys: string[] = []
-
-        keyArray.forEach((key) => {
-            let temp = key.split(' AS ')
-
-            if (temp.length === 2) {
-                keys.push(temp[1])
-            } else {
-                temp = key.split('.')
-                keys.push(temp[1])
-            }
-        })
-
-        query.fields = keys
+        query.fields = fields.keys
         return this.query(query)
     }
 }

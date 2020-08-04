@@ -25,8 +25,9 @@
 import { ValidatorUtils } from '../utils/validator'
 import { SqlPartialGeneratorUtils } from '../utils/sqlPartialGenerator'
 import { ORMModel } from '../model'
-import { Engines, Config, Drivers, ORMModelUpdate, ORMModelQuery } from '../interfaces'
+import { Config, ORMModelUpdate, ORMModelQuery, ORMModelRow } from '../interfaces'
 import { Statement } from './statement'
+import { specialFunctions } from '../utils/defaultValues'
 
 /**
  * Model Abstract
@@ -36,7 +37,6 @@ export class Update extends Statement {
     public config: Config = {} // ToDo: move all config to file
     private validatorUtils: ValidatorUtils
     private partialGeneratorUtils: SqlPartialGeneratorUtils
-    private readonly specialFunctions = ['now()']
     protected template = 'UPDATE <orm_table_name> SET <orm_column_names>;'
     protected templateJoin = 'UPDATE <orm_table_name> <orm_join> SET <orm_column_names>;'
     protected templateWhere = 'UPDATE <orm_table_name> SET <orm_column_names> WHERE <orm_conditions>;'
@@ -56,52 +56,55 @@ export class Update extends Statement {
         this.partialGeneratorUtils = new SqlPartialGeneratorUtils(this.model, config, this.paramCursor)
     }
 
-    private processUpdateKeys(update: ORMModelUpdate): any {
+    private processKey({ key, data }: { key: string; data: ORMModelRow }): any {
+        const joinkeys = String(data[key]).split('__')
+        let field = ''
+        let value = ''
+        let valueObj: any = ''
+
+        if (joinkeys.length === 2) {
+            field = `${this.quote(this.model.tableName)}.${this.quote(key)} = ${this.quote(joinkeys[0])}.${this.quote(
+                joinkeys[1],
+            )}`
+        } else if (specialFunctions.indexOf(data[key]) >= 0) {
+            field = `${this.quote(this.model.tableName)}.${this.quote(key)} = ${data[key]}`
+        } else {
+            valueObj = this.validatorUtils.transform({
+                fields: this.model.getFields({ all: true }),
+                key,
+                value: data[key],
+            })
+            value = data[key]
+            field = `${this.quote(this.model.tableName)}.${this.quote(key)} = ${this.strToReplace(key)}`
+        }
+
+        return { field, value, valueObj }
+    }
+
+    private processKeys(update: ORMModelUpdate): any {
         const data = update.data
         const fields: any = []
         const values: any = []
         const valuesObj: any = []
 
         for (const key in data) {
-            const joinkeys = String(data[key]).split('__')
+            const processedKey = this.processKey({ key, data })
+            const field = processedKey.field
+            const value = processedKey.value
+            const valueObj = processedKey.valueObj
 
-            if (joinkeys.length === 2) {
-                fields.push(
-                    `${this.quote(this.model.tableName)}.${this.quote(key)} = ${this.quote(joinkeys[0])}.${this.quote(
-                        joinkeys[1],
-                    )}`,
-                )
-            } else if (this.specialFunctions.indexOf(data[key]) >= 0) {
-                fields.push(`${this.quote(this.model.tableName)}.${this.quote(key)} = ${data[key]}`)
-            } else {
-                valuesObj.push(
-                    this.validatorUtils.transform({
-                        fields: this.model.getFields({ all: true }),
-                        key,
-                        value: data[key],
-                    }),
-                )
-                values.push(data[key])
-
-                if (this.model.config.driver === Drivers.DataAPI) {
-                    fields.push(`${this.quote(this.model.tableName)}.${this.quote(key)} = :${key}`)
-                } else if (this.model.config.engine === Engines.PostgreSQL) {
-                    fields.push(
-                        `${this.quote(this.model.tableName)}.${this.quote(key)} = $${this.paramCursor.getNext()}`,
-                    )
-                } else if (this.model.config.engine === Engines.MySQL) {
-                    fields.push(`${this.quote(this.model.tableName)}.${this.quote(key)} = ?`)
-                } else {
-                    throw new Error('ENGINE NOT SUPPORTED')
-                }
+            if (field) {
+                fields.push(field)
+            }
+            if (value) {
+                values.push(value)
+            }
+            if (valueObj) {
+                valuesObj.push(valueObj)
             }
         }
 
-        return {
-            fields,
-            values,
-            valuesObj,
-        }
+        return { fields, values, valuesObj }
     }
 
     /**
@@ -111,7 +114,6 @@ export class Update extends Statement {
      * @var where Key/Value object used to filter the query, an array of Key/Value objects will generate a multiple filter separated by an "OR".
      * @return Promise with query result
      */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public update(update: ORMModelUpdate): ORMModelQuery {
         this.paramCursor.restore()
 
@@ -119,7 +121,7 @@ export class Update extends Statement {
         const joinCode = this.partialGeneratorUtils.generateJoinCode()
         const where = update.where
 
-        const { fields, values, valuesObj } = this.processUpdateKeys(update)
+        const { fields, values, valuesObj } = this.processKeys(update)
 
         let whereCode
 

@@ -24,7 +24,7 @@
 
 import { ValidatorUtils } from '../utils/validator'
 import { ORMModel } from '../model'
-import { Engines, Config, Drivers, ORMModelRow, ORMModelQuery } from '../interfaces'
+import { Config, ORMModelRow, ORMModelQuery } from '../interfaces'
 import { Statement } from './statement'
 import { regularQuotes } from '../utils/defaultValues'
 
@@ -35,7 +35,6 @@ export class Insert extends Statement {
     private model: ORMModel
     public config: Config = {} // ToDo: move all config to file
     private validatorUtils: ValidatorUtils
-    private readonly specialFunctions = ['now()']
     protected template = 'INSERT INTO <orm_table_name> (<orm_column_names>) VALUES (<orm_value_keys>);'
     protected templateJoin = ''
     protected templateWhere = ''
@@ -54,6 +53,28 @@ export class Insert extends Statement {
         this.validatorUtils = new ValidatorUtils(config)
     }
 
+    public process(data: ORMModelRow): any {
+        const fields: string[] = []
+        const wildcards: string[] = []
+        const values: string[] = []
+        const valuesObj: any = []
+
+        for (const key in data) {
+            const value = typeof data[key] === 'undefined' ? '' : data[key]
+
+            fields.push(key)
+            values.push(value)
+            valuesObj.push(this.validatorUtils.transform({ fields: this.model.getFields({ all: true }), key, value }))
+            wildcards.push(this.strToReplace(key))
+        }
+
+        return {
+            fields,
+            wildcards,
+            values,
+            valuesObj,
+        }
+    }
     /**
      * Insert query
      *
@@ -64,36 +85,14 @@ export class Insert extends Statement {
     public insert(data: ORMModelRow): ORMModelQuery {
         this.paramCursor.restore()
 
-        const fields: string[] = []
-        const wildcards: string[] = []
-        const values: string[] = []
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const valuesObj: any = []
-
-        for (const key in data) {
-            const value = typeof data[key] === 'undefined' ? '' : data[key]
-
-            fields.push(key)
-            values.push(value)
-            valuesObj.push(this.validatorUtils.transform({ fields: this.model.getFields({ all: true }), key, value }))
-
-            if (this.model.config.driver === Drivers.DataAPI) {
-                wildcards.push(`:${key}`)
-            } else if (this.model.config.engine === Engines.PostgreSQL) {
-                wildcards.push(`$${this.paramCursor.getNext()}`)
-            } else if (this.model.config.engine === Engines.MySQL) {
-                wildcards.push('?')
-            } else {
-                throw new Error('ENGINE NOT SUPPORTED')
-            }
-        }
+        const processed = this.process(data)
 
         const query = this.assembling({
             tableName: this.quote(this.model.tableName),
-            fields: regularQuotes + fields.join(`${regularQuotes}, ${regularQuotes}`) + regularQuotes,
-            values: wildcards.join(', '),
+            fields: regularQuotes + processed.fields.join(`${regularQuotes}, ${regularQuotes}`) + regularQuotes,
+            values: processed.wildcards.join(', '),
         })
 
-        return this.query({ sql: query, parameters: valuesObj, values: values })
+        return this.query({ sql: query, parameters: processed.valuesObj, values: processed.values })
     }
 }

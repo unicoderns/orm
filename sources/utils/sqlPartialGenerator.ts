@@ -26,7 +26,7 @@ import { ValidatorUtils } from './validator'
 import { ORMModel } from '../model'
 import { Engines, Config, ORMModelJoin, Drivers } from '../interfaces'
 import { ParamCursor } from './paramCursor'
-import { regularQuotes } from './defaultValues'
+import { regularQuotes, specialFunctions } from '../utils/defaultValues'
 
 /**
  * Model Abstract
@@ -35,7 +35,6 @@ export class SqlPartialGeneratorUtils {
     private model: ORMModel
     private config: Config = {}
     private validatorUtils: ValidatorUtils
-    private readonly specialFunctions = ['now()']
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private emptyValues: any = []
     protected paramCursor: ParamCursor
@@ -136,11 +135,7 @@ export class SqlPartialGeneratorUtils {
 
                 const joinkeys = String(value).split('__')
 
-                if (
-                    String(value).charAt(0) !== '\\' &&
-                    joinkeys.length !== 2 &&
-                    this.specialFunctions.indexOf(value) < 0
-                ) {
+                if (String(value).charAt(0) !== '\\' && joinkeys.length !== 2 && specialFunctions.indexOf(value) < 0) {
                     values.push(
                         this.validatorUtils.transform({ fields: this.model.getFields({ all: true }), key, value }),
                     )
@@ -185,7 +180,7 @@ export class SqlPartialGeneratorUtils {
                     sql = `${sql} ${operator} ${this.quote(joinkeys[0])}.${this.quote(joinkeys[1])}`
                 } else {
                     // special functiom
-                    if (this.specialFunctions.indexOf(where[item]) >= 0) {
+                    if (specialFunctions.indexOf(where[item]) >= 0) {
                         sql = `${sql} ${operator} ${where[item]}`
                     } else {
                         if (this.config.driver === Drivers.DataAPI) {
@@ -235,7 +230,7 @@ export class SqlPartialGeneratorUtils {
                     if (
                         String(where[item]).charAt(0) != '\\' &&
                         joinkeys.length != 2 &&
-                        this.specialFunctions.indexOf(where[item]) < 0
+                        specialFunctions.indexOf(where[item]) < 0
                     ) {
                         values.push(where[item])
                     }
