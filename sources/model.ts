@@ -22,6 +22,8 @@
 // SOFTWARE.                                                                              //
 ////////////////////////////////////////////////////////////////////////////////////////////
 
+/* eslint-disable  no-explicit-any */
+
 import {
     ORMModelJoin,
     ORMModelQuery,
@@ -83,6 +85,7 @@ export class ORMModel {
         return this.fields
     }
 
+
     /**
      * Fill config.
      *
@@ -104,6 +107,8 @@ export class ORMModel {
             },
         }
     }
+
+
     /**
      * Set config.
      *
@@ -151,7 +156,6 @@ export class ORMModel {
      * @var values Values to replace in the query
      * @return Promise with query result
      */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public query(query: ORMModelQuery): Promise<any> {
         const connection = this.config.connection
 
@@ -182,7 +186,6 @@ export class ORMModel {
      * @var values Values to replace in the query
      * @return Promise with query result
      */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public querySelect(query: ORMModelQuery): Promise<any> {
         return this.query(query).then((data: any) => {
             return Promise.resolve(this.selectConsistentReturn(query.fields || [], data))
@@ -198,26 +201,22 @@ export class ORMModel {
     public selectConsistentReturn(keys: string[], data: any): ORMModelSelectReturn {
         const settings = this.config.settings
 
-        if (settings && settings.consistentReturn) {
-            if (this.config.driver === Drivers.DataAPI) {
-                if (data.records && data.records.length) {
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    const cleanData: ORMModelSelectReturn = {
-                        numberOfRecordsUpdated: data.numberOfRecordsUpdated,
-                        records: [],
-                    }
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-
-                    data.records.forEach((row: any, rowIndex: number) => {
-                        cleanData.records[rowIndex] = {}
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        row.forEach((field: any, fieldIndex: number) => {
-                            cleanData.records[rowIndex][keys[fieldIndex]] = Object.values(field)[0]
-                        })
-                    })
-                    return cleanData
-                }
+        if ((settings && settings.consistentReturn) &&
+            (this.config.driver === Drivers.DataAPI) &&
+            (data.records && data.records.length)
+        ){
+            const cleanData: ORMModelSelectReturn = {
+                numberOfRecordsUpdated: data.numberOfRecordsUpdated,
+                records: [],
             }
+
+            data.records.forEach((row: any, rowIndex: number) => {
+                cleanData.records[rowIndex] = {}
+                row.forEach((field: any, fieldIndex: number) => {
+                    cleanData.records[rowIndex][keys[fieldIndex]] = Object.values(field)[0]
+                })
+            })
+            return cleanData
         }
         return data
     }
@@ -278,7 +277,6 @@ export class ORMModel {
      * @var groupBy String with column names E.g.: "id, name"
      * @return Promise with query result
      */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public getAll(select: ORMModelSelect): Promise<any> {
         return this.querySelect(this.selectStatement.select(select))
     }
@@ -311,7 +309,6 @@ export class ORMModel {
      * @var data object to be inserted in the table
      * @return Promise with query result
      */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public insert(data: ORMModelRow): Promise<any> {
         return this.query(this.insertStatement.insert(data))
     }
@@ -323,7 +320,6 @@ export class ORMModel {
      * @var where Key/Value object used to filter the query, an array of Key/Value objects will generate a multiple filter separated by an "OR".
      * @return Promise with query result
      */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public update(update: ORMModelUpdate): Promise<any> {
         return this.query(this.updateStatement.update(update))
     }
