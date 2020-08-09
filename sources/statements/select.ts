@@ -67,27 +67,53 @@ export class Select extends Statement {
         selectableFields: string[]
         prefix: boolean | undefined
     }): string {
-        let fieldsSQL = ''
-
-        if (typeof prefix === 'undefined') {
-            fieldsSQL = `${this.quote(this.model.tableName)}.${regularQuotes}`
-            fieldsSQL =
-                fieldsSQL +
-                selectableFields.join(`${regularQuotes}, ${this.quote(this.model.tableName)}.${regularQuotes}`) +
-                regularQuotes
-        } else {
-            const formatedFields: string[] = []
-
-            selectableFields.forEach((field: string) => {
-                const joined = `${this.model.tableName}__${field}`
-
-                formatedFields.push(`${this.quote(this.model.tableName)}.${this.quote(field)} AS ${this.quote(joined)}`)
-            })
-            fieldsSQL = formatedFields.join(', ')
-        }
+        let fieldsSQL = (typeof prefix === 'undefined')?
+                    this.generateSelectSQLwithoutPrefix(selectableFields):
+                    this.generateSelectSQLwithPrefix(selectableFields, prefix);
 
         return fieldsSQL
     }
+
+    /**
+     * Generate select sql string without Prefix
+     *
+     * @var fields String array with field names.
+     * @return Object cointaining the SQL and a field report
+     */
+    private generateSelectSQLwithoutPrefix(
+        selectableFields: string[]
+    ): string {
+
+        return `${this.quote(this.model.tableName)}.${regularQuotes}` +
+            selectableFields.join(`${regularQuotes}, ${this.quote(this.model.tableName)}.${regularQuotes}`) +
+            regularQuotes
+    }
+
+
+    
+    /**
+     * Generate select sql string with Prefix
+     *
+     * @var fields String array with field names.
+     * @return Object cointaining the SQL and a field report
+     */
+    private generateSelectSQLwithPrefix(
+        selectableFields: string[],
+        prefix: boolean | undefined
+    ): string{
+
+        const formatedFields: string[] = []
+
+        selectableFields.forEach((field: string) => {
+            const joined = `${this.model.tableName}__${field}`
+
+            formatedFields.push(`${this.quote(this.model.tableName)}.${this.quote(field)} AS ${this.quote(joined)}`)
+        })
+
+        return formatedFields.join(', ')
+    }
+
+
 
     /**
      * Clean and validate a select if is need it
