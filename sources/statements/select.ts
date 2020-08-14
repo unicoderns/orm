@@ -69,7 +69,7 @@ export class Select extends Statement {
     }): string {
         let fieldsSQL = (typeof prefix === 'undefined')?
                     this.generateSelectSQLwithoutPrefix(selectableFields):
-                    this.generateSelectSQLwithPrefix(selectableFields, prefix);
+                    this.generateSelectSQLwithPrefix(selectableFields, prefix)
 
         return fieldsSQL
     }
