@@ -144,7 +144,7 @@ usersTable
 
 `limit` Number of rows to retrieve
 
-## Get All
+### Get All
 
 When you use this function you will get all matching rows, based on the filter you pass
 
@@ -169,7 +169,7 @@ Query executed:
 SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`first_name`, `users`.`last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE `users`.`id` = 3;
 ```
 
-### Params
+#### Params
 
 `fields`
 
