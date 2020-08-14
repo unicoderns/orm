@@ -7,7 +7,7 @@ These are the available functions to query
 - [Update](#update)
 - [Delete](#delete)
 - [Operators](#operators)
-- [Joins](#joins)
+- [Joins](#join)
 - [Special Values](#special-values)
 - [Advanced queries](#advanced)
 
@@ -573,7 +573,7 @@ DELETE FROM `usersTwo` INNER JOIN `users` ON `usersTwo`.`user` = `users`.`id` WH
 
 `type` Type of Join to apply E.g.: INNER, LEFT.
 
-### 7. Special values
+### Special values
 
 Supported out the box SQL functions as where and set values.
 
