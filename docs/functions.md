@@ -1,21 +1,10 @@
 # Functions
 
-These are the available functions to query
+Queries Available
 
-- [Select](#select)
-- [Insert](#insert)
-- [Update](#update)
-- [Delete](#delete)
-- [Operators](#operators)
-- [Joins](#join)
-- [Special Values](#special-values)
-- [Advanced queries](#advanced)
+## Select
 
-## Queries Available
-
-### Select
-
-#### Get
+### Get
 
 When you use this funtion you will get 1 matching row
 
@@ -36,7 +25,7 @@ Query executed:
 SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`first_name`, `users`.`last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` LIMIT 1;
 ```
 
-##### Params
+#### Params
 
 `fields`
 
@@ -80,7 +69,7 @@ usersTable
 
 `groupBy` String with column names E.g.: "id, name"
 
-#### Get Some
+### Get Some
 
 Whe you use this function you will get a limited number of matching rows. This happens beacuse you should pass the limit of rows you need.
 
@@ -103,7 +92,7 @@ Query executed:
 SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`first_name`, `users`.`last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` LIMIT 3;
 ```
 
-##### Params
+#### Params
 
 `fields`
 
@@ -155,7 +144,7 @@ usersTable
 
 `limit` Number of rows to retrieve
 
-### Get All
+## Get All
 
 When you use this function you will get all matching rows, based on the filter you pass
 
@@ -180,7 +169,7 @@ Query executed:
 SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`first_name`, `users`.`last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE `users`.`id` = 3;
 ```
 
-#### Params
+### Params
 
 `fields`
 
@@ -228,7 +217,7 @@ usersTable
 
 `groupBy` String with column names E.g.: "id, name"
 
-### Insert
+## Insert
 
 This function will let you insert information into the database
 
@@ -251,11 +240,11 @@ Query executed:
 INSERT INTO `users` (`firstName`) VALUES (?);
 ```
 
-#### Params
+### Params
 
 Expecting object to be inserted into the table
 
-### Update
+## Update
 
 ```typescript
 usersTable
@@ -279,7 +268,7 @@ Query executed:
 UPDATE `users` SET `firstName` = 'Chriss' WHERE `users`.`id` = 3;
 ```
 
-#### Params
+### Params
 
 `data` object data to be update in the table.
 
@@ -291,7 +280,7 @@ UPDATE `users` SET `firstName` = 'Chriss' WHERE `users`.`id` = 3;
 - Array of [Key/Operator/Value](#operators) objects will generate a multiple filters separated by an "OR".
 - Mixed Array of Key/Value and Key/Operator/Value objects will generate a multiple filters separated by an "OR".
 
-### Delete
+## Delete
 
 This function will let you delete information from the database
 
@@ -314,7 +303,7 @@ Query executed:
 DELETE FROM `users` WHERE `users`.`id` = 1;
 ```
 
-#### Params
+### Params
 
 Expecting:
 
@@ -324,7 +313,7 @@ Expecting:
 - Array of [Key/Operator/Value](#operators) objects will generate a multiple filters separated by an "OR".
 - Mixed Array of Key/Value and Key/Operator/Value objects will generate a multiple filters separated by an "OR".
 
-#### Other examples
+### Other examples
 
 ```typescript
 usersTable
@@ -354,7 +343,7 @@ usersTable
   })
 ```
 
-### Operators
+## Operators
 
 You can change your where condition operator from the default `=` to any operator that you want, as `!=` or `<` following this format:
 
@@ -386,14 +375,14 @@ Query executed:
 SELECT `users`.`id`, `users`.`created`, `users`.`username`, `users`.`email`, `users`.`firstName` AS `first_name`, `users`.`lastName` AS `last_name`, `users`.`admin`, `users`.`verified`, `users`.`active` FROM `users` WHERE (`users`.`id` = ?) OR (`users`.`created` >= now());
 ```
 
-### Join
+## Join
 
 Please notice:
 
 - Fields from the joined table will not be validated (coming soon).
 - You can't assign 1 column value to a joined column value yet (coming soon).
 
-#### GetAll
+### GetAll
 
 ```typescript
 sessionsTable
@@ -423,7 +412,7 @@ Query executed:
 SELECT `sessions`.`id`, `sessions`.`created`, `sessions`.`ip`, `sessions`.`user`, `users`.`username` AS `users__username`, `users`.`email` AS `users__email`, `users`.`firstName` AS `users__firstName`, `users`.`lastName` AS `users__lastName` FROM `sessions` LEFT JOIN `users` ON `sessions`.`user` = `users`.`id` WHERE `users`.`id` = 3;
 ```
 
-##### Params
+#### Params
 
 `keyField` Model foreign key.
 
@@ -431,7 +420,7 @@ SELECT `sessions`.`id`, `sessions`.`created`, `sessions`.`ip`, `sessions`.`user`
 
 `type` Type of Join to apply E.g.: INNER, LEFT.
 
-#### Update
+### Update
 
 ```typescript
 sessionsTable
@@ -463,13 +452,13 @@ Query executed:
 UPDATE `sessions` INNER JOIN `users` ON `sessions`.`user` = `users`.`id` SET `ip` = '121.0.0.1' WHERE `users`.`id` = 3;
 ```
 
-##### Params
+#### Params
 
 `keyField` Model foreign key.
 
 `type` Type of Join to apply E.g.: INNER, LEFT.
 
-#### Update with columns as reference
+### Update with columns as reference
 
 ```typescript
 sessionsTable
@@ -500,13 +489,13 @@ Query executed:
 UPDATE `usersTwo` INNER JOIN `users` ON `usersTwo`.`user` = `users`.`id` SET `usersTwo`.`username` = `users`.`username`;
 ```
 
-##### Params
+#### Params
 
 `keyField` Model foreign key.
 
 `type` Type of Join to apply E.g.: INNER, LEFT.
 
-#### Delete
+### Delete
 
 ```typescript
 sessionsTable
@@ -533,13 +522,13 @@ Query executed:
 DELETE FROM `sessions` INNER JOIN `users` ON `sessions`.`user` = `users`.`id` WHERE `users`.`id` = 3;
 ```
 
-##### Params
+#### Params
 
 `keyField` Model foreign key.
 
 `type` Type of Join to apply E.g.: INNER, LEFT.
 
-#### Delete on joined condition
+### Delete on joined condition
 
 ```typescript
 sessionsTable
@@ -567,21 +556,21 @@ Query executed:
 DELETE FROM `usersTwo` INNER JOIN `users` ON `usersTwo`.`user` = `users`.`id` WHERE `usersTwo`.`username` = `users`.`username`;
 ```
 
-##### Params
+#### Params
 
 `keyField` Model foreign key.
 
 `type` Type of Join to apply E.g.: INNER, LEFT.
 
-### Special values
+## Special values
 
 Supported out the box SQL functions as where and set values.
 
 - `now()` Insert a SQL now() function.
 
-### Advanced
+## Advanced
 
-#### Literal strings
+### Literal strings
 
 You can send an unprepared strings as values in Wheres adding a double `\\` at the start of the value:
 
