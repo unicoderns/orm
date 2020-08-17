@@ -124,23 +124,8 @@ export class SqlPartialGeneratorUtils {
         for (const key in where) {
             keys.push(key)
 
-            if (this.config.driver === Drivers.DataAPI) {
-                let value
-
-                if (typeof where[key].value === 'undefined') {
-                    value = where[key]
-                } else {
-                    value = where[key].value
-                }
-
-                const joinkeys = String(value).split('__')
-
-                if (String(value).charAt(0) !== '\\' && joinkeys.length !== 2 && specialFunctions.indexOf(value) < 0) {
-                    values.push(
-                        this.validatorUtils.transform({ fields: this.model.getFields({ all: true }), key, value }),
-                    )
-                }
-            }
+            if (this.config.driver === Drivers.DataAPI)
+                this.addValueOfWhereKeys(where, key, values)
         }
 
         return {
@@ -149,9 +134,21 @@ export class SqlPartialGeneratorUtils {
         }
     }
 
+    private addValueOfWhereKeys(where: any, key: string, valuesResult: any){
+        let value = (typeof where[key].value === 'undefined')?
+                    where[key]:
+                    where[key].value
+
+        const joinkeys = String(value).split('__')
+
+        if (String(value).charAt(0) !== '\\' && joinkeys.length !== 2 && specialFunctions.indexOf(value) < 0)
+            valuesResult.push(
+                this.validatorUtils.transform({ fields: this.model.getFields({ all: true }), key, value })
+            )
+    }
+    
     private processKeys(where: any): string {
-        const filtered = this.filterWhereKeys(where)
-        const filteredKeys: string[] = filtered.keys
+        const filteredKeys: string[] = this.filterWhereKeys(where).keys
         let sql = ''
 
         filteredKeys.forEach((item: string, index: number, array: string[]) => {
@@ -161,46 +158,65 @@ export class SqlPartialGeneratorUtils {
                 operator = where[item].operator
                 where[item] = where[item].value
             }
-            if (String(where[item]).charAt(0) == '\\') {
-                sql = `${sql + this.quote(this.model.tableName)}.${this.quote(item)} ${operator} ${String(
-                    where[item],
-                ).substring(1)}`
-            } else {
-                let joinkeys = item.split('__')
-                // string literal
 
-                if (joinkeys.length === 2) {
-                    sql = `${sql + this.quote(joinkeys[0])}.${this.quote(joinkeys[1])}`
-                } else {
-                    sql = `${sql + this.quote(this.model.tableName)}.${this.quote(item)}`
-                }
-                joinkeys = String(where[item]).split('__')
-                // joined column
-                if (joinkeys.length == 2) {
-                    sql = `${sql} ${operator} ${this.quote(joinkeys[0])}.${this.quote(joinkeys[1])}`
-                } else {
-                    // special functiom
-                    if (specialFunctions.indexOf(where[item]) >= 0) {
-                        sql = `${sql} ${operator} ${where[item]}`
-                    } else {
-                        if (this.config.driver === Drivers.DataAPI) {
-                            sql = `${sql} ${operator} :${item}`
-                        } else if (this.config.engine === Engines.PostgreSQL) {
-                            sql = `${sql} ${operator} $${this.paramCursor.getNext()}`
-                        } else if (this.config.engine === Engines.MySQL) {
-                            sql = `${sql} ${operator} ?`
-                        } else {
-                            throw new Error('ENGINE NOT SUPPORTED')
-                        }
-                    }
-                }
+            if (String(where[item]).charAt(0) == '\\') {
+                sql = this.processKeysLiterals(sql, item, where, operator)
+            } else {
+                sql = this.processKeysNonliterals(sql, item, where, operator)
             }
-            if (index < array.length - 1) {
+
+            if (index < array.length - 1)
                 sql = `${sql} AND `
-            }
         })
 
         return sql
+    }
+
+    private processKeysLiterals(sql: string, item: string, where: any, operator: string): string{
+        return `${sql + this.quote(this.model.tableName)}.${this.quote(item)} ${operator} ${String(
+            where[item],
+        ).substring(1)}`
+    }
+
+    private processKeysNonliterals(sql: string, item: string, where: any, operator: string): string{
+        let joinkeys = item.split('__')
+
+        if (joinkeys.length === 2) {
+            sql = `${sql + this.quote(joinkeys[0])}.${this.quote(joinkeys[1])}`
+        } else {
+            sql = `${sql + this.quote(this.model.tableName)}.${this.quote(item)}`
+        }
+
+        sql = this.processKeysWithJoinedColum(sql, item, where, operator)
+        return sql
+    }
+
+    private processKeysWithJoinedColum(sql: string, item: string, where: any, operator: string): string{
+        let joinkeys = String(where[item]).split('__')
+        // joined column
+        if (joinkeys.length == 2) {
+            sql = `${sql} ${operator} ${this.quote(joinkeys[0])}.${this.quote(joinkeys[1])}`
+        } else {
+            // special function
+            if (specialFunctions.indexOf(where[item]) >= 0) {
+                sql = `${sql} ${operator} ${where[item]}`
+            } else {
+                sql = this.processKeysWithSpecialFunction(sql, operator, item)
+            }
+        }
+        return sql
+    }
+
+    private processKeysWithSpecialFunction(sql: string, operator: string, item: string): string {
+        if (this.config.driver === Drivers.DataAPI) {
+            return `${sql} ${operator} :${item}`
+        } else if (this.config.engine === Engines.PostgreSQL) {
+            return `${sql} ${operator} $${this.paramCursor.getNext()}`
+        } else if (this.config.engine === Engines.MySQL) {
+            return `${sql} ${operator} ?`
+        } else {
+            throw new Error('ENGINE NOT SUPPORTED')
+        }
     }
 
     /////////////////////////////////////////////////////////////////////
@@ -210,8 +226,6 @@ export class SqlPartialGeneratorUtils {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public generateWhereCodeChain(where: any): { sql: string; values: string[] } {
         const filtered = this.filterWhereKeys(where)
-        const values: string[] = []
-        const filteredKeys: string[] = filtered.keys
         const valuesObj = filtered.values
 
         if (typeof where !== 'undefined') {
@@ -223,21 +237,9 @@ export class SqlPartialGeneratorUtils {
                     values: valuesObj,
                 }
             } else {
-                // getting values
-                filteredKeys.forEach((item: string) => {
-                    const joinkeys = String(where[item]).split('__')
-
-                    if (
-                        String(where[item]).charAt(0) != '\\' &&
-                        joinkeys.length != 2 &&
-                        specialFunctions.indexOf(where[item]) < 0
-                    ) {
-                        values.push(where[item])
-                    }
-                })
                 return {
                     sql: sql,
-                    values: values,
+                    values: this.getValuesOfWhere(filtered.keys, where),
                 }
             }
         } else {
@@ -246,6 +248,22 @@ export class SqlPartialGeneratorUtils {
                 values: this.emptyValues,
             }
         }
+    }
+
+    private getValuesOfWhere(filteredKeys: string[], where: any): string[]{
+        const values: string[] = []
+        filteredKeys.forEach((item: string) => {
+            const joinkeys = String(where[item]).split('__')
+
+            if (
+                String(where[item]).charAt(0) != '\\' &&
+                joinkeys.length != 2 &&
+                specialFunctions.indexOf(where[item]) < 0
+            ) {
+                values.push(where[item])
+            }
+        })
+        return values
     }
 
     /**
@@ -270,30 +288,36 @@ export class SqlPartialGeneratorUtils {
             }
 
             if (Array.isArray(where)) {
-                let values: string[] = []
-                const SQLChains: string[] = []
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                let valuesObj: any = []
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-
-                where.forEach((chain: any) => {
-                    const localChain = this.generateWhereCodeChain(chain)
-
-                    valuesObj = valuesObj.concat(localChain.values)
-                    values = values.concat(localChain.values)
-                    SQLChains.push(localChain.sql)
-                })
-                generated.sql = `(${SQLChains.join(') OR (')})`
-                if (this.config.driver === Drivers.DataAPI) {
-                    generated.values = valuesObj
-                } else {
-                    generated.values = values
-                }
+                generated = this.generateWhereCodeWithWhereLikeArray(where, generated)
             } else {
                 generated = this.generateWhereCodeChain(where)
             }
 
             return generated
         }
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    private generateWhereCodeWithWhereLikeArray(where: any, generated: { sql: string; values: string[] }):
+    { sql: string; values: string[] }{
+
+        let values: string[] = []
+        const SQLChains: string[] = []
+        let valuesObj: any = []
+
+        where.forEach((chain: any) => {
+            const localChain = this.generateWhereCodeChain(chain)
+
+            valuesObj = valuesObj.concat(localChain.values)
+            values = values.concat(localChain.values)
+            SQLChains.push(localChain.sql)
+        })
+        generated.sql = `(${SQLChains.join(') OR (')})`
+        if (this.config.driver === Drivers.DataAPI) {
+            generated.values = valuesObj
+        } else {
+            generated.values = values
+        }
+        return generated
     }
 }
