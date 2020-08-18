@@ -25,7 +25,7 @@
 import { ValidatorUtils } from '../utils/validator'
 import { SqlPartialGeneratorUtils } from '../utils/sqlPartialGenerator'
 import { ORMModel } from '../model'
-import { Config, ORMModelUpdate, ORMModelQuery, ORMModelRow } from '../interfaces'
+import { Config, ORMModelUpdate, ORMModelQuery, ORMModelRow, ORMModelKeyValue } from '../interfaces'
 import { Statement } from './statement'
 import { specialFunctions } from '../utils/defaultValues'
 
@@ -120,16 +120,8 @@ export class Update extends Statement {
         let unifiedValues = []
         const joinCode = this.partialGeneratorUtils.generateJoinCode()
         const where = update.where
-
         const { fields, values, valuesObj } = this.processKeys(update)
-
-        let whereCode
-
-        if (typeof where === 'undefined' || (!Array.isArray(where) && !Object.keys(where).length)) {
-            throw new Error('Invalid where value.')
-        } else {
-            whereCode = this.partialGeneratorUtils.generateWhereCode(where)
-        }
+        let whereCode = this.validateWhereValue(where)
 
         const query = this.assembling({
             tableName: this.quote(this.model.tableName),
@@ -140,5 +132,12 @@ export class Update extends Statement {
 
         unifiedValues = values.concat(whereCode.values)
         return this.query({ sql: query, parameters: valuesObj.concat(whereCode.values), values: unifiedValues })
+    }
+
+    private validateWhereValue(where: string | ORMModelKeyValue | ORMModelKeyValue[]): { sql: string; values: string[] }{
+        if (typeof where === 'undefined' || (!Array.isArray(where) && !Object.keys(where).length)) 
+            throw new Error('Invalid where value.')
+
+        return this.partialGeneratorUtils.generateWhereCode(where)
     }
 }

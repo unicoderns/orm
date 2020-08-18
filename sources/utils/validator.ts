@@ -31,6 +31,26 @@ import { ORMSupportedFields, ORMAllowedFields } from '../enums/db/fields'
 export class ValidatorUtils {
     private config: Config = {} // ToDo: move all config to file
 
+    private longType: ORMSupportedFields[] = [
+        ORMSupportedFields.INT,
+        ORMSupportedFields.TINYINT,
+        ORMSupportedFields.SMALLINT,
+        ORMSupportedFields.BIGINT
+    ]
+
+    private doubleType: ORMSupportedFields[] = [
+        ORMSupportedFields.FLOAT,
+        ORMSupportedFields.REAL,
+        ORMSupportedFields.DOUBLE
+    ]
+
+    private blobType: ORMSupportedFields[] = [
+        ORMSupportedFields.BLOB,
+        ORMSupportedFields.LONGVARBINARY,
+        ORMSupportedFields.VARBINARY
+    ]
+
+
     /**
      * Set model
      *
@@ -66,49 +86,41 @@ export class ValidatorUtils {
 
         if (fields[key]) {
             const type = fields[key].type
+            return this.transformType(key, value, type)
+        }
+        throw new Error(`Type transformation for: ${key}.`)
+    }
 
-            if (type === ORMSupportedFields.BOOL) {
-                return {
-                    name: key,
-                    value: { booleanValue: value },
-                }
-            } else if (
-                type === ORMSupportedFields.INT ||
-                type === ORMSupportedFields.TINYINT ||
-                type === ORMSupportedFields.SMALLINT ||
-                type === ORMSupportedFields.BIGINT
-            ) {
-                return {
-                    name: key,
-                    value: { longValue: value },
-                }
-            } else if (
-                type === ORMSupportedFields.FLOAT ||
-                type === ORMSupportedFields.REAL ||
-                type === ORMSupportedFields.DOUBLE
-            ) {
-                return {
-                    name: key,
-                    value: { doubleValue: value },
-                }
-            } else if (
-                type === ORMSupportedFields.BLOB ||
-                type === ORMSupportedFields.BINARY ||
-                type === ORMSupportedFields.LONGVARBINARY ||
-                type === ORMSupportedFields.VARBINARY
-            ) {
-                return {
-                    name: key,
-                    value: { blobValue: value },
-                }
-            }
-            // ORMSupportedFields.DECIMAL, Clob?, Date, Hour
+
+    private transformType(key: string, value: string | number, type?: ORMSupportedFields):
+        { name: string; value: { [key: string]: string | number } } | string{
+
+        if(typeof type !== 'undefined')
+        if (type === ORMSupportedFields.BOOL) {
             return {
                 name: key,
-                value: { stringValue: value },
+                value: { booleanValue: value },
+            }
+        } else if (type in this.longType) {
+            return {
+                name: key,
+                value: { longValue: value },
+            }
+        } else if (value in this.doubleType) {
+            return {
+                name: key,
+                value: { doubleValue: value },
+            }
+        } else if (type in this.blobType) {
+            return {
+                name: key,
+                value: { blobValue: value },
             }
         }
-
-        throw new Error(`Type transformation for: ${key}.`)
+        // ORMSupportedFields.DECIMAL, Clob?, Date, Hour
+        return {
+            name: key,
+            value: { stringValue: value },
+        }
     }
 }
