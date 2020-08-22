@@ -4,7 +4,9 @@
 
 ### Unicoderns Object/Relational Mapping
 
-[![npm version](https://badge.fury.io/js/%40unicoderns%2Form.svg)](https://badge.fury.io/js/%40unicoderns%2Form)[![Travis](https://travis-ci.org/unicoderns/ORM.svg?branch=master)](https://travis-ci.org/unicoderns/ORM)
+[![npm version](https://badge.fury.io/js/%40unicoderns%2Form.svg)](https://badge.fury.io/js/%40unicoderns%2Form)
+[![Travis](https://travis-ci.org/unicoderns/ORM.svg?branch=master)](https://travis-ci.org/unicoderns/ORM)
+[![CodeBuild](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiK1ZvdHN1NlcwSlJHNVZXQURHbjVMNHpETGxkZ1Y1aE8xUGNzZ0RRVU1DREZyY1IrY292M1F2eTNPRXJidlhxNlhjSDZROGJqdU1nSEQ0cHZFSDVEUEVZPSIsIml2UGFyYW1ldGVyU3BlYyI6IldlZkFhcWlLMWMxeFc0VE0iLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master)](https://unicoderns.com)
 [![Coverage Status](https://coveralls.io/repos/github/unicoderns/orm/badge.svg?branch=master)](https://coveralls.io/github/unicoderns/orm?branch=master)
 [![Maintainability](https://api.codeclimate.com/v1/badges/ee1d8dc169ecc3800527/maintainability)](https://codeclimate.com/github/unicoderns/orm/maintainability)
 [![Known Vulnerabilities](https://snyk.io/test/github/unicoderns/orm/badge.svg?targetFile=package.json)](https://snyk.io/test/github/unicoderns/orm?targetFile=package.json)
